@@ -1,0 +1,3515 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Practicador de vocabulario inglés-español con categorías de dificultad, errores, repaso y estadísticas.">
+<meta name="theme-color" content="#4f46e5">
+<title>Practicador de Vocabulario</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  :root {
+    color-scheme: light;
+    --bg: #edf2ff;
+    --surface: rgba(255,255,255,.82);
+    --surface-solid: #ffffff;
+    --surface-2: rgba(255,255,255,.66);
+    --surface-3: rgba(235,241,255,.82);
+    --text: #11162a;
+    --text-2: #343b55;
+    --muted: #737b95;
+    --border: rgba(120,132,170,.22);
+    --border-2: rgba(100,112,155,.34);
+    --primary: #6858ff;
+    --primary-2: #8f6bff;
+    --primary-soft: #ede9ff;
+    --on-primary: #fff;
+    --success: #10b981;
+    --success-soft: #dcfbef;
+    --danger: #f43f70;
+    --danger-soft: #ffe5ed;
+    --warn: #f59e0b;
+    --warn-soft: #fff1d8;
+    --purple: #a855f7;
+    --purple-soft: #f3e6ff;
+    --ring: 0 0 0 4px rgba(104,88,255,.16);
+    --shadow-sm: 0 8px 20px rgba(49,58,104,.10);
+    --shadow-md: 0 18px 48px rgba(52,63,123,.16);
+    --shadow-lg: 0 30px 90px rgba(33,41,87,.25);
+    --r-lg: 28px;
+    --r-md: 20px;
+    --r-sm: 14px;
+  }
+
+  [data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #070a18;
+    --surface: rgba(17,22,44,.82);
+    --surface-solid: #11162c;
+    --surface-2: rgba(20,27,54,.76);
+    --surface-3: rgba(30,38,72,.9);
+    --text: #f1f4ff;
+    --text-2: #c7cdea;
+    --muted: #8d97ba;
+    --border: rgba(139,151,194,.18);
+    --border-2: rgba(155,166,213,.31);
+    --primary: #9185ff;
+    --primary-2: #b08dff;
+    --primary-soft: rgba(113,94,255,.17);
+    --on-primary: #0c0921;
+    --success: #39e0a6;
+    --success-soft: rgba(32,191,139,.14);
+    --danger: #ff6f97;
+    --danger-soft: rgba(244,63,112,.14);
+    --warn: #ffc857;
+    --warn-soft: rgba(245,158,11,.14);
+    --purple: #cf8cff;
+    --purple-soft: rgba(168,85,247,.15);
+    --ring: 0 0 0 4px rgba(145,133,255,.22);
+    --shadow-sm: 0 10px 28px rgba(0,0,0,.28);
+    --shadow-md: 0 20px 55px rgba(0,0,0,.44);
+    --shadow-lg: 0 34px 110px rgba(0,0,0,.62);
+  }
+
+  html, body { height: 100%; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    background:
+      radial-gradient(circle at 12% 8%, rgba(139,92,246,.20), transparent 28%),
+      radial-gradient(circle at 88% 10%, rgba(59,130,246,.16), transparent 27%),
+      radial-gradient(circle at 70% 88%, rgba(16,185,129,.10), transparent 22%),
+      linear-gradient(135deg, #f5f7ff 0%, var(--bg) 48%, #eaf0ff 100%);
+    transition: background .35s ease, color .35s ease;
+    position: relative;
+  }
+
+  [data-theme="dark"] body {
+    background:
+      radial-gradient(circle at 12% 8%, rgba(124,58,237,.22), transparent 28%),
+      radial-gradient(circle at 88% 10%, rgba(37,99,235,.18), transparent 26%),
+      radial-gradient(circle at 74% 82%, rgba(6,182,212,.10), transparent 22%),
+      linear-gradient(135deg, #050713 0%, #090d1c 48%, #080b19 100%);
+  }
+
+  body::before,
+  body::after {
+    content: "";
+    position: fixed;
+    width: 34vw;
+    height: 34vw;
+    min-width: 220px;
+    min-height: 220px;
+    border-radius: 50%;
+    filter: blur(42px);
+    opacity: .26;
+    pointer-events: none;
+    z-index: -1;
+    animation: floatOrb 15s ease-in-out infinite alternate;
+  }
+
+  body::before {
+    top: -12vw;
+    left: -10vw;
+    background: linear-gradient(135deg, #7c3aed, #60a5fa);
+  }
+
+  body::after {
+    right: -12vw;
+    bottom: -14vw;
+    background: linear-gradient(135deg, #06b6d4, #a855f7);
+    animation-delay: -6s;
+  }
+
+  body.no-scroll { overflow: hidden; }
+
+  button, input, select, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; border: 0; background: none; }
+  kbd {
+    font: inherit; font-size: .68rem; font-weight: 800;
+    padding: 2px 6px; border-radius: 7px;
+    background: rgba(127,127,127,.14);
+    border: 1px solid var(--border);
+    box-shadow: inset 0 -1px 0 rgba(0,0,0,.08);
+  }
+
+  .app {
+    width: min(1080px, calc(100% - 28px));
+    min-height: min(900px, calc(100vh - 28px));
+    margin: 14px auto;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    backdrop-filter: blur(26px) saturate(145%);
+    -webkit-backdrop-filter: blur(26px) saturate(145%);
+    animation: appEnter .7s cubic-bezier(.16,1,.3,1);
+    position: relative;
+  }
+
+  .app::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+    background-size: 26px 26px;
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,.32), transparent 40%);
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 22px;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 8% 10%, rgba(255,255,255,.28), transparent 24%),
+      radial-gradient(circle at 84% 10%, rgba(255,255,255,.16), transparent 22%),
+      linear-gradient(115deg, #4c35c9 0%, #6958ff 43%, #7c57e8 72%, #2f7eea 120%);
+  }
+
+  [data-theme="dark"] .topbar {
+    background:
+      radial-gradient(circle at 10% 20%, rgba(169,157,255,.18), transparent 24%),
+      radial-gradient(circle at 90% 10%, rgba(82,148,255,.16), transparent 24%),
+      linear-gradient(115deg, #1b1646 0%, #2d276f 45%, #3c2870 72%, #123b65 120%);
+  }
+
+  .topbar::after {
+    content: "";
+    position: absolute;
+    width: 260px;
+    height: 260px;
+    right: -70px;
+    top: -160px;
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 50%;
+    box-shadow: 0 0 0 24px rgba(255,255,255,.03), 0 0 0 48px rgba(255,255,255,.02);
+    animation: spinSlow 18s linear infinite;
+  }
+
+  .brand { display: flex; align-items: center; gap: 13px; min-width: 0; position: relative; z-index: 1; }
+  .brand-mark {
+    flex: 0 0 auto;
+    width: 48px; height: 48px;
+    display: grid; place-items: center;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(255,255,255,.26), rgba(255,255,255,.08));
+    border: 1px solid rgba(255,255,255,.28);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.24), 0 12px 30px rgba(18,16,58,.18);
+    font-weight: 950; font-size: 1.18rem;
+    letter-spacing: -.03em;
+    transform: rotate(-4deg);
+    animation: logoBob 4s ease-in-out infinite;
+  }
+  .brand h1 { margin: 0; font-size: 1.35rem; line-height: 1.2; letter-spacing: -.025em; }
+  .brand p  { margin: 4px 0 0; font-size: .84rem; color: rgba(245,247,255,.78); }
+
+  .topbar-actions { display: flex; align-items: center; gap: 10px; flex: 0 0 auto; position: relative; z-index: 1; }
+
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.13);
+    border: 1px solid rgba(255,255,255,.18);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
+    font-size: .76rem; font-weight: 850;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .pill.on-surface {
+    background: var(--surface-3);
+    border-color: var(--border);
+    color: var(--muted);
+  }
+
+  .icon-btn {
+    width: 40px; height: 40px;
+    display: grid; place-items: center;
+    border-radius: 13px;
+    background: rgba(255,255,255,.13);
+    border: 1px solid rgba(255,255,255,.18);
+    color: #fff;
+    transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
+  }
+  .icon-btn:hover { background: rgba(255,255,255,.24); transform: translateY(-2px) rotate(2deg); box-shadow: 0 8px 20px rgba(0,0,0,.15); }
+  .icon-btn:active { transform: scale(.93); }
+  .icon-btn.plain {
+    background: transparent; border-color: transparent;
+    color: var(--muted); font-size: .95rem;
+  }
+  .icon-btn.plain:hover { background: var(--surface-3); color: var(--danger); }
+  .icon-btn svg { display: block; }
+  .icon-sun { display: none; }
+  [data-theme="dark"] .icon-moon { display: none; }
+  [data-theme="dark"] .icon-sun  { display: block; }
+
+  main { flex: 1; overflow: auto; padding: 28px; scroll-behavior: smooth; position: relative; z-index: 1; }
+
+  .view { display: none; }
+  .view.is-active { display: block; animation: viewIn .5s cubic-bezier(.16,1,.3,1); }
+
+  .stack { display: grid; gap: 16px; }
+
+  .card {
+    padding: 21px;
+    background: linear-gradient(145deg, var(--surface-2), rgba(255,255,255,.28));
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    box-shadow: 0 8px 28px rgba(47,57,101,.06);
+    position: relative;
+    overflow: hidden;
+    transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+  }
+
+  .card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, rgba(255,255,255,.13), transparent 28%, transparent 70%, rgba(125,100,255,.06));
+    pointer-events: none;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-2);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .card-head {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 14px; margin-bottom: 14px;
+  }
+  .card-title {
+    display: flex; align-items: center; gap: 9px;
+    margin: 0 0 12px;
+    font-size: .98rem; font-weight: 850; letter-spacing: -.015em;
+  }
+  .card-head .card-title { margin-bottom: 4px; }
+  .step {
+    flex: 0 0 auto;
+    width: 26px; height: 26px;
+    display: grid; place-items: center;
+    border-radius: 9px;
+    color: #fff;
+    background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    font-size: .72rem; font-weight: 950;
+    box-shadow: 0 8px 18px rgba(104,88,255,.25);
+  }
+
+  .label {
+    display: block; margin-bottom: 8px;
+    color: var(--muted);
+    font-size: .75rem; font-weight: 850;
+    text-transform: uppercase; letter-spacing: .07em;
+  }
+
+  select, .input {
+    width: 100%;
+    padding: 13px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    background: var(--surface-solid);
+    color: var(--text);
+    outline: none;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.4);
+    transition: border-color .18s, box-shadow .18s, transform .18s;
+  }
+  select:hover, .input:hover { border-color: var(--border-2); }
+  select:focus, .input:focus {
+    border-color: var(--primary);
+    box-shadow: var(--ring), 0 12px 28px rgba(104,88,255,.08);
+    transform: translateY(-1px);
+  }
+
+  .hint-text {
+    margin: 10px 0 0;
+    color: var(--muted);
+    font-size: .82rem;
+    line-height: 1.5;
+  }
+
+  .segmented {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 5px;
+    background: rgba(127,127,127,.06);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+  }
+  .segmented label { position: relative; }
+  .segmented input { position: absolute; opacity: 0; pointer-events: none; }
+  .segmented span {
+    display: block;
+    padding: 12px 8px;
+    text-align: center;
+    border-radius: 12px;
+    font-size: .84rem; font-weight: 800;
+    color: var(--muted);
+    transition: transform .18s ease, background .18s ease, color .18s ease, box-shadow .18s ease;
+  }
+  .segmented label:hover span { transform: translateY(-1px); color: var(--text-2); }
+  .segmented input:checked + span {
+    background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    color: var(--on-primary);
+    box-shadow: 0 8px 18px rgba(104,88,255,.22);
+    animation: selectionPop .28s ease-out;
+  }
+  .segmented input:focus-visible + span { box-shadow: var(--ring); }
+
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 11px;
+  }
+  .cat-grid .cat-review { grid-column: 1 / -1; }
+
+  .cat-btn {
+    position: relative;
+    min-height: 112px;
+    padding: 16px 15px 13px;
+    display: flex; flex-direction: column; gap: 4px;
+    text-align: left;
+    background: var(--surface-solid);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+    isolation: isolate;
+    transition: transform .22s cubic-bezier(.2,.8,.2,1), border-color .22s, box-shadow .22s, opacity .2s;
+  }
+  .cat-btn::before {
+    content: ""; position: absolute; inset: 0 0 auto 0; height: 4px;
+    background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent), white 40%));
+    z-index: 2;
+  }
+  .cat-btn::after {
+    content: "";
+    position: absolute;
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    right: -28px; bottom: -34px;
+    background: var(--accent);
+    opacity: .08;
+    transition: transform .3s ease, opacity .3s ease;
+    z-index: -1;
+  }
+  .cat-btn:hover:not(:disabled) {
+    transform: translateY(-5px) scale(1.012);
+    border-color: color-mix(in srgb, var(--accent), var(--border-2) 38%);
+    box-shadow: 0 16px 28px color-mix(in srgb, var(--accent), transparent 84%);
+  }
+  .cat-btn:hover::after { transform: scale(1.6); opacity: .14; }
+  .cat-btn:active:not(:disabled) { transform: translateY(-2px) scale(.99); }
+  .cat-btn:disabled { opacity: .42; cursor: not-allowed; }
+  .cat-btn .cat-name { font-size: .82rem; font-weight: 850; line-height: 1.25; }
+  .cat-btn .cat-count { font-size: 1.9rem; font-weight: 950; line-height: 1; margin-top: 7px; font-variant-numeric: tabular-nums; }
+  .cat-btn .cat-foot { margin-top: auto; font-size: .64rem; font-weight: 850; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; }
+
+  .cat-easy   { --accent: #10b981; }
+  .cat-medium { --accent: #f59e0b; }
+  .cat-hard   { --accent: #f43f5e; }
+  .cat-review { --accent: var(--primary); }
+
+  .mini-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .mini-stat {
+    padding: 13px;
+    text-align: center;
+    background: rgba(127,127,127,.055);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    transition: transform .2s ease, background .2s ease;
+  }
+  .mini-stat:hover { transform: translateY(-2px); background: var(--surface-3); }
+  .mini-stat strong { display: block; font-size: 1.32rem; font-variant-numeric: tabular-nums; }
+  .mini-stat span { font-size: .62rem; font-weight: 850; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; }
+
+  .row-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+  .row-actions .btn-primary { flex: 1 1 260px; }
+
+  .link-danger {
+    align-self: flex-start;
+    padding: 4px 0;
+    color: var(--danger);
+    font-size: .82rem; font-weight: 750;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: transform .16s ease, opacity .16s ease;
+  }
+  .link-danger:hover { transform: translateX(2px); opacity: .82; }
+
+  .btn {
+    min-height: 46px;
+    padding: 11px 18px;
+    border-radius: 14px;
+    font-weight: 850;
+    font-size: .91rem;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    transition: transform .18s cubic-bezier(.2,.8,.2,1), box-shadow .18s, background .18s, filter .18s;
+  }
+  .btn:hover:not(:disabled) { transform: translateY(-3px); }
+  .btn:active:not(:disabled) { transform: translateY(-1px) scale(.985); }
+  .btn:disabled { opacity: .42; cursor: not-allowed; }
+  .btn-lg { min-height: 54px; font-size: 1rem; }
+  .btn-sm { min-height: 38px; padding: 8px 13px; font-size: .81rem; }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    color: var(--on-primary);
+    box-shadow: 0 12px 24px rgba(104,88,255,.21), inset 0 1px 0 rgba(255,255,255,.19);
+  }
+  .btn-primary:hover:not(:disabled) { filter: brightness(1.06); box-shadow: 0 18px 34px rgba(104,88,255,.28), inset 0 1px 0 rgba(255,255,255,.2); }
+  .btn-secondary { background: var(--surface-3); color: var(--text-2); border: 1px solid var(--border); }
+  .btn-secondary:hover:not(:disabled) { background: var(--surface-solid); box-shadow: var(--shadow-sm); }
+  .btn-danger { background: linear-gradient(135deg, #e11d48, #fb7185); color: #fff; box-shadow: 0 12px 24px rgba(225,29,72,.18); }
+  .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .btn-ghost:hover:not(:disabled) { color: var(--text); background: rgba(255,255,255,.08); border-color: var(--border-2); }
+
+  .practice-top {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; margin-bottom: 22px;
+  }
+  .back-btn {
+    padding: 8px 0;
+    color: var(--muted);
+    font-weight: 850; font-size: .87rem;
+    transition: color .16s, transform .16s;
+  }
+  .back-btn:hover { color: var(--primary); transform: translateX(-2px); }
+
+  .progress { display: flex; align-items: center; gap: 12px; }
+  .progress-track {
+    width: 180px; height: 10px;
+    background: rgba(127,127,127,.11);
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,.06);
+  }
+  .progress-fill {
+    width: 0; height: 100%;
+    background: linear-gradient(90deg, #5f46e8, #8b5cf6, #38bdf8);
+    background-size: 180% 100%;
+    border-radius: 999px;
+    transition: width .4s cubic-bezier(.3,.8,.4,1);
+    animation: progressFlow 2.5s linear infinite;
+  }
+  .progress-text { min-width: 62px; text-align: right; font-size: .82rem; font-weight: 850; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .score-chips { display: flex; gap: 6px; }
+  .chip {
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: .72rem; font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    border: 1px solid var(--border);
+    animation: chipIn .25s ease-out;
+  }
+  .chip.ok   { background: var(--success-soft); color: var(--success); }
+  .chip.bad  { background: var(--danger-soft);  color: var(--danger); }
+  .chip.streak { background: var(--warn-soft); color: var(--warn); }
+
+  .practice-stage { display: grid; place-items: center; min-height: 500px; perspective: 1000px; }
+
+  .word-card {
+    width: min(660px, 100%);
+    padding: 32px;
+    background: linear-gradient(145deg, var(--surface-solid), var(--surface-2));
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+    animation: cardFloat 7s ease-in-out infinite;
+  }
+  .word-card::before {
+    content: "";
+    position: absolute;
+    inset: -35% 55% 55% -20%;
+    background: radial-gradient(circle, rgba(123,97,255,.16), transparent 65%);
+    pointer-events: none;
+  }
+  .word-card::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -35%;
+    width: 28%;
+    height: 100%;
+    transform: skewX(-18deg);
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
+    animation: sheen 6s ease-in-out infinite;
+    pointer-events: none;
+  }
+  .word-card.shake { animation: shake .4s cubic-bezier(.36,.07,.19,.97); }
+  @keyframes shake {
+    10%,90% { transform: translateX(-2px); }
+    20%,80% { transform: translateX(4px); }
+    30%,50%,70% { transform: translateX(-6px); }
+    40%,60% { transform: translateX(6px); }
+  }
+
+  .flag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; position: relative; z-index: 1; }
+  .tag {
+    display: inline-flex; align-items: center;
+    padding: 5px 9px;
+    border-radius: 999px;
+    font-size: .63rem; font-weight: 950;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    background: rgba(127,127,127,.08);
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .tag-primary { background: var(--primary-soft); color: var(--primary); border-color: color-mix(in srgb, var(--primary), var(--border) 70%); }
+  .tag-review  { background: var(--purple-soft); color: var(--purple); }
+  .tag-easy    { background: var(--success-soft); color: var(--success); }
+  .tag-medium  { background: var(--warn-soft); color: var(--warn); }
+  .tag-hard    { background: var(--danger-soft); color: var(--danger); }
+  .tag-repeated{ background: var(--warn-soft); color: var(--warn); }
+
+  .word-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; position: relative; z-index: 1; }
+  .eyebrow {
+    margin: 0;
+    font-size: .67rem; font-weight: 850;
+    letter-spacing: .14em; text-transform: uppercase;
+    color: var(--muted);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+
+  .prompt {
+    margin: 14px 0 9px;
+    font-size: clamp(1.8rem, 4.8vw, 2.7rem);
+    line-height: 1.12;
+    text-align: center;
+    overflow-wrap: anywhere;
+    letter-spacing: -.03em;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 10px 35px rgba(104,88,255,.08);
+  }
+  .note { margin: 0 0 18px; text-align: center; font-size: .82rem; font-style: italic; color: var(--muted); position: relative; z-index: 1; }
+
+  .hint-box {
+    margin: 0 0 16px;
+    padding: 13px 15px;
+    text-align: center;
+    border: 1px dashed color-mix(in srgb, var(--primary), transparent 25%);
+    border-radius: 14px;
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-weight: 850;
+    animation: hintReveal .35s cubic-bezier(.2,.8,.2,1);
+    position: relative;
+    z-index: 1;
+  }
+
+  .answer-form { display: grid; gap: 10px; position: relative; z-index: 1; }
+  .answer-input {
+    width: 100%;
+    padding: 16px 16px;
+    text-align: center;
+    font-size: 1.08rem; font-weight: 650;
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    background: rgba(255,255,255,.60);
+    color: var(--text);
+    outline: none;
+    transition: border-color .18s, box-shadow .18s, background .18s, transform .18s;
+  }
+  [data-theme="dark"] .answer-input { background: rgba(8,12,29,.48); }
+  .answer-input:focus { border-color: var(--primary); box-shadow: var(--ring), 0 12px 30px rgba(104,88,255,.08); transform: translateY(-1px); }
+  .answer-input.correct { border-color: var(--success); background: var(--success-soft); color: var(--success); animation: pop .35s ease-out; }
+  .answer-input.wrong { border-color: var(--danger); background: var(--danger-soft); color: var(--danger); }
+  @keyframes pop {
+    0% { box-shadow: 0 0 0 0 rgba(16,185,129,.42); }
+    100% { box-shadow: 0 0 0 14px rgba(16,185,129,0); }
+  }
+
+  .feedback {
+    padding: 13px 15px;
+    border-radius: 14px;
+    font-size: .88rem; font-weight: 750; line-height: 1.5;
+    animation: feedbackIn .3s cubic-bezier(.2,.8,.2,1);
+    border: 1px solid var(--border);
+  }
+  .feedback.success { background: var(--success-soft); color: var(--success); }
+  .feedback.error   { background: var(--danger-soft);  color: var(--danger); }
+  .feedback.info    { background: var(--primary-soft); color: var(--primary); }
+  .feedback .fb-line + .fb-line { margin-top: 4px; }
+  .feedback .fb-dim { opacity: .8; font-weight: 600; font-size: .84rem; }
+
+  .answer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .shortcuts { margin: 14px 0 0; text-align: center; font-size: .75rem; color: var(--muted); }
+
+  .result { width: min(680px, 100%); margin: 0 auto; text-align: center; padding-top: 10px; }
+  .result-icon {
+    width: 86px; height: 86px; margin: 0 auto 18px;
+    display: grid; place-items: center;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-soft), rgba(56,189,248,.14));
+    color: var(--primary);
+    font-size: 2.1rem; font-weight: 950;
+    border: 1px solid var(--border);
+    box-shadow: 0 20px 50px rgba(104,88,255,.13);
+    animation: resultPop .65s cubic-bezier(.16,1,.3,1), resultPulse 3.2s ease-in-out .8s infinite;
+  }
+  .result h2 { margin: 0 0 6px; font-size: 2rem; letter-spacing: -.03em; }
+  .result > p { margin: 0; color: var(--muted); }
+
+  .result-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 26px 0; }
+  .stat {
+    padding: 17px 10px;
+    border-radius: 17px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .stat:hover { transform: translateY(-3px); box-shadow: var(--shadow-sm); }
+  .stat strong { display: block; font-size: 1.65rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .stat span { font-size: .62rem; font-weight: 850; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; }
+  .stat.ok strong { color: var(--success); }
+  .stat.bad strong { color: var(--danger); }
+
+  .review-list {
+    margin: 0 0 22px;
+    text-align: left;
+    border: 1px solid var(--border);
+    border-radius: 17px;
+    overflow: hidden;
+    background: var(--surface-2);
+  }
+  .review-list h3 { margin: 0; padding: 12px 15px; font-size: .74rem; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); background: rgba(127,127,127,.05); border-bottom: 1px solid var(--border); }
+  .review-list ul { margin: 0; padding: 0; list-style: none; max-height: 260px; overflow: auto; }
+  .review-list li { display: grid; grid-template-columns: minmax(120px,1fr) auto minmax(120px,1fr); gap: 8px 10px; padding: 11px 15px; font-size: .86rem; border-bottom: 1px solid var(--border); transition: background .16s ease; }
+  .review-list li:hover { background: rgba(127,127,127,.05); }
+  .review-list li:last-child { border-bottom: 0; }
+  .review-list .rl-en { font-weight: 850; }
+  .review-list .rl-es { color: var(--muted); }
+  .review-list .rl-arrow { color: var(--border-2); }
+  .review-list .rl-meta { grid-column: 1 / -1; color: var(--muted); font-size: .72rem; line-height: 1.35; }
+  .result-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .result-actions .btn-primary { min-width: 190px; }
+  .result-actions .btn-secondary { min-width: 190px; }
+
+  .modal[hidden] { display: none; }
+  .modal { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 20px; }
+  .modal-backdrop { position: absolute; inset: 0; background: rgba(4,7,20,.58); backdrop-filter: blur(8px); animation: backdropIn .2s ease-out; }
+  .modal-panel {
+    position: relative;
+    width: min(650px, 100%);
+    max-height: min(80vh, 740px);
+    display: flex; flex-direction: column;
+    background: var(--surface-solid);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    box-shadow: var(--shadow-lg);
+    animation: modalIn .38s cubic-bezier(.16,1,.3,1);
+    overflow: hidden;
+  }
+  .modal-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--border); background: linear-gradient(90deg, rgba(104,88,255,.05), transparent); }
+  .modal-head h2 { margin: 0; font-size: 1.05rem; letter-spacing: -.015em; }
+  .modal-head .icon-btn { background: transparent; border-color: transparent; color: var(--muted); width: 34px; height: 34px; }
+  .modal-head .icon-btn:hover { background: var(--surface-3); color: var(--text); }
+  .modal-body { padding: 18px; overflow: auto; }
+  .modal-foot { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 18px; border-top: 1px solid var(--border); background: rgba(127,127,127,.035); }
+  .modal-foot .btn { flex: 1 1 auto; }
+  .modal-foot[hidden] { display: none; }
+
+  .group-title { display: flex; align-items: center; justify-content: space-between; margin: 18px 0 8px; font-size: .72rem; font-weight: 950; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); }
+  .group-title:first-child { margin-top: 0; }
+  .item-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+  .item-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; transition: transform .16s ease, background .16s ease, border-color .16s ease; }
+  .item-row:hover { transform: translateX(3px); background: var(--surface-3); border-color: var(--border-2); }
+  .item-row .item-text { flex: 1; min-width: 0; }
+  .item-row .item-en { display: block; font-size: .87rem; font-weight: 850; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .item-row .item-es { display: block; font-size: .79rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .item-row .item-meta { display: block; font-size: .66rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; font-weight: 750; margin-top: 2px; }
+  .empty-state { padding: 30px 16px; text-align: center; color: var(--muted); font-size: .86rem; }
+
+  .toasts { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; gap: 8px; z-index: 120; pointer-events: none; width: min(440px, calc(100% - 32px)); }
+  .toast {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 15px;
+    border-radius: 13px;
+    background: #1c2235;
+    color: #fff;
+    font-size: .84rem; font-weight: 750;
+    box-shadow: 0 18px 40px rgba(0,0,0,.28);
+    pointer-events: auto;
+    animation: toastIn .32s cubic-bezier(.16,1,.3,1);
+    border: 1px solid rgba(255,255,255,.10);
+  }
+  .toast.success { background: linear-gradient(135deg, #047857, #10b981); }
+  .toast.error   { background: linear-gradient(135deg, #be123c, #f43f5e); }
+  .toast.info    { background: linear-gradient(135deg, #4338ca, #6858ff); }
+  .toast .toast-msg { flex: 1; }
+  .toast .toast-action { padding: 4px 10px; border-radius: 8px; background: rgba(255,255,255,.18); font-size: .76rem; font-weight: 900; }
+  .toast .toast-action:hover { background: rgba(255,255,255,.3); }
+
+  .hidden { display: none !important; }
+
+  @keyframes appEnter { from { opacity: 0; transform: translateY(14px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  @keyframes viewIn { from { opacity: 0; transform: translateY(10px) scale(.992); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  @keyframes floatOrb { from { transform: translate3d(0,0,0) scale(1); } to { transform: translate3d(30px,20px,0) scale(1.08); } }
+  @keyframes spinSlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes logoBob { 0%,100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-3px) rotate(2deg); } }
+  @keyframes selectionPop { 0% { transform: scale(.97); } 100% { transform: scale(1); } }
+  @keyframes progressFlow { from { background-position: 0% 0; } to { background-position: 180% 0; } }
+  @keyframes chipIn { from { opacity: 0; transform: translateY(-4px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  @keyframes cardFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+  @keyframes sheen { 0%, 54%, 100% { left: -35%; opacity: 0; } 60% { opacity: .7; } 74% { left: 120%; opacity: 0; } }
+  @keyframes hintReveal { from { opacity: 0; transform: translateY(-7px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  @keyframes feedbackIn { from { opacity: 0; transform: translateY(5px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  @keyframes resultPop { from { opacity: 0; transform: scale(.72) rotate(-10deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
+  @keyframes resultPulse { 0%,100% { box-shadow: 0 20px 50px rgba(104,88,255,.13); } 50% { box-shadow: 0 22px 60px rgba(104,88,255,.23); } }
+  @keyframes backdropIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes modalIn { from { opacity: 0; transform: translateY(18px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  @keyframes toastIn { from { opacity: 0; transform: translateY(12px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+  @media (max-width: 780px) {
+    .cat-grid { grid-template-columns: repeat(2, 1fr); }
+    .cat-grid .cat-review { grid-column: 1 / -1; }
+    .result-stats { grid-template-columns: repeat(2, 1fr); }
+    .mini-stats { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  @media (max-width: 680px) {
+    .app { width: 100%; min-height: 100vh; margin: 0; border-radius: 0; border-left: 0; border-right: 0; }
+    main { padding: 18px; }
+    .topbar { padding: 16px 18px; }
+    .brand p { display: none; }
+    .pill { display: none; }
+    .segmented { grid-template-columns: 1fr; }
+    .practice-top { flex-wrap: wrap; }
+    .progress-track { width: 100px; }
+    .word-card { padding: 23px; border-radius: 22px; }
+    .practice-stage { min-height: 460px; }
+  }
+
+  @media (max-width: 460px) {
+    .cat-grid, .answer-grid, .mini-stats { grid-template-columns: 1fr; }
+    .result-stats { grid-template-columns: repeat(2, 1fr); }
+    .score-chips { display: none; }
+    .brand-mark { width: 43px; height: 43px; border-radius: 14px; }
+    .brand h1 { font-size: 1.12rem; }
+    .prompt { font-size: 1.65rem; }
+    .review-list li { grid-template-columns: 1fr; }
+    .review-list .rl-arrow { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">V</div>
+      <div>
+        <h1>Practicador de Vocabulario</h1>
+        <p>Practica, guarda tus errores y repásalos después.</p>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <span id="header-status" class="pill">0 errores · 0 revisar</span>
+      <button id="btn-theme" class="icon-btn" type="button" aria-label="Cambiar tema">
+        <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============================ SETUP ============================ -->
+    <section id="view-setup" class="view is-active" aria-labelledby="setup-title">
+      <div class="stack">
+
+        <article class="card">
+          <h2 id="setup-title" class="card-title"><span class="step">1</span> Selecciona un bloque</h2>
+          <label class="label" for="block-select">Contenido</label>
+          <select id="block-select"></select>
+          <p id="data-info" class="hint-text"></p>
+        </article>
+
+        <article class="card">
+          <h2 class="card-title"><span class="step">2</span> Dirección de la práctica</h2>
+          <div class="segmented" role="radiogroup" aria-label="Dirección de la práctica">
+            <label><input type="radio" name="mode" value="EN-ES" checked><span>Inglés a Español</span></label>
+            <label><input type="radio" name="mode" value="ES-EN"><span>Español a Inglés</span></label>
+            <label><input type="radio" name="mode" value="MIX"><span>Mezcla aleatoria</span></label>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head">
+            <div>
+              <h2 class="card-title"><span class="step">3</span> Tus categorías</h2>
+              <p class="hint-text" style="margin-top:0">
+                Los errores conservan su dificultad. Las palabras con pista van a Revisar.
+              </p>
+            </div>
+            <span id="total-progress" class="pill on-surface">0 errores · 0 revisar</span>
+          </div>
+
+          <div class="cat-grid">
+            <button class="cat-btn cat-easy" data-category="easy" type="button">
+              <span class="cat-name">Regalada</span>
+              <span class="cat-count" id="count-easy">0</span>
+              <span class="cat-foot">estudiar</span>
+            </button>
+            <button class="cat-btn cat-medium" data-category="medium" type="button">
+              <span class="cat-name">Intermedia</span>
+              <span class="cat-count" id="count-medium">0</span>
+              <span class="cat-foot">estudiar</span>
+            </button>
+            <button class="cat-btn cat-hard" data-category="hard" type="button">
+              <span class="cat-name">Difícil</span>
+              <span class="cat-count" id="count-hard">0</span>
+              <span class="cat-foot">estudiar</span>
+            </button>
+
+            <button class="cat-btn cat-easy" data-category="mistakes-easy" type="button">
+              <span class="cat-name">Errores · Regalada</span>
+              <span class="cat-count" id="count-mistakes-easy">0</span>
+              <span class="cat-foot">repasar</span>
+            </button>
+            <button class="cat-btn cat-medium" data-category="mistakes-medium" type="button">
+              <span class="cat-name">Errores · Intermedia</span>
+              <span class="cat-count" id="count-mistakes-medium">0</span>
+              <span class="cat-foot">repasar</span>
+            </button>
+            <button class="cat-btn cat-hard" data-category="mistakes-hard" type="button">
+              <span class="cat-name">Errores · Difícil</span>
+              <span class="cat-count" id="count-mistakes-hard">0</span>
+              <span class="cat-foot">repasar</span>
+            </button>
+
+            <button class="cat-btn cat-review" data-category="review" type="button">
+              <span class="cat-name">Revisar · palabras con pista o reveladas</span>
+              <span class="cat-count" id="count-review">0</span>
+              <span class="cat-foot">estudiar · pista desactivada</span>
+            </button>
+          </div>
+
+          <div class="mini-stats">
+            <div class="mini-stat"><strong id="stat-total">0</strong><span>Respondidas</span></div>
+            <div class="mini-stat"><strong id="stat-accuracy">—</strong><span>Precisión</span></div>
+            <div class="mini-stat"><strong id="stat-streak">0</strong><span>Mejor racha</span></div>
+          </div>
+        </article>
+
+        <div class="row-actions">
+          <button id="btn-start" class="btn btn-primary btn-lg" type="button">Empezar práctica</button>
+          <button id="btn-manage" class="btn btn-ghost" type="button">Gestionar guardados</button>
+          <button id="btn-explore" class="btn btn-ghost" type="button">Explorar vocabulario</button>
+        </div>
+
+        <button id="btn-reset" class="link-danger hidden" type="button">Borrar todo el progreso guardado</button>
+      </div>
+    </section>
+
+    <!-- =========================== PRÁCTICA =========================== -->
+    <section id="view-practice" class="view" aria-labelledby="word-prompt">
+      <div class="practice-top">
+        <button id="btn-back" class="back-btn" type="button">&larr; Volver al menú</button>
+        <div class="progress">
+          <div class="score-chips">
+            <span id="chip-ok" class="chip ok">0 correctas</span>
+            <span id="chip-bad" class="chip bad">0 fallos</span>
+            <span id="chip-streak" class="chip streak hidden">Racha 0</span>
+          </div>
+          <div class="progress-track" aria-hidden="true">
+            <div id="progress-fill" class="progress-fill"></div>
+          </div>
+          <span id="progress-text" class="progress-text" aria-live="polite">0 / 0</span>
+        </div>
+      </div>
+
+      <div class="practice-stage">
+        <article id="word-card" class="word-card">
+          <div class="flag-row">
+            <span id="flag-mode" class="tag tag-primary">PRÁCTICA</span>
+            <span id="flag-repeat" class="tag tag-repeated hidden">REPETIDA</span>
+            <span id="flag-history" class="tag tag-repeated hidden"></span>
+          </div>
+
+          <div class="word-meta">
+            <p id="word-section" class="eyebrow">General</p>
+            <span id="flag-difficulty" class="tag tag-medium">INTERMEDIA</span>
+          </div>
+
+          <h2 id="word-prompt" class="prompt">—</h2>
+          <p id="word-note" class="note hidden"></p>
+
+          <div id="hint-box" class="hint-box" hidden></div>
+
+          <form id="answer-form" class="answer-form" autocomplete="off" novalidate>
+            <input
+              id="answer-input"
+              class="answer-input"
+              type="text"
+              autocomplete="off"
+              autocapitalize="none"
+              autocorrect="off"
+              spellcheck="false"
+              placeholder="Escribe tu respuesta"
+              aria-label="Tu respuesta"
+            >
+
+            <div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div>
+
+            <div id="answer-idle" class="answer-grid">
+              <button id="btn-hint" class="btn btn-secondary" type="button">Pista</button>
+              <button id="btn-reveal" class="btn btn-secondary" type="button">Revelar</button>
+            </div>
+
+            <button id="btn-submit" class="btn btn-primary btn-lg" type="submit">Comprobar</button>
+            <button id="btn-next" class="btn btn-primary btn-lg hidden" type="button">Siguiente &rarr;</button>
+          </form>
+
+          <p id="shortcuts" class="shortcuts"></p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ========================== RESULTADOS ========================== -->
+    <section id="view-results" class="view" aria-labelledby="results-title">
+      <div class="result">
+        <div class="result-icon">&#10003;</div>
+        <h2 id="results-title">Sesión completada</h2>
+        <p id="results-summary">Has terminado el bloque.</p>
+
+        <div class="result-stats">
+          <div class="stat ok"><strong id="res-correct">0</strong><span>Correctas</span></div>
+          <div class="stat bad"><strong id="res-wrong">0</strong><span>Fallos</span></div>
+          <div class="stat"><strong id="res-accuracy">—</strong><span>Precisión</span></div>
+          <div class="stat"><strong id="res-time">—</strong><span>Tiempo</span></div>
+        </div>
+
+        <div id="res-review" class="review-list hidden">
+          <h3>Palabras por reforzar</h3>
+          <ul id="res-review-list"></ul>
+        </div>
+
+        <div class="result-actions">
+          <button id="btn-repeat" class="btn btn-primary" type="button">↻ Repetir sesión</button>
+          <button id="btn-another" class="btn btn-secondary" type="button">＋ Elegir otra sesión</button>
+          <button id="btn-retry" class="btn btn-secondary hidden" type="button">Repetir fallos</button>
+          <button id="btn-copy-image" class="btn btn-secondary hidden" type="button">▣ Copiar errores como imagen</button>
+          <button id="btn-copy" class="btn btn-secondary" type="button">Copiar resumen</button>
+          <button id="btn-finish" class="btn btn-ghost" type="button">Volver al menú</button>
+        </div>
+        <p class="shortcuts">La imagen incluye bloque, sección, posición, dificultad, tu respuesta y la respuesta correcta. También puedes usar <kbd>Ctrl</kbd> + <kbd>C</kbd>.</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="modal" class="modal" hidden>
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <header class="modal-head">
+      <h2 id="modal-title">Título</h2>
+      <button class="icon-btn" type="button" data-close aria-label="Cerrar">&#10005;</button>
+    </header>
+    <div class="modal-body" id="modal-body"></div>
+    <footer class="modal-foot" id="modal-foot" hidden></footer>
+  </div>
+</div>
+
+<div id="toasts" class="toasts" aria-live="polite"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  /* ======================================================================
+     DATOS · vocabData con las 504 entradas originales
+     ====================================================================== */
+  const vocabData = { "total": 504, "vocabulary": [
+    {"id": 1, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Where is...?", "spanish": "¿Dónde está...?"},
+    {"id": 2, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "It's here.", "spanish": "Está aquí."},
+    {"id": 3, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "It's there.", "spanish": "Está allí."},
+    {"id": 4, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "It's over there.", "spanish": "Está por allá."},
+    {"id": 5, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Next to", "spanish": "Junto a / Al lado de"},
+    {"id": 6, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Beside", "spanish": "A un lado de"},
+    {"id": 7, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Near", "spanish": "Cerca de"},
+    {"id": 8, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Close to", "spanish": "Cerca de"},
+    {"id": 9, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Far from", "spanish": "Lejos de"},
+    {"id": 10, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Across from", "spanish": "Enfrente de"},
+    {"id": 11, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Opposite", "spanish": "Frente a"},
+    {"id": 12, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "In front of", "spanish": "Delante de"},
+    {"id": 13, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Behind", "spanish": "Detrás de"},
+    {"id": 14, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Between", "spanish": "Entre"},
+    {"id": 15, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Among", "spanish": "Entre varios"},
+    {"id": 16, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "On the corner of", "spanish": "En la esquina de"},
+    {"id": 17, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "At the end of the street", "spanish": "Al final de la calle"},
+    {"id": 18, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "At the beginning of the street", "spanish": "Al inicio de la calle"},
+    {"id": 19, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Around the corner", "spanish": "A la vuelta de la esquina"},
+    {"id": 20, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "On the left", "spanish": "A la izquierda"},
+    {"id": 21, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "On the right", "spanish": "A la derecha"},
+    {"id": 22, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "To your left", "spanish": "A tu izquierda"},
+    {"id": 23, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "To your right", "spanish": "A tu derecha"},
+    {"id": 24, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Straight ahead", "spanish": "Todo recto"},
+    {"id": 25, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Go straight", "spanish": "Sigue derecho"},
+    {"id": 26, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Turn left", "spanish": "Gira a la izquierda"},
+    {"id": 27, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Turn right", "spanish": "Gira a la derecha"},
+    {"id": 28, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Go back", "spanish": "Regresa"},
+    {"id": 29, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Go past", "spanish": "Pasa de largo"},
+    {"id": 30, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Walk past", "spanish": "Camina pasando"},
+    {"id": 31, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Cross the street", "spanish": "Cruza la calle"},
+    {"id": 32, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Go across", "spanish": "Cruza al otro lado"},
+    {"id": 33, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Follow this road", "spanish": "Sigue esta calle (o carretera)"},
+    {"id": 34, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Take the first left", "spanish": "Toma la primera a la izquierda"},
+    {"id": 35, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Take the first right", "spanish": "Toma la primera a la derecha"},
+    {"id": 36, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Take the second left", "spanish": "Toma la segunda a la izquierda"},
+    {"id": 37, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Take the second right", "spanish": "Toma la segunda a la derecha"},
+    {"id": 38, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Keep going", "spanish": "Sigue avanzando"},
+    {"id": 39, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Continue straight", "spanish": "Continúa derecho"},
+    {"id": 40, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Go down this street", "spanish": "Baja por esta calle"},
+    {"id": 41, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Go up this street", "spanish": "Sube por esta calle"},
+    {"id": 42, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "It's on your left.", "spanish": "Está a tu izquierda."},
+    {"id": 43, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "It's on your right.", "spanish": "Está a tu derecha."},
+    {"id": 44, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "It's nearby.", "spanish": "Está cerca."},
+    {"id": 45, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "It's far away.", "spanish": "Está lejos."},
+    {"id": 46, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Can you show me on the map?", "spanish": "¿Puedes mostrarme en el mapa?"},
+    {"id": 47, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "How do I get there?", "spanish": "¿Cómo llego allí?"},
+    {"id": 48, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Which way is...?", "spanish": "¿Por dónde queda...?"},
+    {"id": 49, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "You're almost there.", "spanish": "Ya casi llegas."},
+    {"id": 50, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "You've arrived.", "spanish": "Has llegado."},
+    {"id": 51, "section": "THINGS YOU FIND ON THE STREET", "english": "Sidewalk", "spanish": "Banqueta / Acera"},
+    {"id": 52, "section": "THINGS YOU FIND ON THE STREET", "english": "Crosswalk", "spanish": "Paso peatonal"},
+    {"id": 53, "section": "THINGS YOU FIND ON THE STREET", "english": "Traffic light", "spanish": "Semáforo"},
+    {"id": 54, "section": "THINGS YOU FIND ON THE STREET", "english": "Stop sign", "spanish": "Señal de alto"},
+    {"id": 55, "section": "THINGS YOU FIND ON THE STREET", "english": "Yield sign", "spanish": "Señal de ceda el paso"},
+    {"id": 56, "section": "THINGS YOU FIND ON THE STREET", "english": "Roundabout", "spanish": "Rotonda / Glorieta"},
+    {"id": 57, "section": "THINGS YOU FIND ON THE STREET", "english": "Boulevard", "spanish": "Bulevar"},
+    {"id": 58, "section": "THINGS YOU FIND ON THE STREET", "english": "Street", "spanish": "Calle"},
+    {"id": 59, "section": "THINGS YOU FIND ON THE STREET", "english": "Avenue", "spanish": "Avenida"},
+    {"id": 60, "section": "THINGS YOU FIND ON THE STREET", "english": "Road", "spanish": "Camino / Carretera"},
+    {"id": 61, "section": "THINGS YOU FIND ON THE STREET", "english": "Highway", "spanish": "Autopista"},
+    {"id": 62, "section": "THINGS YOU FIND ON THE STREET", "english": "Freeway", "spanish": "Vía rápida"},
+    {"id": 63, "section": "THINGS YOU FIND ON THE STREET", "english": "Intersection", "spanish": "Intersección"},
+    {"id": 64, "section": "THINGS YOU FIND ON THE STREET", "english": "Corner", "spanish": "Esquina"},
+    {"id": 65, "section": "THINGS YOU FIND ON THE STREET", "english": "Lane", "spanish": "Carril"},
+    {"id": 66, "section": "THINGS YOU FIND ON THE STREET", "english": "Bike lane", "spanish": "Ciclovía"},
+    {"id": 67, "section": "THINGS YOU FIND ON THE STREET", "english": "Bus lane", "spanish": "Carril para autobuses"},
+    {"id": 68, "section": "THINGS YOU FIND ON THE STREET", "english": "Median strip", "spanish": "Camellón"},
+    {"id": 69, "section": "THINGS YOU FIND ON THE STREET", "english": "Speed bump", "spanish": "Tope"},
+    {"id": 70, "section": "THINGS YOU FIND ON THE STREET", "english": "Pedestrian crossing", "spanish": "Cruce peatonal"},
+    {"id": 71, "section": "THINGS YOU FIND ON THE STREET", "english": "Railroad crossing", "spanish": "Cruce ferroviario"},
+    {"id": 72, "section": "THINGS YOU FIND ON THE STREET", "english": "Bridge", "spanish": "Puente"},
+    {"id": 73, "section": "THINGS YOU FIND ON THE STREET", "english": "Overpass", "spanish": "Puente elevado"},
+    {"id": 74, "section": "THINGS YOU FIND ON THE STREET", "english": "Underpass", "spanish": "Paso inferior"},
+    {"id": 75, "section": "THINGS YOU FIND ON THE STREET", "english": "Tunnel", "spanish": "Túnel"},
+    {"id": 76, "section": "THINGS YOU FIND ON THE STREET", "english": "Curb", "spanish": "Banqueta / Guarnición"},
+    {"id": 77, "section": "THINGS YOU FIND ON THE STREET", "english": "Gutter", "spanish": "Cuneta"},
+    {"id": 78, "section": "THINGS YOU FIND ON THE STREET", "english": "Storm drain", "spanish": "Alcantarilla pluvial"},
+    {"id": 79, "section": "THINGS YOU FIND ON THE STREET", "english": "Manhole", "spanish": "Registro / Tapa de alcantarilla"},
+    {"id": 80, "section": "THINGS YOU FIND ON THE STREET", "english": "Sewer", "spanish": "Alcantarillado"},
+    {"id": 81, "section": "THINGS YOU FIND ON THE STREET", "english": "Street sign", "spanish": "Señal de calle"},
+    {"id": 82, "section": "THINGS YOU FIND ON THE STREET", "english": "Street name sign", "spanish": "Letrero con nombre de la calle"},
+    {"id": 83, "section": "THINGS YOU FIND ON THE STREET", "english": "Direction sign", "spanish": "Señal de dirección"},
+    {"id": 84, "section": "THINGS YOU FIND ON THE STREET", "english": "Traffic sign", "spanish": "Señal de tránsito"},
+    {"id": 85, "section": "THINGS YOU FIND ON THE STREET", "english": "One-way street", "spanish": "Calle de un solo sentido"},
+    {"id": 86, "section": "THINGS YOU FIND ON THE STREET", "english": "Two-way street", "spanish": "Calle de doble sentido"},
+    {"id": 87, "section": "THINGS YOU FIND ON THE STREET", "english": "Dead-end street", "spanish": "Calle sin salida"},
+    {"id": 88, "section": "THINGS YOU FIND ON THE STREET", "english": "Parking lot", "spanish": "Estacionamiento"},
+    {"id": 89, "section": "THINGS YOU FIND ON THE STREET", "english": "Parking meter", "spanish": "Parquímetro"},
+    {"id": 90, "section": "THINGS YOU FIND ON THE STREET", "english": "Bus stop", "spanish": "Parada de autobús"},
+    {"id": 91, "section": "THINGS YOU FIND ON THE STREET", "english": "Taxi stand", "spanish": "Sitio de taxis"},
+    {"id": 92, "section": "THINGS YOU FIND ON THE STREET", "english": "Gas station", "spanish": "Gasolinera"},
+    {"id": 93, "section": "THINGS YOU FIND ON THE STREET", "english": "Fire hydrant", "spanish": "Hidrante"},
+    {"id": 94, "section": "THINGS YOU FIND ON THE STREET", "english": "Streetlamp", "spanish": "Farola / Poste de luz"},
+    {"id": 95, "section": "THINGS YOU FIND ON THE STREET", "english": "Utility pole", "spanish": "Poste de servicios"},
+    {"id": 96, "section": "THINGS YOU FIND ON THE STREET", "english": "Power lines", "spanish": "Líneas eléctricas"},
+    {"id": 97, "section": "THINGS YOU FIND ON THE STREET", "english": "Mailbox", "spanish": "Buzón"},
+    {"id": 98, "section": "THINGS YOU FIND ON THE STREET", "english": "Bench", "spanish": "Banca"},
+    {"id": 99, "section": "THINGS YOU FIND ON THE STREET", "english": "Trash can", "spanish": "Bote de basura"},
+    {"id": 100, "section": "THINGS YOU FIND ON THE STREET", "english": "Recycling bin", "spanish": "Contenedor de reciclaje"},
+    {"id": 101, "section": "THINGS YOU FIND ON THE STREET", "english": "Fence", "spanish": "Cerca"},
+    {"id": 102, "section": "THINGS YOU FIND ON THE STREET", "english": "Wall", "spanish": "Muro"},
+    {"id": 103, "section": "THINGS YOU FIND ON THE STREET", "english": "Gate", "spanish": "Portón"},
+    {"id": 104, "section": "THINGS YOU FIND ON THE STREET", "english": "Driveway", "spanish": "Entrada para vehículos"},
+    {"id": 105, "section": "THINGS YOU FIND ON THE STREET", "english": "Alley", "spanish": "Callejón"},
+    {"id": 106, "section": "THINGS YOU FIND ON THE STREET", "english": "Construction zone", "spanish": "Zona de construcción"},
+    {"id": 107, "section": "THINGS YOU FIND ON THE STREET", "english": "Roadwork", "spanish": "Obras viales"},
+    {"id": 108, "section": "THINGS YOU FIND ON THE STREET", "english": "Detour", "spanish": "Desvío"},
+    {"id": 109, "section": "THINGS YOU FIND ON THE STREET", "english": "Speed limit sign", "spanish": "Señal de límite de velocidad"},
+    {"id": 110, "section": "THINGS YOU FIND ON THE STREET", "english": "Pedestrian bridge", "spanish": "Puente peatonal"},
+    {"id": 111, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Happy", "spanish": "Feliz"},
+    {"id": 112, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Sad", "spanish": "Triste"},
+    {"id": 113, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Angry", "spanish": "Enojado"},
+    {"id": 114, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Calm", "spanish": "Tranquilo"},
+    {"id": 115, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Friendly", "spanish": "Amigable"},
+    {"id": 116, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Kind", "spanish": "Amable"},
+    {"id": 117, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Nice", "spanish": "Agradable"},
+    {"id": 118, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Polite", "spanish": "Cortés"},
+    {"id": 119, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Honest", "spanish": "Honesto"},
+    {"id": 120, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Brave", "spanish": "Valiente"},
+    {"id": 121, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Strong", "spanish": "Fuerte"},
+    {"id": 122, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Weak", "spanish": "Débil"},
+    {"id": 123, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Smart", "spanish": "Inteligente"},
+    {"id": 124, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Clever", "spanish": "Astuto"},
+    {"id": 125, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Funny", "spanish": "Divertido"},
+    {"id": 126, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Serious", "spanish": "Serio"},
+    {"id": 127, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Shy", "spanish": "Tímido"},
+    {"id": 128, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Quiet", "spanish": "Callado"},
+    {"id": 129, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Loud", "spanish": "Ruidoso"},
+    {"id": 130, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Patient", "spanish": "Paciente"},
+    {"id": 131, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Impatient", "spanish": "Impaciente"},
+    {"id": 132, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Generous", "spanish": "Generoso"},
+    {"id": 133, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Selfish", "spanish": "Egoísta"},
+    {"id": 134, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Lazy", "spanish": "Perezoso"},
+    {"id": 135, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Hardworking", "spanish": "Trabajador"},
+    {"id": 136, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Careful", "spanish": "Cuidadoso"},
+    {"id": 137, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Careless", "spanish": "Descuidado"},
+    {"id": 138, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Helpful", "spanish": "Servicial"},
+    {"id": 139, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Creative", "spanish": "Creativo"},
+    {"id": 140, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Talented", "spanish": "Talentoso"},
+    {"id": 141, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Beautiful", "spanish": "Hermoso"},
+    {"id": 142, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Handsome", "spanish": "Guapo"},
+    {"id": 143, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Pretty", "spanish": "Bonita"},
+    {"id": 144, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Ugly", "spanish": "Feo"},
+    {"id": 145, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Cute", "spanish": "Lindo"},
+    {"id": 146, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Attractive", "spanish": "Atractivo"},
+    {"id": 147, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Young", "spanish": "Joven"},
+    {"id": 148, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Old", "spanish": "Viejo"},
+    {"id": 149, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Tall", "spanish": "Alto"},
+    {"id": 150, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Short", "spanish": "Bajo"},
+    {"id": 151, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Thin", "spanish": "Delgado"},
+    {"id": 152, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Fat", "spanish": "Gordo"},
+    {"id": 153, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Slim", "spanish": "Esbelto"},
+    {"id": 154, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Fit", "spanish": "En forma"},
+    {"id": 155, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Big", "spanish": "Grande"},
+    {"id": 156, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Small", "spanish": "Pequeño"},
+    {"id": 157, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Tiny", "spanish": "Diminuto"},
+    {"id": 158, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Huge", "spanish": "Enorme"},
+    {"id": 159, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Wide", "spanish": "Ancho"},
+    {"id": 160, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Narrow", "spanish": "Estrecho"},
+    {"id": 161, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Long", "spanish": "Largo"},
+    {"id": 162, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Brief", "spanish": "Breve"},
+    {"id": 163, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Heavy", "spanish": "Pesado"},
+    {"id": 164, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Light", "spanish": "Ligero"},
+    {"id": 165, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Clean", "spanish": "Limpio"},
+    {"id": 166, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Dirty", "spanish": "Sucio"},
+    {"id": 167, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Wet", "spanish": "Mojado"},
+    {"id": 168, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Dry", "spanish": "Seco"},
+    {"id": 169, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Hot", "spanish": "Caliente"},
+    {"id": 170, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Cold", "spanish": "Frío"},
+    {"id": 171, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Warm", "spanish": "Tibio"},
+    {"id": 172, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Cool", "spanish": "Fresco"},
+    {"id": 173, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Bright", "spanish": "Brillante"},
+    {"id": 174, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Dark", "spanish": "Oscuro"},
+    {"id": 175, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Soft", "spanish": "Suave"},
+    {"id": 176, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Hard", "spanish": "Duro"},
+    {"id": 177, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Smooth", "spanish": "Liso"},
+    {"id": 178, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Rough", "spanish": "Áspero"},
+    {"id": 179, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Sweet", "spanish": "Dulce"},
+    {"id": 180, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Bitter", "spanish": "Amargo"},
+    {"id": 181, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Sour", "spanish": "Agrio"},
+    {"id": 182, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Salty", "spanish": "Salado"},
+    {"id": 183, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Fresh", "spanish": "Fresco"},
+    {"id": 184, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Delicious", "spanish": "Delicioso"},
+    {"id": 185, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Tasty", "spanish": "Sabroso"},
+    {"id": 186, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Spicy", "spanish": "Picante"},
+    {"id": 187, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Healthy", "spanish": "Saludable"},
+    {"id": 188, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Sick", "spanish": "Enfermo"},
+    {"id": 189, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Rich", "spanish": "Rico"},
+    {"id": 190, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Poor", "spanish": "Pobre"},
+    {"id": 191, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Expensive", "spanish": "Caro"},
+    {"id": 192, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Cheap", "spanish": "Barato"},
+    {"id": 193, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Free", "spanish": "Libre"},
+    {"id": 194, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Busy", "spanish": "Ocupado"},
+    {"id": 195, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Available", "spanish": "Disponible"},
+    {"id": 196, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Important", "spanish": "Importante"},
+    {"id": 197, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Necessary", "spanish": "Necesario"},
+    {"id": 198, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Useful", "spanish": "Útil"},
+    {"id": 199, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Useless", "spanish": "Inútil"},
+    {"id": 200, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Correct", "spanish": "Correcto"},
+    {"id": 201, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Wrong", "spanish": "Incorrecto"},
+    {"id": 202, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Easy", "spanish": "Fácil"},
+    {"id": 203, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Difficult", "spanish": "Difícil"},
+    {"id": 204, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Simple", "spanish": "Simple"},
+    {"id": 205, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Complicated", "spanish": "Complicado"},
+    {"id": 206, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Possible", "spanish": "Posible"},
+    {"id": 207, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Impossible", "spanish": "Imposible"},
+    {"id": 208, "section": "ADJETIVOS Y PERSONALIDAD", "english": "True", "spanish": "Verdadero"},
+    {"id": 209, "section": "ADJETIVOS Y PERSONALIDAD", "english": "False", "spanish": "Falso"},
+    {"id": 210, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Real", "spanish": "Real"},
+    {"id": 211, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Fake", "spanish": "Falso"},
+    {"id": 212, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Modern", "spanish": "Moderno"},
+    {"id": 213, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Ancient", "spanish": "Antiguo"},
+    {"id": 214, "section": "ADJETIVOS Y PERSONALIDAD", "english": "New", "spanish": "Nuevo"},
+    {"id": 215, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Used", "spanish": "Usado"},
+    {"id": 216, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Popular", "spanish": "Popular"},
+    {"id": 217, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Famous", "spanish": "Famoso"},
+    {"id": 218, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Unknown", "spanish": "Desconocido"},
+    {"id": 219, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Successful", "spanish": "Exitoso"},
+    {"id": 220, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Unsuccessful", "spanish": "Fracasado"},
+    {"id": 221, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Lucky", "spanish": "Afortunado"},
+    {"id": 222, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Unlucky", "spanish": "Desafortunado"},
+    {"id": 223, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Safe", "spanish": "Seguro"},
+    {"id": 224, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Dangerous", "spanish": "Peligroso"},
+    {"id": 225, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Peaceful", "spanish": "Pacífico"},
+    {"id": 226, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Noisy", "spanish": "Ruidoso"},
+    {"id": 227, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Crowded", "spanish": "Lleno"},
+    {"id": 228, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Empty", "spanish": "Vacío"},
+    {"id": 229, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Full", "spanish": "Lleno"},
+    {"id": 230, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Open", "spanish": "Abierto"},
+    {"id": 231, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Closed", "spanish": "Cerrado"},
+    {"id": 232, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Fast", "spanish": "Rápido"},
+    {"id": 233, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Slow", "spanish": "Lento"},
+    {"id": 234, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Early", "spanish": "Temprano"},
+    {"id": 235, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Late", "spanish": "Tarde"},
+    {"id": 236, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Stronger", "spanish": "Más fuerte"},
+    {"id": 237, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Weaker", "spanish": "Más débil"},
+    {"id": 238, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Better", "spanish": "Mejor"},
+    {"id": 239, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Worse", "spanish": "Peor"},
+    {"id": 240, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Best", "spanish": "El mejor"},
+    {"id": 241, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Worst", "spanish": "El peor"},
+    {"id": 242, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Curious", "spanish": "Curioso"},
+    {"id": 243, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Bored", "spanish": "Aburrido"},
+    {"id": 244, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Excited", "spanish": "Emocionado"},
+    {"id": 245, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Nervous", "spanish": "Nervioso"},
+    {"id": 246, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Relaxed", "spanish": "Relajado"},
+    {"id": 247, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Proud", "spanish": "Orgulloso"},
+    {"id": 248, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Ashamed", "spanish": "Avergonzado"},
+    {"id": 249, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Confident", "spanish": "Seguro de sí mismo"},
+    {"id": 250, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Confused", "spanish": "Confundido"},
+    {"id": 251, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Surprised", "spanish": "Sorprendido"},
+    {"id": 252, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Scared", "spanish": "Asustado"},
+    {"id": 253, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Afraid", "spanish": "Temeroso"},
+    {"id": 254, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Lonely", "spanish": "Solitario"},
+    {"id": 255, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Popular", "spanish": "Popular"},
+    {"id": 256, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Romantic", "spanish": "Romántico"},
+    {"id": 257, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Responsible", "spanish": "Responsable"},
+    {"id": 258, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Reliable", "spanish": "Confiable"},
+    {"id": 259, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Independent", "spanish": "Independiente"},
+    {"id": 260, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Ambitious", "spanish": "Ambicioso"},
+    {"id": 261, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Energetic", "spanish": "Energético"},
+    {"id": 262, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Lazy", "spanish": "Flojo"},
+    {"id": 263, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Positive", "spanish": "Positivo"},
+    {"id": 264, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Negative", "spanish": "Negativo"},
+    {"id": 265, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Optimistic", "spanish": "Optimista"},
+    {"id": 266, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Pessimistic", "spanish": "Pesimista"},
+    {"id": 267, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Elegant", "spanish": "Elegante"},
+    {"id": 268, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Fashionable", "spanish": "A la moda"},
+    {"id": 269, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Stylish", "spanish": "Estiloso"},
+    {"id": 270, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Dirty", "spanish": "Sucio"},
+    {"id": 271, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Fragile", "spanish": "Frágil"},
+    {"id": 272, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Solid", "spanish": "Sólido"},
+    {"id": 273, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Valuable", "spanish": "Valioso"},
+    {"id": 274, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Worthless", "spanish": "Sin valor"},
+    {"id": 275, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Rare", "spanish": "Raro"},
+    {"id": 276, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Common", "spanish": "Común"},
+    {"id": 277, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Deep", "spanish": "Profundo"},
+    {"id": 278, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Shallow", "spanish": "Poco profundo"},
+    {"id": 279, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Sharp", "spanish": "Afilado"},
+    {"id": 280, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Blunt", "spanish": "Desafilado"},
+    {"id": 281, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Curly", "spanish": "Rizado"},
+    {"id": 282, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Straight", "spanish": "Lacio"},
+    {"id": 283, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Blonde", "spanish": "Rubio"},
+    {"id": 284, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Bald", "spanish": "Calvo"},
+    {"id": 285, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Married", "spanish": "Casado"},
+    {"id": 286, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Single", "spanish": "Soltero"},
+    {"id": 287, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Pregnant", "spanish": "Embarazada"},
+    {"id": 288, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Alive", "spanish": "Vivo"},
+    {"id": 289, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Dead", "spanish": "Muerto"},
+    {"id": 290, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Hungry", "spanish": "Hambriento"},
+    {"id": 291, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Thirsty", "spanish": "Sediento"},
+    {"id": 292, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Sleepy", "spanish": "Somnoliento"},
+    {"id": 293, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Tired", "spanish": "Cansado"},
+    {"id": 294, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Comfortable", "spanish": "Cómodo"},
+    {"id": 295, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Uncomfortable", "spanish": "Incómodo"},
+    {"id": 296, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Excellent", "spanish": "Excelente"},
+    {"id": 297, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Wonderful", "spanish": "Maravilloso"},
+    {"id": 298, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Fantastic", "spanish": "Fantástico"},
+    {"id": 299, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Amazing", "spanish": "Increíble"},
+    {"id": 300, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Terrible", "spanish": "Terrible"},
+    {"id": 301, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Awful", "spanish": "Horrible"},
+    {"id": 302, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Perfect", "spanish": "Perfecto"},
+    {"id": 303, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Imperfect", "spanish": "Imperfecto"},
+    {"id": 304, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Outstanding", "spanish": "Sobresaliente"},
+    {"id": 305, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Ordinary", "spanish": "Ordinario"},
+    {"id": 306, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Extraordinary", "spanish": "Extraordinario"},
+    {"id": 307, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Unique", "spanish": "Único"},
+    {"id": 308, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Special", "spanish": "Especial"},
+    {"id": 309, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Different", "spanish": "Diferente"},
+    {"id": 310, "section": "ADJETIVOS Y PERSONALIDAD", "english": "Similar", "spanish": "Similar"},
+    {"id": 312, "section": "LUGARES Y EDIFICIOS", "english": "Airport", "spanish": "Aeropuerto"},
+    {"id": 313, "section": "LUGARES Y EDIFICIOS", "english": "Airport lounge / VIP lounge", "spanish": "Sala VIP / Salón de espera exclusivo"},
+    {"id": 314, "section": "LUGARES Y EDIFICIOS", "english": "Alley", "spanish": "Callejón"},
+    {"id": 315, "section": "LUGARES Y EDIFICIOS", "english": "Amusement park", "spanish": "Parque de atracciones"},
+    {"id": 316, "section": "LUGARES Y EDIFICIOS", "english": "Aquarium", "spanish": "Acuario"},
+    {"id": 317, "section": "LUGARES Y EDIFICIOS", "english": "Arcade", "spanish": "Salón de juegos / Maquinitas"},
+    {"id": 318, "section": "LUGARES Y EDIFICIOS", "english": "Arcade corner", "spanish": "Zona de videojuegos", "note": "dentro de un establecimiento"},
+    {"id": 319, "section": "LUGARES Y EDIFICIOS", "english": "Art gallery", "spanish": "Galería de arte"},
+    {"id": 320, "section": "LUGARES Y EDIFICIOS", "english": "Asylum", "spanish": "Asilo / Manicomio"},
+    {"id": 321, "section": "LUGARES Y EDIFICIOS", "english": "Attic", "spanish": "Ático / Desván"},
+    {"id": 322, "section": "LUGARES Y EDIFICIOS", "english": "Backyard", "spanish": "Patio trasero"},
+    {"id": 323, "section": "LUGARES Y EDIFICIOS", "english": "Baggage claim", "spanish": "Mostrador de entrega de equipaje"},
+    {"id": 324, "section": "LUGARES Y EDIFICIOS", "english": "Bakery", "spanish": "Panadería"},
+    {"id": 325, "section": "LUGARES Y EDIFICIOS", "english": "Bank", "spanish": "Banco"},
+    {"id": 326, "section": "LUGARES Y EDIFICIOS", "english": "Bar / Pub", "spanish": "Bar / Taberna"},
+    {"id": 327, "section": "LUGARES Y EDIFICIOS", "english": "Barbershop", "spanish": "Barbería"},
+    {"id": 328, "section": "LUGARES Y EDIFICIOS", "english": "Basement", "spanish": "Sótano"},
+    {"id": 329, "section": "LUGARES Y EDIFICIOS", "english": "Bay", "spanish": "Bahía"},
+    {"id": 330, "section": "LUGARES Y EDIFICIOS", "english": "Bazaar", "spanish": "Bazar"},
+    {"id": 331, "section": "LUGARES Y EDIFICIOS", "english": "Beach", "spanish": "Playa"},
+    {"id": 332, "section": "LUGARES Y EDIFICIOS", "english": "Beauty salon", "spanish": "Salón de belleza"},
+    {"id": 333, "section": "LUGARES Y EDIFICIOS", "english": "Bedroom", "spanish": "Dormitorio / Recámara"},
+    {"id": 334, "section": "LUGARES Y EDIFICIOS", "english": "Bookstore", "spanish": "Librería"},
+    {"id": 335, "section": "LUGARES Y EDIFICIOS", "english": "Border checkpoint", "spanish": "Puesto de control fronterizo"},
+    {"id": 336, "section": "LUGARES Y EDIFICIOS", "english": "Boutique", "spanish": "Tienda de ropa de diseño"},
+    {"id": 337, "section": "LUGARES Y EDIFICIOS", "english": "Bowling alley", "spanish": "Bolera / Salón de bolos"},
+    {"id": 338, "section": "LUGARES Y EDIFICIOS", "english": "Box office / Ticket counter", "spanish": "Taquilla"},
+    {"id": 339, "section": "LUGARES Y EDIFICIOS", "english": "Brewery", "spanish": "Cervecería"},
+    {"id": 340, "section": "LUGARES Y EDIFICIOS", "english": "Bridge", "spanish": "Puente"},
+    {"id": 341, "section": "LUGARES Y EDIFICIOS", "english": "Bus station", "spanish": "Estación de autobuses"},
+    {"id": 342, "section": "LUGARES Y EDIFICIOS", "english": "Butcher shop", "spanish": "Carnicería"},
+    {"id": 343, "section": "LUGARES Y EDIFICIOS", "english": "Cabin", "spanish": "Cabaña"},
+    {"id": 344, "section": "LUGARES Y EDIFICIOS", "english": "Café / Coffee shop", "spanish": "Cafetería"},
+    {"id": 345, "section": "LUGARES Y EDIFICIOS", "english": "Cafeteria", "spanish": "Cafetería de autoservicio / Comedor"},
+    {"id": 346, "section": "LUGARES Y EDIFICIOS", "english": "Campground / Campsite", "spanish": "Campamento / Zona de acampar"},
+    {"id": 347, "section": "LUGARES Y EDIFICIOS", "english": "Canal", "spanish": "Canal"},
+    {"id": 348, "section": "LUGARES Y EDIFICIOS", "english": "Canyon", "spanish": "Cañón"},
+    {"id": 349, "section": "LUGARES Y EDIFICIOS", "english": "Casino", "spanish": "Casino"},
+    {"id": 350, "section": "LUGARES Y EDIFICIOS", "english": "Castle", "spanish": "Castillo"},
+    {"id": 351, "section": "LUGARES Y EDIFICIOS", "english": "Catacombs", "spanish": "Catacumbas"},
+    {"id": 352, "section": "LUGARES Y EDIFICIOS", "english": "Cathedral", "spanish": "Catedral"},
+    {"id": 353, "section": "LUGARES Y EDIFICIOS", "english": "Cave", "spanish": "Cueva"},
+    {"id": 354, "section": "LUGARES Y EDIFICIOS", "english": "Cemetery / Graveyard", "spanish": "Cementerio"},
+    {"id": 355, "section": "LUGARES Y EDIFICIOS", "english": "Chapel", "spanish": "Capilla"},
+    {"id": 356, "section": "LUGARES Y EDIFICIOS", "english": "Check-in counter", "spanish": "Mostrador de facturación / Registro"},
+    {"id": 357, "section": "LUGARES Y EDIFICIOS", "english": "Church", "spanish": "Iglesia"},
+    {"id": 358, "section": "LUGARES Y EDIFICIOS", "english": "Cinema / Movie theater", "spanish": "Cine"},
+    {"id": 359, "section": "LUGARES Y EDIFICIOS", "english": "Circus", "spanish": "Circo"},
+    {"id": 360, "section": "LUGARES Y EDIFICIOS", "english": "City hall", "spanish": "Ayuntamiento / Palacio municipal"},
+    {"id": 361, "section": "LUGARES Y EDIFICIOS", "english": "Cliff", "spanish": "Acantilado"},
+    {"id": 362, "section": "LUGARES Y EDIFICIOS", "english": "Clinic", "spanish": "Clínica"},
+    {"id": 363, "section": "LUGARES Y EDIFICIOS", "english": "Concert hall", "spanish": "Sala de conciertos"},
+    {"id": 364, "section": "LUGARES Y EDIFICIOS", "english": "Concession stand", "spanish": "Snack bar - Cafetería del cine / Dulcería"},
+    {"id": 366, "section": "LUGARES Y EDIFICIOS", "english": "Court", "spanish": "Cancha / Tribunal"},
+    {"id": 367, "section": "LUGARES Y EDIFICIOS", "english": "Courthouse", "spanish": "Tribunal / Juzgado"},
+    {"id": 368, "section": "LUGARES Y EDIFICIOS", "english": "Creek / Stream", "spanish": "Arroyo"},
+    {"id": 369, "section": "LUGARES Y EDIFICIOS", "english": "Currency exchange office", "spanish": "Casa de cambio"},
+    {"id": 370, "section": "LUGARES Y EDIFICIOS", "english": "Customs", "spanish": "Aduana"},
+    {"id": 371, "section": "LUGARES Y EDIFICIOS", "english": "Customs inspection area", "spanish": "Zona de inspección de aduanas"},
+    {"id": 372, "section": "LUGARES Y EDIFICIOS", "english": "Dam", "spanish": "Presa"},
+    {"id": 373, "section": "LUGARES Y EDIFICIOS", "english": "Customs office", "spanish": "Caja de declaración", "note": "fiscal / de mercancías"},
+    {"id": 374, "section": "LUGARES Y EDIFICIOS", "english": "Departure gate", "spanish": "Puerta de embarque"},
+    {"id": 375, "section": "LUGARES Y EDIFICIOS", "english": "Desert", "spanish": "Desierto"},
+    {"id": 376, "section": "LUGARES Y EDIFICIOS", "english": "Docks", "spanish": "Muelle"},
+    {"id": 377, "section": "LUGARES Y EDIFICIOS", "english": "Dock", "spanish": "Muelle"},
+    {"id": 378, "section": "LUGARES Y EDIFICIOS", "english": "Dormitory / Dorm", "spanish": "Residencia estudiantil"},
+    {"id": 379, "section": "LUGARES Y EDIFICIOS", "english": "Drive-thru", "spanish": "Servicio en auto de autoservicio"},
+    {"id": 380, "section": "LUGARES Y EDIFICIOS", "english": "Dry cleaner", "spanish": "Tintorería"},
+    {"id": 381, "section": "LUGARES Y EDIFICIOS", "english": "Duty-free shop", "spanish": "Tienda libre de impuestos"},
+    {"id": 382, "section": "LUGARES Y EDIFICIOS", "english": "Emergency room", "spanish": "Sala de emergencia"},
+    {"id": 384, "section": "LUGARES Y EDIFICIOS", "english": "Factory", "spanish": "Fábrica"},
+    {"id": 385, "section": "LUGARES Y EDIFICIOS", "english": "Fairground", "spanish": "Recinto ferial / Campo de la feria"},
+    {"id": 386, "section": "LUGARES Y EDIFICIOS", "english": "Farm", "spanish": "Granja"},
+    {"id": 387, "section": "LUGARES Y EDIFICIOS", "english": "Fire station", "spanish": "Estación de bomberos"},
+    {"id": 388, "section": "LUGARES Y EDIFICIOS", "english": "Flower shop / Florist", "spanish": "Floristería"},
+    {"id": 389, "section": "LUGARES Y EDIFICIOS", "english": "Forest", "spanish": "Bosque"},
+    {"id": 390, "section": "LUGARES Y EDIFICIOS", "english": "Fortress", "spanish": "Fortaleza"},
+    {"id": 391, "section": "LUGARES Y EDIFICIOS", "english": "Foundry", "spanish": "Fundición"},
+    {"id": 392, "section": "LUGARES Y EDIFICIOS", "english": "Funeral home / Funeral parlor", "spanish": "Funeraria"},
+    {"id": 393, "section": "LUGARES Y EDIFICIOS", "english": "Garden", "spanish": "Jardín"},
+    {"id": 394, "section": "LUGARES Y EDIFICIOS", "english": "Gas station", "spanish": "Gasolinera"},
+    {"id": 395, "section": "LUGARES Y EDIFICIOS", "english": "Glacier", "spanish": "Glaciar"},
+    {"id": 396, "section": "LUGARES Y EDIFICIOS", "english": "Greenhouse", "spanish": "Invernadero"},
+    {"id": 397, "section": "LUGARES Y EDIFICIOS", "english": "Gym", "spanish": "Gimnasio"},
+    {"id": 398, "section": "LUGARES Y EDIFICIOS", "english": "Harbor / Port", "spanish": "Puerto marítimo"},
+    {"id": 399, "section": "LUGARES Y EDIFICIOS", "english": "Hardware store", "spanish": "Ferretería"},
+    {"id": 400, "section": "LUGARES Y EDIFICIOS", "english": "High school / School", "spanish": "Escuela"},
+    {"id": 401, "section": "LUGARES Y EDIFICIOS", "english": "Highway / Freeway", "spanish": "Autopista"},
+    {"id": 402, "section": "LUGARES Y EDIFICIOS", "english": "Hill", "spanish": "Colina"},
+    {"id": 403, "section": "LUGARES Y EDIFICIOS", "english": "Hospital", "spanish": "Hospital"},
+    {"id": 404, "section": "LUGARES Y EDIFICIOS", "english": "Hotel", "spanish": "Hotel"},
+    {"id": 405, "section": "LUGARES Y EDIFICIOS", "english": "Ice rink", "spanish": "Pista de hielo"},
+    {"id": 406, "section": "LUGARES Y EDIFICIOS", "english": "Immigration hall", "spanish": "Sala de migración / Control de pasaportes"},
+    {"id": 407, "section": "LUGARES Y EDIFICIOS", "english": "In an airport / Inside an airport", "spanish": "Dentro de un aeropuerto", "note": "contexto"},
+    {"id": 408, "section": "LUGARES Y EDIFICIOS", "english": "Infirmary", "spanish": "Enfermería"},
+    {"id": 409, "section": "LUGARES Y EDIFICIOS", "english": "Information desk", "spanish": "Mostrador de información"},
+    {"id": 410, "section": "LUGARES Y EDIFICIOS", "english": "International bridge", "spanish": "Puente internacional"},
+    {"id": 411, "section": "LUGARES Y EDIFICIOS", "english": "Jail", "spanish": "Cárcel"},
+    {"id": 412, "section": "LUGARES Y EDIFICIOS", "english": "Jewelry store", "spanish": "Joyería"},
+    {"id": 413, "section": "LUGARES Y EDIFICIOS", "english": "Jungle", "spanish": "Selva"},
+    {"id": 414, "section": "LUGARES Y EDIFICIOS", "english": "Junkyard / Scrap yard", "spanish": "Desguace / Depósito de chatarra"},
+    {"id": 415, "section": "LUGARES Y EDIFICIOS", "english": "Kitchen", "spanish": "Cocina"},
+    {"id": 416, "section": "LUGARES Y EDIFICIOS", "english": "Laboratory / Lab", "spanish": "Laboratorio"},
+    {"id": 417, "section": "LUGARES Y EDIFICIOS", "english": "Lake", "spanish": "Lago"},
+    {"id": 418, "section": "LUGARES Y EDIFICIOS", "english": "Laundromat", "spanish": "Lavandería autoservicio"},
+    {"id": 419, "section": "LUGARES Y EDIFICIOS", "english": "Library", "spanish": "Biblioteca"},
+    {"id": 420, "section": "LUGARES Y EDIFICIOS", "english": "Lighthouse", "spanish": "Faro"},
+    {"id": 421, "section": "LUGARES Y EDIFICIOS", "english": "Lobby", "spanish": "Vestíbulo / Entrada principal"},
+    {"id": 422, "section": "LUGARES Y EDIFICIOS", "english": "Lost and found office", "spanish": "Oficina de objetos perdidos"},
+    {"id": 423, "section": "LUGARES Y EDIFICIOS", "english": "Luggage claim area", "spanish": "Zona de recogida de equipaje"},
+    {"id": 424, "section": "LUGARES Y EDIFICIOS", "english": "Mall / Shopping center", "spanish": "Centro comercial"},
+    {"id": 425, "section": "LUGARES Y EDIFICIOS", "english": "Mansion", "spanish": "Mansión"},
+    {"id": 426, "section": "LUGARES Y EDIFICIOS", "english": "Market", "spanish": "Mercado"},
+    {"id": 427, "section": "LUGARES Y EDIFICIOS", "english": "Meadow", "spanish": "Prado"},
+    {"id": 428, "section": "LUGARES Y EDIFICIOS", "english": "Mine", "spanish": "Mina"},
+    {"id": 429, "section": "LUGARES Y EDIFICIOS", "english": "Monastery", "spanish": "Monasterio"},
+    {"id": 430, "section": "LUGARES Y EDIFICIOS", "english": "Monument", "spanish": "Monumento"},
+    {"id": 431, "section": "LUGARES Y EDIFICIOS", "english": "Motel", "spanish": "Motel"},
+    {"id": 432, "section": "LUGARES Y EDIFICIOS", "english": "Mountain", "spanish": "Montaña"},
+    {"id": 433, "section": "LUGARES Y EDIFICIOS", "english": "Movie screen", "spanish": "Pantalla de cine"},
+    {"id": 434, "section": "LUGARES Y EDIFICIOS", "english": "Museum", "spanish": "Museo"},
+    {"id": 435, "section": "LUGARES Y EDIFICIOS", "english": "Neighborhood", "spanish": "Vecindario / Barrio"},
+    {"id": 436, "section": "LUGARES Y EDIFICIOS", "english": "Nightclub", "spanish": "Discoteca"},
+    {"id": 437, "section": "LUGARES Y EDIFICIOS", "english": "Nursery", "spanish": "Guardería / Vivero"},
+    {"id": 438, "section": "LUGARES Y EDIFICIOS", "english": "Observatory", "spanish": "Observatorio"},
+    {"id": 439, "section": "LUGARES Y EDIFICIOS", "english": "Ocean / Sea", "spanish": "Océano / Mar"},
+    {"id": 440, "section": "LUGARES Y EDIFICIOS", "english": "Office building", "spanish": "Edificio de oficinas"},
+    {"id": 441, "section": "LUGARES Y EDIFICIOS", "english": "Orchard", "spanish": "Huerto de árboles frutales"},
+    {"id": 442, "section": "LUGARES Y EDIFICIOS", "english": "Orphanage", "spanish": "Orfanato"},
+    {"id": 443, "section": "LUGARES Y EDIFICIOS", "english": "Palace", "spanish": "Palacio"},
+    {"id": 444, "section": "LUGARES Y EDIFICIOS", "english": "Pantheon", "spanish": "Panteón"},
+    {"id": 445, "section": "LUGARES Y EDIFICIOS", "english": "Park", "spanish": "Parque"},
+    {"id": 446, "section": "LUGARES Y EDIFICIOS", "english": "Parking lot", "spanish": "Estacionamiento"},
+    {"id": 447, "section": "LUGARES Y EDIFICIOS", "english": "Parking control booth", "spanish": "Caseta de control de estacionamiento"},
+    {"id": 448, "section": "LUGARES Y EDIFICIOS", "english": "Penthouse", "spanish": "Ático / Piso de lujo"},
+    {"id": 449, "section": "LUGARES Y EDIFICIOS", "english": "Pet shop", "spanish": "Tienda de mascotas"},
+    {"id": 450, "section": "LUGARES Y EDIFICIOS", "english": "Pharmacy / Drugstore", "spanish": "Farmacia"},
+    {"id": 451, "section": "LUGARES Y EDIFICIOS", "english": "Planetarium", "spanish": "Planetario"},
+    {"id": 452, "section": "LUGARES Y EDIFICIOS", "english": "Playground", "spanish": "Parque infantil"},
+    {"id": 454, "section": "LUGARES Y EDIFICIOS", "english": "Police station", "spanish": "Estación de policía"},
+    {"id": 455, "section": "LUGARES Y EDIFICIOS", "english": "Post office", "spanish": "Oficina de correos"},
+    {"id": 456, "section": "LUGARES Y EDIFICIOS", "english": "Prison / Jail", "spanish": "Prisión / Cárcel"},
+    {"id": 457, "section": "LUGARES Y EDIFICIOS", "english": "Projection booth", "spanish": "Cabina de proyección"},
+    {"id": 458, "section": "LUGARES Y EDIFICIOS", "english": "Quarry", "spanish": "Cantera"},
+    {"id": 459, "section": "LUGARES Y EDIFICIOS", "english": "Ranch", "spanish": "Rancho"},
+    {"id": 460, "section": "LUGARES Y EDIFICIOS", "english": "Refinery", "spanish": "Refinería"},
+    {"id": 461, "section": "LUGARES Y EDIFICIOS", "english": "Resort", "spanish": "Centro vacacional"},
+    {"id": 462, "section": "LUGARES Y EDIFICIOS", "english": "Restaurant", "spanish": "Restaurante"},
+    {"id": 463, "section": "LUGARES Y EDIFICIOS", "english": "Restrooms / Bathrooms", "spanish": "Sanitarios / Baños"},
+    {"id": 464, "section": "LUGARES Y EDIFICIOS", "english": "River", "spanish": "Río"},
+    {"id": 465, "section": "LUGARES Y EDIFICIOS", "english": "Row of seats", "spanish": "Fila de asientos"},
+    {"id": 466, "section": "LUGARES Y EDIFICIOS", "english": "Ruins", "spanish": "Ruinas"},
+    {"id": 467, "section": "LUGARES Y EDIFICIOS", "english": "Runway", "spanish": "Pista de aterrizaje / despegue"},
+    {"id": 468, "section": "LUGARES Y EDIFICIOS", "english": "Safari park", "spanish": "Parque de safari"},
+    {"id": 469, "section": "LUGARES Y EDIFICIOS", "english": "Sanctuary", "spanish": "Santuario"},
+    {"id": 470, "section": "LUGARES Y EDIFICIOS", "english": "Screening room / Auditorium", "spanish": "Sala de proyección"},
+    {"id": 471, "section": "LUGARES Y EDIFICIOS", "english": "Secondary inspection area", "spanish": "Zona de inspección secundaria"},
+    {"id": 472, "section": "LUGARES Y EDIFICIOS", "english": "Security checkpoint", "spanish": "Filtro de seguridad / Control de seguridad"},
+    {"id": 473, "section": "LUGARES Y EDIFICIOS", "english": "Shoe store", "spanish": "Zapatería"},
+    {"id": 474, "section": "LUGARES Y EDIFICIOS", "english": "Skyscraper", "spanish": "Rascacielos"},
+    {"id": 475, "section": "LUGARES Y EDIFICIOS", "english": "Spa", "spanish": "Spa / Balneario"},
+    {"id": 476, "section": "LUGARES Y EDIFICIOS", "english": "Square / Plaza", "spanish": "Plaza"},
+    {"id": 477, "section": "LUGARES Y EDIFICIOS", "english": "Stadium", "spanish": "Estadio"},
+    {"id": 478, "section": "LUGARES Y EDIFICIOS", "english": "Studio", "spanish": "Estudio", "note": "arte, música o grabación"},
+    {"id": 479, "section": "LUGARES Y EDIFICIOS", "english": "Subway station", "spanish": "Estación de metro"},
+    {"id": 480, "section": "LUGARES Y EDIFICIOS", "english": "Supermarket", "spanish": "Supermercado"},
+    {"id": 481, "section": "LUGARES Y EDIFICIOS", "english": "Swamp / Marsh", "spanish": "Pantano"},
+    {"id": 482, "section": "LUGARES Y EDIFICIOS", "english": "Synagogue", "spanish": "Sinagoga"},
+    {"id": 483, "section": "LUGARES Y EDIFICIOS", "english": "Tarmac / Apron", "spanish": "Plataforma de estacionamiento de aviones"},
+    {"id": 484, "section": "LUGARES Y EDIFICIOS", "english": "Temple", "spanish": "Templo"},
+    {"id": 485, "section": "LUGARES Y EDIFICIOS", "english": "Theater", "spanish": "Teatro"},
+    {"id": 486, "section": "LUGARES Y EDIFICIOS", "english": "Ticket gate / Turnstile", "spanish": "Control de accesos / Entrada de boletos"},
+    {"id": 487, "section": "LUGARES Y EDIFICIOS", "english": "Tomb", "spanish": "Tumba / Sepulcro"},
+    {"id": 488, "section": "LUGARES Y EDIFICIOS", "english": "Tower", "spanish": "Torre"},
+    {"id": 489, "section": "LUGARES Y EDIFICIOS", "english": "Train station", "spanish": "Estación de tren"},
+    {"id": 490, "section": "LUGARES Y EDIFICIOS", "english": "University", "spanish": "Universidad"},
+    {"id": 491, "section": "LUGARES Y EDIFICIOS", "english": "Valley", "spanish": "Valle"},
+    {"id": 492, "section": "LUGARES Y EDIFICIOS", "english": "Veterinary clinic", "spanish": "Clínica veterinaria"},
+    {"id": 493, "section": "LUGARES Y EDIFICIOS", "english": "Vineyard", "spanish": "Viñedo"},
+    {"id": 494, "section": "LUGARES Y EDIFICIOS", "english": "VIP lounge", "spanish": "Sala de espera VIP", "note": "cine / general"},
+    {"id": 495, "section": "LUGARES Y EDIFICIOS", "english": "Volcano", "spanish": "Volcán"},
+    {"id": 496, "section": "LUGARES Y EDIFICIOS", "english": "Waiting area", "spanish": "Área de espera con sillas"},
+    {"id": 497, "section": "LUGARES Y EDIFICIOS", "english": "Warehouse", "spanish": "Almacén / Bodega"},
+    {"id": 498, "section": "LUGARES Y EDIFICIOS", "english": "Water fountain", "spanish": "Bebedero de agua"},
+    {"id": 499, "section": "LUGARES Y EDIFICIOS", "english": "Water park", "spanish": "Parque acuático"},
+    {"id": 500, "section": "LUGARES Y EDIFICIOS", "english": "Waterfall", "spanish": "Cascada"},
+    {"id": 501, "section": "LUGARES Y EDIFICIOS", "english": "Welcome center / Tourist office", "spanish": "Centro de bienvenida / Oficina de turismo"},
+    {"id": 502, "section": "LUGARES Y EDIFICIOS", "english": "Wheelchair seating area", "spanish": "Espacio para sillas de ruedas"},
+    {"id": 503, "section": "LUGARES Y EDIFICIOS", "english": "Windmill", "spanish": "Molino de viento"},
+    {"id": 504, "section": "LUGARES Y EDIFICIOS", "english": "Zoo", "spanish": "Zoológico"}
+  ]};
+
+  /* ======================================================================
+     UTILIDADES
+     ====================================================================== */
+  const $  = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+  const normalize = value => String(value ?? '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[¿?¡!.,;:()[\]{}"«»…]/g, ' ')
+    .replace(/['’`´]/g, '')
+    .replace(/[-–—]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  // "Sigue esta calle (o carretera)" acepta con y sin lo de paréntesis
+  const stripParens = value => String(value ?? '').replace(/\([^)]*\)/g, ' ');
+  const answerForms = variant =>
+    [...new Set([normalize(variant), normalize(stripParens(variant))].filter(Boolean))];
+
+  const splitVariants = value => String(value ?? '')
+    .split('/')
+    .map(part => part.trim())
+    .filter(Boolean);
+
+  const firstLetter = value => {
+    const cleaned = String(value ?? '').replace(/^[¿¡"'“”‘’(\[]+/, '').trim();
+    return Array.from(cleaned)[0] || '';
+  };
+
+  const shuffle = list => {
+    const a = list.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+
+  function levenshtein(a, b) {
+    if (a === b) return 0;
+    if (!a.length) return b.length;
+    if (!b.length) return a.length;
+    let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+    for (let i = 1; i <= a.length; i++) {
+      const cur = [i];
+      for (let j = 1; j <= b.length; j++) {
+        cur[j] = Math.min(
+          prev[j] + 1,
+          cur[j - 1] + 1,
+          prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+        );
+      }
+      prev = cur;
+    }
+    return prev[b.length];
+  }
+
+  const formatDuration = ms => {
+    const totalSec = Math.max(0, Math.round(ms / 1000));
+    const m = Math.floor(totalSec / 60);
+    const s = totalSec % 60;
+    return m ? `${m}m ${String(s).padStart(2, '0')}s` : `${s}s`;
+  };
+
+  /* ======================================================================
+     PREPARACIÓN DE DATOS
+     ====================================================================== */
+  const rawEntries = (vocabData && Array.isArray(vocabData.vocabulary) ? vocabData.vocabulary : [])
+    .map((v, i) => ({
+      id: v.id ?? i + 1,
+      section: String(v.section || 'General').trim(),
+      english: String(v.english || '').trim(),
+      spanish: String(v.spanish || '').trim(),
+      note: String(v.note || '').trim()
+    }))
+    .filter(v =>
+      v.english && v.spanish &&
+      !/\(columna/i.test(v.english) &&
+      !/\(columna/i.test(v.spanish)
+    );
+
+  const dedupeSeen = new Set();
+  const entries = rawEntries.filter(v => {
+    const key = `${v.section}|${normalize(v.english)}|${normalize(v.spanish)}`;
+    if (dedupeSeen.has(key)) return false;
+    dedupeSeen.add(key);
+    return true;
+  });
+
+  const enCounts = new Map();
+  const esCounts = new Map();
+  entries.forEach(v => {
+    splitVariants(v.english).forEach(p => {
+      const k = normalize(p);
+      enCounts.set(k, (enCounts.get(k) || 0) + 1);
+    });
+    splitVariants(v.spanish).forEach(p => {
+      const k = normalize(p);
+      esCounts.set(k, (esCounts.get(k) || 0) + 1);
+    });
+  });
+
+  /* ======================================================================
+     DIFICULTAD MANUAL POR ID
+     ----------------------------------------------------------------------
+     easy   = Regalada   (cognados casi idénticos, palabras muy básicas)
+     medium = Intermedia (comunes pero no cognados directos)
+     hard   = Difícil    (compuestas, frases largas, términos técnicos)
+     ====================================================================== */
+  const DIFFICULTY_MAP = {
+    // ---- GIVING DIRECTIONS & LOCATION WORDS (1-50) ----
+    1:'easy', 2:'easy', 3:'easy', 4:'easy', 5:'medium', 6:'medium',
+    7:'easy', 8:'easy', 9:'easy', 10:'medium', 11:'medium', 12:'medium',
+    13:'easy', 14:'easy', 15:'medium', 16:'medium', 17:'hard', 18:'hard',
+    19:'medium', 20:'easy', 21:'easy', 22:'easy', 23:'easy', 24:'medium',
+    25:'easy', 26:'easy', 27:'easy', 28:'easy', 29:'medium', 30:'medium',
+    31:'easy', 32:'medium', 33:'medium', 34:'hard', 35:'hard', 36:'hard',
+    37:'hard', 38:'medium', 39:'medium', 40:'medium', 41:'medium',
+    42:'easy', 43:'easy', 44:'easy', 45:'easy', 46:'hard', 47:'medium',
+    48:'medium', 49:'medium', 50:'medium',
+
+    // ---- THINGS YOU FIND ON THE STREET (51-110) ----
+    51:'medium', 52:'medium', 53:'medium', 54:'easy', 55:'hard',
+    56:'medium', 57:'easy', 58:'easy', 59:'easy', 60:'easy',
+    61:'medium', 62:'medium', 63:'easy', 64:'easy', 65:'easy',
+    66:'medium', 67:'medium', 68:'hard', 69:'medium', 70:'medium',
+    71:'hard', 72:'easy', 73:'medium', 74:'medium', 75:'easy',
+    76:'hard', 77:'medium', 78:'hard', 79:'hard', 80:'medium',
+    81:'easy', 82:'hard', 83:'medium', 84:'easy', 85:'medium',
+    86:'medium', 87:'medium', 88:'easy', 89:'medium', 90:'easy',
+    91:'medium', 92:'easy', 93:'medium', 94:'medium', 95:'hard',
+    96:'medium', 97:'easy', 98:'easy', 99:'easy', 100:'medium',
+    101:'easy', 102:'easy', 103:'easy', 104:'hard', 105:'easy',
+    106:'medium', 107:'medium', 108:'easy', 109:'hard', 110:'medium',
+
+    // ---- ADJETIVOS Y PERSONALIDAD (111-310) ----
+    111:'easy', 112:'easy', 113:'easy', 114:'easy', 115:'easy', 116:'easy',
+    117:'easy', 118:'easy', 119:'easy', 120:'easy', 121:'easy', 122:'easy',
+    123:'easy', 124:'medium', 125:'easy', 126:'easy', 127:'easy', 128:'medium',
+    129:'medium', 130:'easy', 131:'easy', 132:'easy', 133:'medium', 134:'easy',
+    135:'medium', 136:'easy', 137:'medium', 138:'medium', 139:'easy', 140:'easy',
+    141:'easy', 142:'easy', 143:'easy', 144:'easy', 145:'easy', 146:'easy',
+    147:'easy', 148:'easy', 149:'easy', 150:'easy', 151:'easy', 152:'easy',
+    153:'medium', 154:'easy', 155:'easy', 156:'easy', 157:'medium', 158:'easy',
+    159:'easy', 160:'easy', 161:'easy', 162:'easy', 163:'easy', 164:'easy',
+    165:'easy', 166:'easy', 167:'easy', 168:'easy', 169:'easy', 170:'easy',
+    171:'medium', 172:'easy', 173:'easy', 174:'easy', 175:'easy', 176:'easy',
+    177:'easy', 178:'medium', 179:'easy', 180:'easy', 181:'medium', 182:'easy',
+    183:'easy', 184:'easy', 185:'easy', 186:'easy', 187:'easy', 188:'easy',
+    189:'easy', 190:'easy', 191:'easy', 192:'easy', 193:'easy', 194:'easy',
+    195:'easy', 196:'easy', 197:'easy', 198:'easy', 199:'easy', 200:'easy',
+    201:'easy', 202:'easy', 203:'easy', 204:'easy', 205:'easy', 206:'easy',
+    207:'easy', 208:'easy', 209:'easy', 210:'easy', 211:'medium', 212:'easy',
+    213:'medium', 214:'easy', 215:'easy', 216:'easy', 217:'easy', 218:'medium',
+    219:'easy', 220:'medium', 221:'easy', 222:'medium', 223:'easy', 224:'easy',
+    225:'easy', 226:'medium', 227:'medium', 228:'easy', 229:'easy', 230:'easy',
+    231:'easy', 232:'easy', 233:'easy', 234:'easy', 235:'easy', 236:'easy',
+    237:'easy', 238:'easy', 239:'easy', 240:'easy', 241:'easy', 242:'easy',
+    243:'easy', 244:'medium', 245:'easy', 246:'easy', 247:'medium', 248:'medium',
+    249:'hard', 250:'easy', 251:'easy', 252:'easy', 253:'medium', 254:'medium',
+    255:'easy', 256:'easy', 257:'easy', 258:'medium', 259:'easy', 260:'easy',
+    261:'easy', 262:'easy', 263:'easy', 264:'easy', 265:'easy', 266:'easy',
+    267:'easy', 268:'medium', 269:'medium', 270:'easy', 271:'easy', 272:'easy',
+    273:'easy', 274:'medium', 275:'easy', 276:'easy', 277:'medium', 278:'medium',
+    279:'medium', 280:'medium', 281:'medium', 282:'medium', 283:'easy', 284:'easy',
+    285:'easy', 286:'easy', 287:'medium', 288:'easy', 289:'easy', 290:'easy',
+    291:'medium', 292:'medium', 293:'easy', 294:'easy', 295:'easy', 296:'easy',
+    297:'easy', 298:'easy', 299:'medium', 300:'easy', 301:'easy', 302:'easy',
+    303:'easy', 304:'medium', 305:'easy', 306:'easy', 307:'easy', 308:'easy',
+    309:'easy', 310:'easy',
+
+    // ---- LUGARES Y EDIFICIOS (312-504) ----
+    312:'easy', 313:'hard', 314:'easy', 315:'medium', 316:'easy', 317:'medium',
+    318:'hard', 319:'easy', 320:'medium', 321:'medium', 322:'easy', 323:'hard',
+    324:'medium', 325:'easy', 326:'easy', 327:'easy', 328:'medium', 329:'easy',
+    330:'easy', 331:'easy', 332:'easy', 333:'easy', 334:'medium', 335:'hard',
+    336:'medium', 337:'medium', 338:'hard', 339:'easy', 340:'easy', 341:'easy',
+    342:'medium', 343:'easy', 344:'easy', 345:'medium', 346:'medium', 347:'easy',
+    348:'easy', 349:'easy', 350:'easy', 351:'easy', 352:'easy', 353:'easy',
+    354:'easy', 355:'easy', 356:'hard', 357:'easy', 358:'easy', 359:'easy',
+    360:'hard', 361:'medium', 362:'easy', 363:'medium', 364:'hard', 366:'medium',
+    367:'medium', 368:'medium', 369:'hard', 370:'medium', 371:'hard', 372:'easy',
+    373:'hard', 374:'medium', 375:'easy', 376:'easy', 377:'easy', 378:'medium',
+    379:'hard', 380:'medium', 381:'hard', 382:'easy', 384:'easy', 385:'hard',
+    386:'easy', 387:'medium', 388:'easy', 389:'easy', 390:'easy', 391:'medium',
+    392:'medium', 393:'easy', 394:'easy', 395:'easy', 396:'hard', 397:'easy',
+    398:'medium', 399:'medium', 400:'easy', 401:'medium', 402:'easy', 403:'easy',
+    404:'easy', 405:'medium', 406:'hard', 407:'hard', 408:'medium', 409:'medium',
+    410:'medium', 411:'easy', 412:'easy', 413:'medium', 414:'hard', 415:'easy',
+    416:'easy', 417:'easy', 418:'medium', 419:'medium', 420:'medium', 421:'medium',
+    422:'hard', 423:'hard', 424:'medium', 425:'easy', 426:'easy', 427:'medium',
+    428:'easy', 429:'easy', 430:'easy', 431:'easy', 432:'easy', 433:'medium',
+    434:'easy', 435:'medium', 436:'medium', 437:'hard', 438:'easy', 439:'easy',
+    440:'medium', 441:'hard', 442:'easy', 443:'easy', 444:'easy', 445:'easy',
+    446:'easy', 447:'hard', 448:'medium', 449:'easy', 450:'easy', 451:'easy',
+    452:'easy', 454:'easy', 455:'easy', 456:'easy', 457:'hard', 458:'medium',
+    459:'easy', 460:'easy', 461:'medium', 462:'easy', 463:'easy', 464:'easy',
+    465:'medium', 466:'easy', 467:'hard', 468:'medium', 469:'easy', 470:'hard',
+    471:'hard', 472:'hard', 473:'medium', 474:'medium', 475:'easy', 476:'easy',
+    477:'easy', 478:'easy', 479:'easy', 480:'easy', 481:'medium', 482:'easy',
+    483:'hard', 484:'easy', 485:'easy', 486:'hard', 487:'easy', 488:'easy',
+    489:'easy', 490:'easy', 491:'easy', 492:'medium', 493:'medium', 494:'hard',
+    495:'easy', 496:'medium', 497:'medium', 498:'medium', 499:'easy', 500:'medium',
+    501:'hard', 502:'hard', 503:'medium', 504:'easy'
+  };
+
+  function expandEntry(raw) {
+    const enVariants = splitVariants(raw.english);
+    const esVariants = splitVariants(raw.spanish);
+    const count = Math.max(enVariants.length, esVariants.length);
+    const pick = (arr, i) => (arr.length === 1 ? arr[0] : arr[i % arr.length]);
+
+    const repeated =
+      enVariants.some(p => (enCounts.get(normalize(p)) || 0) > 1) ||
+      esVariants.some(p => (esCounts.get(normalize(p)) || 0) > 1);
+
+    const difficulty = DIFFICULTY_MAP[raw.id] || 'medium';
+
+    return Array.from({ length: count }, (_, i) => ({
+      uid: `${raw.id}::${i}`,
+      sourceId: raw.id,
+      section: raw.section,
+      english: pick(enVariants, i),
+      spanish: pick(esVariants, i),
+      englishVariants: enVariants,
+      spanishVariants: esVariants,
+      difficulty,
+      repeated,
+      note: raw.note
+    }));
+  }
+
+  const QUESTIONS = entries.flatMap(expandEntry);
+  const QUESTION_BY_UID = new Map(QUESTIONS.map(q => [q.uid, q]));
+
+  /* ======================================================================
+     BLOQUES
+     ====================================================================== */
+  const SESSION_SIZE = 30;
+  const DIFFICULTIES = ['easy', 'medium', 'hard'];
+  const DIFF_LABEL = { easy: 'Regalada', medium: 'Intermedia', hard: 'Difícil' };
+
+  const BLOCKS = [];
+  DIFFICULTIES.forEach(diff => {
+    const items = QUESTIONS.filter(q => q.difficulty === diff);
+    const total = Math.max(1, Math.ceil(items.length / SESSION_SIZE));
+    for (let i = 0, n = 1; i < items.length; i += SESSION_SIZE, n++) {
+      const id = `${diff}-${n}`;
+      const slice = items.slice(i, i + SESSION_SIZE);
+      slice.forEach(q => { q.blockId = id; });
+      BLOCKS.push({
+        id,
+        name: `Bloque ${n}/${total} · ${DIFF_LABEL[diff]}`,
+        difficulty: diff,
+        items: slice
+      });
+    }
+  });
+
+  /* ---- Ayudantes de dirección y grupos ---- */
+  const promptOf = (q, dir) => dir === 'EN-ES' ? q.english : q.spanish;
+  const ownOf    = (q, dir) => dir === 'EN-ES' ? q.spanish : q.english;           // variante de ESTA tarjeta
+  const allOf    = (q, dir) => dir === 'EN-ES' ? q.spanishVariants : q.englishVariants; // todas las de la entrada
+  const formsOf  = variants => [...new Set(variants.flatMap(answerForms))];
+  const slotForms = m => formsOf([ownOf(m.item, m.direction)]);
+  // Mismo bloque + misma dirección + mismo enunciado = mismo grupo
+  const makeGroupKey = (q, dir) => `${q.blockId}|${dir}|${normalize(promptOf(q, dir))}`;
+
+  // Índice global (para avisar "esa traducción es válida pero de otro bloque")
+  const GLOBAL_PROMPTS = { 'EN-ES': new Map(), 'ES-EN': new Map() };
+  QUESTIONS.forEach(q => ['EN-ES', 'ES-EN'].forEach(dir => {
+    const k = normalize(promptOf(q, dir));
+    const map = GLOBAL_PROMPTS[dir];
+    if (!map.has(k)) map.set(k, []);
+    map.get(k).push(q);
+  }));
+
+  /* ======================================================================
+     ALMACENAMIENTO
+     ====================================================================== */
+  const DB_KEY = 'vocabPractice.v4';
+  const LEGACY_MISTAKES_KEY = 'vocabPractice_v3';
+  const LEGACY_STATS_KEY = 'vocabStats_v1';
+
+  const createDB = () => ({
+    version: 4,
+    mistakes: {},
+    review: {},
+    stats: { answered: 0, correct: 0, bestStreak: 0, currentStreak: 0, sessions: 0 },
+    history: [],
+    settings: { theme: null, mode: 'EN-ES' }
+  });
+
+  function readJSON(key) {
+    try { return JSON.parse(localStorage.getItem(key) || 'null'); }
+    catch { return null; }
+  }
+
+  function loadDB() {
+    const base = createDB();
+    const saved = readJSON(DB_KEY);
+
+    if (!saved) {
+      const legacy = readJSON(LEGACY_MISTAKES_KEY);
+      if (legacy && typeof legacy === 'object') {
+        const keepValid = obj => {
+          const out = {};
+          Object.entries(obj || {}).forEach(([uid, val]) => {
+            if (QUESTION_BY_UID.has(uid) && val && typeof val === 'object') {
+              out[uid] = { ...val, uid };
+            }
+          });
+          return out;
+        };
+        base.mistakes = keepValid(legacy.mistakes);
+        base.review = keepValid(legacy.review);
+      }
+      const legacyStats = readJSON(LEGACY_STATS_KEY);
+      if (legacyStats && typeof legacyStats === 'object') {
+        Object.assign(base.stats, {
+          answered: Number(legacyStats.answered) || 0,
+          correct: Number(legacyStats.correct) || 0,
+          bestStreak: Number(legacyStats.bestStreak) || 0,
+          currentStreak: Number(legacyStats.currentStreak) || 0
+        });
+      }
+      return base;
+    }
+
+    if (saved.mistakes && typeof saved.mistakes === 'object') base.mistakes = saved.mistakes;
+    if (saved.review && typeof saved.review === 'object') base.review = saved.review;
+    if (saved.stats && typeof saved.stats === 'object') Object.assign(base.stats, saved.stats);
+    if (saved.settings && typeof saved.settings === 'object') Object.assign(base.settings, saved.settings);
+    if (Array.isArray(saved.history)) base.history = saved.history.slice(-20);
+    return base;
+  }
+
+  const db = loadDB();
+
+  let saveTimer = null;
+  function saveDB() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => {
+      try {
+        localStorage.setItem(DB_KEY, JSON.stringify(db));
+      } catch {
+        toast('No se pudo guardar el progreso', 'error');
+      }
+    }, 100);
+  }
+
+  /* ======================================================================
+     ESTADO DE SESIÓN
+     ====================================================================== */
+  const state = {
+    groups: new Map(),
+    queue: [],
+    index: 0,
+    results: [],
+    answered: false,
+    usedHint: false,
+    streak: 0,
+    startedAt: 0,
+    categoryMode: 'practice',
+    lastCategory: 'practice',
+    lastItems: []
+  };
+
+  /* ======================================================================
+     REFERENCIAS DOM
+     ====================================================================== */
+  const views = {
+    setup: $('#view-setup'),
+    practice: $('#view-practice'),
+    results: $('#view-results')
+  };
+  const main = document.querySelector('main');
+
+  const el = {
+    blockSelect: $('#block-select'),
+    dataInfo: $('#data-info'),
+
+    countEasy: $('#count-easy'),
+    countMedium: $('#count-medium'),
+    countHard: $('#count-hard'),
+    countMistakesEasy: $('#count-mistakes-easy'),
+    countMistakesMedium: $('#count-mistakes-medium'),
+    countMistakesHard: $('#count-mistakes-hard'),
+    countReview: $('#count-review'),
+
+    headerStatus: $('#header-status'),
+    totalProgress: $('#total-progress'),
+
+    statTotal: $('#stat-total'),
+    statAccuracy: $('#stat-accuracy'),
+    statStreak: $('#stat-streak'),
+
+    resetBtn: $('#btn-reset'),
+
+    progressFill: $('#progress-fill'),
+    progressText: $('#progress-text'),
+    chipOk: $('#chip-ok'),
+    chipBad: $('#chip-bad'),
+    chipStreak: $('#chip-streak'),
+
+    wordCard: $('#word-card'),
+    flagMode: $('#flag-mode'),
+    flagRepeat: $('#flag-repeat'),
+    flagHistory: $('#flag-history'),
+    wordSection: $('#word-section'),
+    flagDifficulty: $('#flag-difficulty'),
+    wordPrompt: $('#word-prompt'),
+    wordNote: $('#word-note'),
+    hintBox: $('#hint-box'),
+    shortcuts: $('#shortcuts'),
+
+    form: $('#answer-form'),
+    input: $('#answer-input'),
+    feedback: $('#feedback'),
+    answerIdle: $('#answer-idle'),
+    btnHint: $('#btn-hint'),
+    btnReveal: $('#btn-reveal'),
+    btnSubmit: $('#btn-submit'),
+    btnNext: $('#btn-next'),
+
+    resCorrect: $('#res-correct'),
+    resWrong: $('#res-wrong'),
+    resAccuracy: $('#res-accuracy'),
+    resTime: $('#res-time'),
+    resSummary: $('#results-summary'),
+    resReview: $('#res-review'),
+    resReviewList: $('#res-review-list'),
+    btnRetry: $('#btn-retry'),
+    btnCopyImage: $('#btn-copy-image'),
+
+    modal: $('#modal'),
+    modalTitle: $('#modal-title'),
+    modalBody: $('#modal-body'),
+    modalFoot: $('#modal-foot'),
+    toasts: $('#toasts')
+  };
+
+  /* ======================================================================
+     UI HELPERS
+     ====================================================================== */
+  function showView(name) {
+    Object.entries(views).forEach(([key, node]) => {
+      node.classList.toggle('is-active', key === name);
+    });
+    main.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function toast(message, type = 'info', options = {}) {
+    const node = document.createElement('div');
+    node.className = `toast ${type}`;
+
+    const msg = document.createElement('span');
+    msg.className = 'toast-msg';
+    msg.textContent = message;
+    node.appendChild(msg);
+
+    if (options.action) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'toast-action';
+      btn.textContent = options.action;
+      btn.addEventListener('click', () => {
+        options.onAction?.();
+        dismiss();
+      });
+      node.appendChild(btn);
+    }
+
+    el.toasts.appendChild(node);
+
+    const timer = setTimeout(dismiss, options.duration ?? (options.action ? 5200 : 2400));
+
+    function dismiss() {
+      clearTimeout(timer);
+      if (!node.isConnected) return;
+      node.style.transition = 'opacity .25s ease, transform .25s ease';
+      node.style.opacity = '0';
+      node.style.transform = 'translateY(10px)';
+      setTimeout(() => node.remove(), 260);
+    }
+  }
+
+  function difficultyTagClass(difficulty) {
+    return `tag tag-${difficulty}`;
+  }
+  function difficultyLabel(difficulty) {
+    return ({ easy: 'REGALADA', medium: 'INTERMEDIA', hard: 'DIFÍCIL' })[difficulty] || 'INTERMEDIA';
+  }
+  function categoryLabel(mode) {
+    return ({
+      practice: 'PRÁCTICA',
+      easy: 'REGALADA',
+      medium: 'INTERMEDIA',
+      hard: 'DIFÍCIL',
+      'mistakes-easy': 'ERROR · REGALADA',
+      'mistakes-medium': 'ERROR · INTERMEDIA',
+      'mistakes-hard': 'ERROR · DIFÍCIL',
+      review: 'REVISAR'
+    })[mode] || 'PRÁCTICA';
+  }
+
+  /* ======================================================================
+     MODAL
+     ====================================================================== */
+  let lastFocused = null;
+
+  function openModal({ title, body = [], footer = [] }) {
+    lastFocused = document.activeElement;
+    el.modalTitle.textContent = title;
+    el.modalBody.replaceChildren(...body);
+    el.modalFoot.replaceChildren(...footer);
+    el.modalFoot.hidden = footer.length === 0;
+    el.modal.hidden = false;
+    document.body.classList.add('no-scroll');
+    requestAnimationFrame(() => {
+      const focusable = el.modal.querySelector('input, button:not([data-close]), [tabindex]');
+      focusable?.focus();
+    });
+  }
+
+  function closeModal() {
+    if (el.modal.hidden) return;
+    el.modal.hidden = true;
+    document.body.classList.remove('no-scroll');
+    if (lastFocused && document.contains(lastFocused)) lastFocused.focus();
+  }
+
+  el.modal.addEventListener('click', event => {
+    if (event.target.closest('[data-close]')) closeModal();
+  });
+
+  /* ======================================================================
+     CONTADORES
+     ====================================================================== */
+  const mistakeItems = () => Object.keys(db.mistakes)
+    .map(uid => QUESTION_BY_UID.get(uid))
+    .filter(Boolean);
+
+  const reviewItems = () => Object.keys(db.review)
+    .map(uid => QUESTION_BY_UID.get(uid))
+    .filter(Boolean);
+
+  function updateCounters() {
+    const byDifficulty = { easy: 0, medium: 0, hard: 0 };
+    mistakeItems().forEach(item => { byDifficulty[item.difficulty] += 1; });
+
+    const totals = {
+      easy: QUESTIONS.filter(q => q.difficulty === 'easy').length,
+      medium: QUESTIONS.filter(q => q.difficulty === 'medium').length,
+      hard: QUESTIONS.filter(q => q.difficulty === 'hard').length
+    };
+    const reviewTotal = reviewItems().length;
+
+    el.countEasy.textContent = totals.easy;
+    el.countMedium.textContent = totals.medium;
+    el.countHard.textContent = totals.hard;
+    el.countMistakesEasy.textContent = byDifficulty.easy;
+    el.countMistakesMedium.textContent = byDifficulty.medium;
+    el.countMistakesHard.textContent = byDifficulty.hard;
+    el.countReview.textContent = reviewTotal;
+
+    const totalErrors = byDifficulty.easy + byDifficulty.medium + byDifficulty.hard;
+    const statusText = `${totalErrors} ${totalErrors === 1 ? 'error' : 'errores'} · ${reviewTotal} revisar`;
+    el.headerStatus.textContent = statusText;
+    el.totalProgress.textContent = statusText;
+
+    $$('.cat-btn').forEach(button => {
+      const category = button.dataset.category;
+      const available = {
+        easy: totals.easy,
+        medium: totals.medium,
+        hard: totals.hard,
+        'mistakes-easy': byDifficulty.easy,
+        'mistakes-medium': byDifficulty.medium,
+        'mistakes-hard': byDifficulty.hard,
+        review: reviewTotal
+      }[category] ?? 0;
+      button.disabled = available === 0;
+    });
+
+    el.resetBtn.classList.toggle('hidden', totalErrors === 0 && reviewTotal === 0);
+
+    const { answered, correct, bestStreak } = db.stats;
+    el.statTotal.textContent = answered;
+    el.statAccuracy.textContent = answered ? `${Math.round((correct / answered) * 100)}%` : '—';
+    el.statStreak.textContent = bestStreak;
+  }
+
+  function populateBlocks() {
+    el.blockSelect.innerHTML = '';
+
+    const randomOption = document.createElement('option');
+    randomOption.value = 'random';
+    randomOption.textContent = `Sesión aleatoria · ${SESSION_SIZE} preguntas de todo el vocabulario`;
+    el.blockSelect.appendChild(randomOption);
+
+    DIFFICULTIES.forEach(diff => {
+      const group = document.createElement('optgroup');
+      group.label = DIFF_LABEL[diff];
+      BLOCKS.filter(b => b.difficulty === diff).forEach(block => {
+        const option = document.createElement('option');
+        option.value = block.id;
+        option.textContent = `${block.name} (${block.items.length} preguntas)`;
+        group.appendChild(option);
+      });
+      el.blockSelect.appendChild(group);
+    });
+
+    el.dataInfo.textContent =
+      `${QUESTIONS.length} preguntas · ${entries.length} entradas únicas · ` +
+      `${BLOCKS.length} bloques`;
+  }
+
+  /* ======================================================================
+     GUARDADO
+     ====================================================================== */
+  function saveMistake(item, userAnswer, reason = 'answer') {
+    const previous = db.mistakes[item.uid];
+    delete db.review[item.uid];
+    db.mistakes[item.uid] = {
+      uid: item.uid,
+      sourceId: item.sourceId,
+      difficulty: item.difficulty,
+      english: item.english,
+      spanish: item.spanish,
+      lastAnswer: userAnswer || '',
+      attempts: (previous?.attempts || 0) + 1,
+      reason,
+      updatedAt: new Date().toISOString()
+    };
+    saveDB();
+  }
+
+  function removeMistake(uid) {
+    if (!db.mistakes[uid]) return false;
+    delete db.mistakes[uid];
+    saveDB();
+    return true;
+  }
+
+  function saveForReview(item, reason = 'hint') {
+    delete db.mistakes[item.uid];
+    db.review[item.uid] = {
+      uid: item.uid,
+      sourceId: item.sourceId,
+      difficulty: item.difficulty,
+      english: item.english,
+      spanish: item.spanish,
+      reason,
+      updatedAt: new Date().toISOString()
+    };
+    saveDB();
+  }
+
+  function removeFromReview(uid) {
+    if (!db.review[uid]) return false;
+    delete db.review[uid];
+    saveDB();
+    return true;
+  }
+
+  /* ======================================================================
+     MODO
+     ====================================================================== */
+  const getMode = () => document.querySelector('input[name="mode"]:checked')?.value || 'EN-ES';
+
+  function setMode(mode) {
+    const input = document.querySelector(`input[name="mode"][value="${mode}"]`);
+    if (input) input.checked = true;
+  }
+
+  /* ======================================================================
+     SELECCIÓN DE ITEMS
+     ====================================================================== */
+  function getItemsForCategory(category) {
+    if (DIFFICULTIES.includes(category)) {
+      return QUESTIONS.filter(q => q.difficulty === category);
+    }
+    if (category === 'review') return reviewItems();
+    if (category.startsWith('mistakes-')) {
+      const difficulty = category.replace('mistakes-', '');
+      return mistakeItems().filter(q => q.difficulty === difficulty);
+    }
+    return [];
+  }
+
+  /* ======================================================================
+     SESIÓN
+     ====================================================================== */
+  function startSession(items, categoryMode = 'practice') {
+    if (!items || !items.length) {
+      toast('No hay preguntas disponibles', 'error');
+      return;
+    }
+
+    const mode = getMode();
+    state.queue = shuffle(items).map(item => ({
+      item,
+      direction: mode === 'MIX' ? (Math.random() < 0.5 ? 'EN-ES' : 'ES-EN') : mode,
+      claimed: false,
+      groupKey: ''
+    }));
+    state.groups = new Map();
+    state.queue.forEach(entry => {
+      entry.groupKey = makeGroupKey(entry.item, entry.direction);
+      if (!state.groups.has(entry.groupKey)) state.groups.set(entry.groupKey, []);
+      state.groups.get(entry.groupKey).push(entry);
+    });
+    state.index = 0;
+    state.results = [];
+    state.answered = false;
+    state.usedHint = false;
+    state.streak = 0;
+    state.startedAt = Date.now();
+    state.categoryMode = categoryMode;
+    state.lastCategory = categoryMode;
+    state.lastItems = items.slice();
+
+    showView('practice');
+    renderCurrent();
+  }
+
+  function renderCurrent() {
+    const entry = state.queue[state.index];
+    if (!entry) { finishSession(); return; }
+
+    const { item, direction } = entry;
+    const total = state.queue.length;
+
+    el.progressText.textContent = `${state.index + 1} / ${total}`;
+    el.progressFill.style.width = `${((state.index + 1) / total) * 100}%`;
+
+    const isReview = state.categoryMode === 'review';
+    el.flagMode.textContent = isReview ? 'REVISAR · SIN PISTA' : categoryLabel(state.categoryMode);
+    el.flagMode.className = `tag ${isReview ? 'tag-review' : 'tag-primary'}`;
+
+    el.flagRepeat.classList.toggle('hidden', !item.repeated);
+
+    const savedMistake = db.mistakes[item.uid];
+    const savedReview = db.review[item.uid];
+    if (savedMistake) {
+      const n = savedMistake.attempts || 1;
+      el.flagHistory.textContent = `ERROR · ${n} ${n === 1 ? 'intento' : 'intentos'}`;
+      el.flagHistory.classList.remove('hidden');
+    } else if (savedReview) {
+      el.flagHistory.textContent = 'EN REVISAR';
+      el.flagHistory.classList.remove('hidden');
+    } else {
+      el.flagHistory.classList.add('hidden');
+    }
+
+    el.wordSection.textContent = item.section;
+    el.flagDifficulty.textContent = difficultyLabel(item.difficulty);
+    el.flagDifficulty.className = difficultyTagClass(item.difficulty);
+
+    el.wordPrompt.textContent = direction === 'EN-ES' ? item.english : item.spanish;
+
+    const groupMembers = state.groups.get(entry.groupKey) || [entry];
+    const notes = [];
+    if (item.note) notes.push(`Nota: ${item.note}`);
+    if (groupMembers.length > 1) {
+      notes.push(`Sale ${groupMembers.length} veces en este bloque: da una traducción distinta cada vez, en el orden que quieras.`);
+    }
+    if (notes.length) {
+      el.wordNote.textContent = notes.join(' · ');
+      el.wordNote.classList.remove('hidden');
+    } else {
+      el.wordNote.textContent = '';
+      el.wordNote.classList.add('hidden');
+    }
+
+    el.hintBox.hidden = true;
+    el.hintBox.textContent = '';
+
+    el.input.value = '';
+    el.input.disabled = false;
+    el.input.className = 'answer-input';
+    el.input.setAttribute('aria-label', direction === 'EN-ES' ? 'Respuesta en español' : 'Respuesta en inglés');
+
+    el.feedback.hidden = true;
+    el.feedback.className = 'feedback';
+    el.feedback.textContent = '';
+
+    el.answerIdle.classList.remove('hidden');
+    el.btnSubmit.classList.remove('hidden');
+    el.btnNext.classList.add('hidden');
+    el.btnHint.disabled = isReview;
+
+    el.shortcuts.textContent = isReview ? 'En Revisar la pista está desactivada. · ' : '';
+    appendKbdHint(el.shortcuts);
+
+    state.answered = false;
+    state.usedHint = false;
+
+    el.wordCard.classList.remove('shake');
+    updateLiveChips();
+
+    requestAnimationFrame(() => el.input.focus());
+  }
+
+  function appendKbdHint(container) {
+    const parts = [
+      ['Alt', 'H', 'pista'],
+      ['Alt', 'R', 'revelar'],
+      ['Enter', null, 'continuar'],
+      ['Esc', null, 'salir']
+    ];
+    parts.forEach(([a, b, label], i) => {
+      if (i > 0) container.append(' · ');
+      const k1 = document.createElement('kbd'); k1.textContent = a;
+      container.append(k1);
+      if (b) {
+        container.append('+');
+        const k2 = document.createElement('kbd'); k2.textContent = b;
+        container.append(k2);
+      }
+      container.append(` ${label}`);
+    });
+  }
+
+  function updateLiveChips() {
+    const ok = state.results.filter(r => r.status === 'correct').length;
+    const bad = state.results.length - ok;
+    el.chipOk.textContent = `${ok} correctas`;
+    el.chipBad.textContent = `${bad} fallos`;
+    el.chipStreak.textContent = `Racha ${state.streak}`;
+    el.chipStreak.classList.toggle('hidden', state.streak < 2);
+  }
+
+  /* ======================================================================
+     VALIDACIÓN
+     ====================================================================== */
+
+  // Grupo = tarjetas con el mismo enunciado en el MISMO bloque.
+  // Devuelve null si la tarjeta va sola.
+  function livePool(entry) {
+    const members = state.groups.get(entry.groupKey);
+    if (!members || members.length < 2) return null;
+    return members.filter(m => !m.claimed);
+  }
+
+  // Gasta una respuesta del grupo (al fallar o revelar)
+  function claimSlot(entry) {
+    const pool = livePool(entry);
+    if (!pool || !pool.length) return null;
+    const slot = pool.includes(entry) ? entry : pool[0];
+    slot.claimed = true;
+    return slot;
+  }
+
+  function checkAnswer(value, entry) {
+    const { item, direction } = entry;
+    const user = normalize(value);
+    const pool = livePool(entry);
+
+    const accepted = pool && pool.length
+      ? formsOf(pool.map(m => ownOf(m.item, m.direction)))
+      : formsOf(allOf(item, direction));
+
+    const miss = { correct: false, near: false, accepted, slot: null, alreadyUsed: false, otherBlock: null };
+    if (!user) return miss;
+
+    if (pool && pool.length) {
+      // Orden libre: vale la respuesta de cualquier tarjeta pendiente del grupo (primero la propia)
+      const slot = [entry, ...pool].find(m => pool.includes(m) && slotForms(m).includes(user));
+      if (slot) return { ...miss, correct: true, slot };
+    } else if (accepted.includes(user)) {
+      return { ...miss, correct: true };
+    }
+
+    const members = state.groups.get(entry.groupKey) || [];
+    const alreadyUsed = members.length > 1 &&
+      members.some(m => m.claimed && slotForms(m).includes(user));
+
+    const otherQ = (GLOBAL_PROMPTS[direction].get(normalize(promptOf(item, direction))) || [])
+      .find(q => q.blockId !== item.blockId && formsOf([ownOf(q, direction)]).includes(user));
+    const otherBlock = otherQ ? (BLOCKS.find(b => b.id === otherQ.blockId)?.name || null) : null;
+
+    const near = accepted.some(a => {
+      const tolerance = a.length <= 5 ? 1 : 2;
+      return levenshtein(user, a) <= tolerance;
+    });
+
+    return { ...miss, near, alreadyUsed, otherBlock };
+  }
+
+  /* ======================================================================
+     RESPUESTA
+     ====================================================================== */
+  function currentEntry() { return state.queue[state.index]; }
+
+  function expectedFor(entry, slot) {
+    const s = slot || entry;
+    return ownOf(s.item, s.direction);
+  }
+
+  // Líneas extra al fallar/revelar
+  function extraLines(entry) {
+    const { item, direction } = entry;
+    const members = state.groups.get(entry.groupKey);
+    if (members && members.length > 1) {
+      return members.some(m => !m.claimed)
+        ? ['Este enunciado vuelve a salir en este bloque con otra traducción.']
+        : [];
+    }
+    const own = normalize(ownOf(item, direction));
+    const others = allOf(item, direction).filter(v => normalize(v) !== own);
+    return others.length ? [`También válido: ${others.join(' / ')}`] : [];
+  }
+
+  function useHint() {
+    if (state.answered || state.usedHint) return;
+    if (state.categoryMode === 'review') {
+      toast('La pista está desactivada en Revisar', 'info');
+      return;
+    }
+
+    const entry = currentEntry();
+    const { item, direction } = entry;
+    const pool = livePool(entry);
+    const options = pool && pool.length
+      ? pool.map(m => ownOf(m.item, m.direction))
+      : allOf(item, direction);
+    const letters = [...new Set(options.map(firstLetter).filter(Boolean))];
+
+    state.usedHint = true;
+    const extra = pool && pool.length > 1 ? ` (${pool.length} respuestas posibles)` : '';
+    el.hintBox.textContent = `Pista: ${letters.join('  ·  ')}${extra}`;
+    el.hintBox.hidden = false;
+
+    const wasInReview = Boolean(db.review[item.uid]);
+    const previousMistake = db.mistakes[item.uid];
+    saveForReview(item, 'hint');
+    updateCounters();
+    updateHistoryFlag(item);
+
+    toast('Añadido a Revisar', 'info', {
+      action: 'Deshacer',
+      onAction: () => {
+        if (previousMistake) {
+          db.mistakes[item.uid] = previousMistake;
+          delete db.review[item.uid];
+        } else if (!wasInReview) {
+          delete db.review[item.uid];
+        }
+        saveDB();
+        updateCounters();
+        updateHistoryFlag(item);
+      }
+    });
+
+    el.input.focus();
+  }
+
+  function updateHistoryFlag(item) {
+    const savedMistake = db.mistakes[item.uid];
+    const savedReview = db.review[item.uid];
+    if (savedMistake) {
+      const n = savedMistake.attempts || 1;
+      el.flagHistory.textContent = `ERROR · ${n} ${n === 1 ? 'intento' : 'intentos'}`;
+      el.flagHistory.classList.remove('hidden');
+    } else if (savedReview) {
+      el.flagHistory.textContent = 'EN REVISAR';
+      el.flagHistory.classList.remove('hidden');
+    } else {
+      el.flagHistory.classList.add('hidden');
+    }
+  }
+
+  function revealAnswer() {
+    if (state.answered) return;
+    const entry = currentEntry();
+    const { item, direction } = entry;
+
+    const slot = claimSlot(entry);
+    const expected = expectedFor(entry, slot);
+    state.answered = true;
+    state.streak = 0;
+
+    el.input.disabled = true;
+    el.input.classList.add('wrong');
+    el.answerIdle.classList.add('hidden');
+    el.btnSubmit.classList.add('hidden');
+    el.btnNext.classList.remove('hidden');
+    el.hintBox.hidden = true;
+
+    el.feedback.hidden = false;
+    el.feedback.className = 'feedback error';
+    el.feedback.replaceChildren(
+      line('Respuesta revelada', 'fb-line'),
+      line(expected, 'fb-line fb-dim'),
+      ...extraLines(entry).map(t => line(t, 'fb-line fb-dim'))
+    );
+
+    saveForReview(item, 'reveal');
+    updateCounters();
+    updateHistoryFlag(item);
+
+    state.results.push({
+      item, direction, status: 'revealed',
+      userAnswer: '', usedHint: state.usedHint
+    });
+
+    db.stats.answered += 1;
+    db.stats.currentStreak = 0;
+    saveDB();
+
+    updateLiveChips();
+    el.btnNext.focus();
+  }
+
+  function submitAnswer() {
+    if (state.answered) return;
+
+    const entry = currentEntry();
+    const { item, direction } = entry;
+    const userAnswer = el.input.value;
+
+    if (!normalize(userAnswer)) {
+      el.input.focus();
+      el.wordCard.classList.add('shake');
+      setTimeout(() => el.wordCard.classList.remove('shake'), 400);
+      return;
+    }
+
+    const result = checkAnswer(userAnswer, entry);
+
+    state.answered = true;
+    el.input.disabled = true;
+    el.answerIdle.classList.add('hidden');
+    el.btnSubmit.classList.add('hidden');
+    el.btnNext.classList.remove('hidden');
+
+    db.stats.answered += 1;
+
+    if (result.correct) {
+      if (result.slot) result.slot.claimed = true;   // gasta esa respuesta del grupo
+
+      state.streak += 1;
+      db.stats.correct += 1;
+      db.stats.currentStreak += 1;
+      db.stats.bestStreak = Math.max(db.stats.bestStreak, db.stats.currentStreak);
+
+      el.input.classList.add('correct');
+      el.feedback.hidden = false;
+      el.feedback.className = 'feedback success';
+      el.feedback.replaceChildren(
+        line(state.usedHint ? 'Correcto (con pista)' : 'Correcto')
+      );
+
+      removeMistake(item.uid);
+      if (!state.usedHint) removeFromReview(item.uid);
+      updateCounters();
+      updateHistoryFlag(item);
+
+      state.results.push({ item, direction, status: 'correct', userAnswer, usedHint: state.usedHint });
+    } else {
+      state.streak = 0;
+      db.stats.currentStreak = 0;
+
+      el.input.classList.add('wrong');
+      el.wordCard.classList.add('shake');
+      setTimeout(() => el.wordCard.classList.remove('shake'), 420);
+
+      const slot = claimSlot(entry);
+      el.feedback.hidden = false;
+      el.feedback.className = 'feedback error';
+
+      const nodes = [line(`Respuesta correcta: ${expectedFor(entry, slot)}`)];
+      if (result.near) nodes.push(line('Casi. Revisa la ortografía.', 'fb-line fb-dim'));
+      if (result.alreadyUsed) {
+        nodes.push(line('Esa respuesta ya la usaste en otra tarjeta de este bloque.', 'fb-line fb-dim'));
+      } else if (result.otherBlock) {
+        nodes.push(line(`Esa traducción existe, pero es de una tarjeta de otro bloque (${result.otherBlock}).`, 'fb-line fb-dim'));
+      }
+      extraLines(entry).forEach(t => nodes.push(line(t, 'fb-line fb-dim')));
+      nodes.push(line(`Tu respuesta: ${userAnswer}`, 'fb-line fb-dim'));
+      el.feedback.replaceChildren(...nodes);
+
+      if (!state.usedHint) saveMistake(item, userAnswer, 'answer');
+      else saveForReview(item, 'hint');
+      updateCounters();
+      updateHistoryFlag(item);
+
+      state.results.push({ item, direction, status: 'wrong', userAnswer, usedHint: state.usedHint });
+    }
+
+    saveDB();
+    updateLiveChips();
+    el.btnNext.focus();
+  }
+
+  function line(text, className = 'fb-line') {
+    const div = document.createElement('div');
+    div.className = className;
+    div.textContent = text;
+    return div;
+  }
+
+  /* ======================================================================
+     NAVEGACIÓN
+     ====================================================================== */
+  function goNext() {
+    state.index += 1;
+    if (state.index < state.queue.length) renderCurrent();
+    else finishSession();
+  }
+
+  function finishSession() {
+    const total = state.results.length;
+    const correct = state.results.filter(r => r.status === 'correct').length;
+    const wrong = total - correct;
+    const accuracy = total ? Math.round((correct / total) * 100) : 0;
+
+    db.stats.sessions += 1;
+    db.history.push({
+      at: new Date().toISOString(),
+      category: state.categoryMode,
+      total, correct, wrong, accuracy
+    });
+    db.history = db.history.slice(-20);
+    saveDB();
+
+    el.resCorrect.textContent = correct;
+    el.resWrong.textContent = wrong;
+    el.resAccuracy.textContent = total ? `${accuracy}%` : '—';
+    el.resTime.textContent = formatDuration(Date.now() - state.startedAt);
+
+    const categoryName = categoryLabel(state.categoryMode).toLowerCase();
+    el.resSummary.textContent = `${total} preguntas de ${categoryName}.`;
+
+    const failed = state.results.filter(r => r.status !== 'correct');
+    el.resReviewList.replaceChildren();
+    if (failed.length) {
+      failed.forEach(r => {
+        const li = document.createElement('li');
+        const en = document.createElement('span');
+        en.className = 'rl-en';
+        en.textContent = r.item.english;
+        const arrow = document.createElement('span');
+        arrow.className = 'rl-arrow';
+        arrow.textContent = '—';
+        const es = document.createElement('span');
+        es.className = 'rl-es';
+        es.textContent = r.item.spanish;
+
+        const meta = document.createElement('span');
+        meta.className = 'rl-meta';
+        const blockName = BLOCKS.find(b => b.id === r.item.blockId)?.name || r.item.blockId || 'Bloque';
+        const position = state.results.indexOf(r) + 1;
+        const answerText = r.userAnswer?.trim()
+          ? `Tu respuesta: ${r.userAnswer.trim()}`
+          : (r.status === 'revealed' ? 'Respuesta revelada' : 'Sin respuesta');
+        meta.textContent = `Pregunta ${position}/${total} · ${blockName} · ${r.item.section || 'General'} · ${difficultyLabel(r.item.difficulty)} · ${answerText}`;
+
+        li.append(en, arrow, es, meta);
+        el.resReviewList.appendChild(li);
+      });
+      el.resReview.classList.remove('hidden');
+      el.btnRetry.classList.remove('hidden');
+      el.btnCopyImage.classList.remove('hidden');
+    } else {
+      el.resReview.classList.add('hidden');
+      el.btnRetry.classList.add('hidden');
+      el.btnCopyImage.classList.add('hidden');
+    }
+
+    updateCounters();
+    showView('results');
+  }
+
+  /* ======================================================================
+     COPIAR RESUMEN
+     ====================================================================== */
+  async function copySummary() {
+    const total = state.results.length;
+    if (!total) { toast('Nada que copiar', 'info'); return; }
+
+    const correct = state.results.filter(r => r.status === 'correct');
+    const failed = state.results.filter(r => r.status !== 'correct');
+
+    const lines = [
+      `PRACTICADOR DE VOCABULARIO · ${new Date().toLocaleString()}`,
+      `Bloque: ${categoryLabel(state.categoryMode)}`,
+      `Resultado: ${correct.length}/${total} (${Math.round(correct.length / total * 100)}%)`,
+      ''
+    ];
+
+    if (failed.length) {
+      lines.push('POR REFORZAR');
+      failed.forEach((r, i) => {
+        lines.push(`${i + 1}. ${r.item.english} — ${r.item.spanish} [${difficultyLabel(r.item.difficulty)}]`);
+      });
+      lines.push('');
+    }
+    if (correct.length) {
+      lines.push('CORRECTAS');
+      correct.forEach((r, i) => lines.push(`${i + 1}. ${r.item.english} — ${r.item.spanish}`));
+    }
+
+    const text = lines.join('\n');
+
+    try {
+      await navigator.clipboard.writeText(text);
+      toast('Resumen copiado', 'success');
+    } catch {
+      const helper = document.createElement('textarea');
+      helper.value = text;
+      helper.style.position = 'fixed';
+      helper.style.opacity = '0';
+      document.body.appendChild(helper);
+      helper.select();
+      try {
+        document.execCommand('copy');
+        toast('Resumen copiado', 'success');
+      } catch {
+        toast('No se pudo copiar', 'error');
+      }
+      helper.remove();
+    }
+  }
+
+  /* ======================================================================
+     COPIAR ERRORES COMO IMAGEN
+     ====================================================================== */
+  async function copyMistakesImage() {
+    if (!views.results.classList.contains('is-active')) return;
+
+    const failed = state.results.filter(r => r.status !== 'correct');
+    if (!failed.length) {
+      toast('No hay errores que copiar', 'info');
+      return;
+    }
+
+    const dark = document.documentElement.dataset.theme === 'dark';
+    const width = 1200;
+    const padding = 42;
+    const headerHeight = 168;
+    const infoHeight = 112;
+    const cardGap = 14;
+
+    const colors = {
+      bg: dark ? '#0d1226' : '#f7f8ff',
+      surface: dark ? '#151b36' : '#ffffff',
+      surfaceAlt: dark ? '#1c2548' : '#f1f3ff',
+      text: dark ? '#f1f4ff' : '#11162a',
+      muted: dark ? '#9ba5c9' : '#69718d',
+      border: dark ? 'rgba(155,166,213,.18)' : 'rgba(120,132,170,.24)',
+      primary: '#6858ff',
+      primary2: '#8f6bff',
+      blue: '#2f7eea',
+      danger: '#f43f70',
+      dangerSoft: dark ? 'rgba(244,63,112,.14)' : '#ffe7ee',
+      success: '#10b981',
+      warn: '#f59e0b',
+      white: '#ffffff'
+    };
+
+    const font = (size, weight = 400) => `${weight} ${size}px Arial, sans-serif`;
+
+    function roundRect(x, y, w, h, r, fill, stroke = null) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+      if (fill) {
+        ctx.fillStyle = fill;
+        ctx.fill();
+      }
+      if (stroke) {
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+    }
+
+    function truncate(text, maxChars) {
+      const value = String(text ?? '').trim();
+      if (value.length <= maxChars) return value;
+      return value.slice(0, Math.max(0, maxChars - 1)).trimEnd() + '…';
+    }
+
+    function wrapLines(text, maxWidth, fontSpec, maxLines = 3) {
+      ctx.font = fontSpec;
+      const words = String(text ?? '').trim().split(/\s+/).filter(Boolean);
+      if (!words.length) return ['—'];
+
+      const lines = [];
+      let lineText = '';
+
+      for (const word of words) {
+        const candidate = lineText ? `${lineText} ${word}` : word;
+        if (ctx.measureText(candidate).width <= maxWidth || !lineText) {
+          lineText = candidate;
+        } else {
+          lines.push(lineText);
+          lineText = word;
+          if (lines.length === maxLines - 1) break;
+        }
+      }
+
+      if (lineText && lines.length < maxLines) lines.push(lineText);
+
+      const consumed = lines.join(' ');
+      if (consumed !== words.join(' ')) {
+        lines[lines.length - 1] = truncate(lines[lines.length - 1], 54) + '…';
+      }
+
+      return lines.slice(0, maxLines);
+    }
+
+    function drawWrapped(text, x, y, maxWidth, fontSpec, fill, lineHeight = 24, maxLines = 2, align = 'left') {
+      const lines = wrapLines(text, maxWidth, fontSpec, maxLines);
+      ctx.font = fontSpec;
+      ctx.fillStyle = fill;
+      ctx.textAlign = align;
+      lines.forEach((lineText, i) => ctx.fillText(lineText, x, y + i * lineHeight));
+      return lines.length;
+    }
+
+    function sectionLabel(item) {
+      const section = String(item.section || '').trim();
+      return section || 'General';
+    }
+
+    function blockLabel(item) {
+      const block = BLOCKS.find(b => b.id === item.blockId);
+      return block ? block.name : (item.blockId || 'Bloque no identificado');
+    }
+
+    function statusLabel(result) {
+      if (result.status === 'revealed') return 'RESPUESTA REVELADA';
+      if (result.usedHint) return 'FALLO · CON PISTA';
+      return 'FALLO';
+    }
+
+    function reasonLabel(result) {
+      if (result.status === 'revealed') return 'La respuesta se reveló durante la sesión.';
+      if (result.usedHint) return 'Fallaste después de usar una pista.';
+      return 'Respuesta incorrecta.';
+    }
+
+    const total = state.results.length;
+    const correct = state.results.filter(r => r.status === 'correct').length;
+    const accuracy = total ? Math.round((correct / total) * 100) : 0;
+    const duration = formatDuration(Date.now() - state.startedAt);
+
+    const blocks = [...new Set(failed.map(r => blockLabel(r.item)))];
+    const categories = [...new Set(failed.map(r => difficultyLabel(r.item.difficulty)))];
+    const directions = [...new Set(failed.map(r => r.direction))];
+    const directionLabel = directions.length === 1
+      ? (directions[0] === 'EN-ES' ? 'INGLÉS → ESPAÑOL' : 'ESPAÑOL → INGLÉS')
+      : 'MEZCLA DE DIRECCIONES';
+
+    const headerSummary = `${correct}/${total} correctas · ${accuracy}% · ${duration}`;
+    const sessionLabel = categoryLabel(state.categoryMode);
+
+    const cardData = failed.map((r, i) => {
+      const prompt = r.direction === 'EN-ES'
+        ? (r.item.englishVariants || [r.item.english]).join(' / ')
+        : (r.item.spanishVariants || [r.item.spanish]).join(' / ');
+      const answer = r.direction === 'EN-ES'
+        ? (r.item.spanishVariants || [r.item.spanish]).join(' / ')
+        : (r.item.englishVariants || [r.item.english]).join(' / ');
+      const history = db.mistakes[r.item.uid];
+      const attempts = Number(history?.attempts || 0);
+      return {
+        result: r,
+        number: i + 1,
+        position: state.results.indexOf(r) + 1,
+        prompt,
+        answer,
+        block: blockLabel(r.item),
+        section: sectionLabel(r.item),
+        difficulty: difficultyLabel(r.item.difficulty),
+        userAnswer: r.userAnswer?.trim() || (r.status === 'revealed' ? '— (revelada)' : '— (sin respuesta)'),
+        attempts,
+      };
+    });
+
+    const cardHeight = 168;
+    const height = headerHeight + infoHeight + padding + cardData.length * (cardHeight + cardGap) + padding;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      toast('No se pudo crear la imagen', 'error');
+      return;
+    }
+
+    // Fondo
+    ctx.fillStyle = colors.bg;
+    ctx.fillRect(0, 0, width, height);
+
+    // Encabezado
+    const gradient = ctx.createLinearGradient(0, 0, width, 0);
+    gradient.addColorStop(0, '#4c35c9');
+    gradient.addColorStop(.45, colors.primary);
+    gradient.addColorStop(.72, colors.primary2);
+    gradient.addColorStop(1, colors.blue);
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, width, headerHeight);
+
+    ctx.fillStyle = colors.white;
+    ctx.textAlign = 'left';
+    ctx.font = font(16, 800);
+    ctx.fillText('PRACTICADOR DE VOCABULARIO', padding, 38);
+
+    ctx.font = font(40, 900);
+    ctx.fillText('Repaso de errores', padding, 88);
+
+    ctx.font = font(18, 700);
+    ctx.fillText(headerSummary, padding, 122);
+
+    ctx.textAlign = 'right';
+    ctx.font = font(15, 800);
+    ctx.fillText(sessionLabel, width - padding, 38);
+
+    ctx.font = font(14, 600);
+    ctx.fillText(directionLabel, width - padding, 64);
+    ctx.fillText(new Date().toLocaleString(), width - padding, 88);
+
+    // Banda de contexto de la sesión
+    ctx.fillStyle = colors.surfaceAlt;
+    ctx.fillRect(0, headerHeight, width, infoHeight);
+
+    const info = [
+      ['BLOQUE' + (blocks.length === 1 ? '' : 'S'), blocks.length === 1 ? blocks[0] : `${blocks.length} bloques en esta sesión`],
+      ['DIFICULTAD', categories.length === 1 ? categories[0] : 'Varias'],
+      ['SESIÓN', sessionLabel],
+      ['ERRORES', String(failed.length)]
+    ];
+    const infoCellWidth = (width - padding * 2) / info.length;
+
+    info.forEach(([label, value], i) => {
+      const x = padding + i * infoCellWidth;
+      if (i > 0) {
+        ctx.strokeStyle = colors.border;
+        ctx.beginPath();
+        ctx.moveTo(x, headerHeight + 18);
+        ctx.lineTo(x, headerHeight + infoHeight - 18);
+        ctx.stroke();
+      }
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = colors.muted;
+      ctx.font = font(12, 900);
+      ctx.fillText(label, x + 14, headerHeight + 34);
+
+      drawWrapped(value, x + 14, headerHeight + 62, infoCellWidth - 28, font(16, 800), colors.text, 22, 2);
+    });
+
+    // Tarjetas por error
+    cardData.forEach(data => {
+      const index = data.number - 1;
+      const y = headerHeight + infoHeight + padding + index * (cardHeight + cardGap);
+
+      roundRect(padding, y, width - padding * 2, cardHeight, 22, colors.surface, colors.border);
+
+      // Barra lateral de error
+      roundRect(padding, y, 8, cardHeight, 8, colors.danger);
+
+      // Número + estado
+      ctx.textAlign = 'left';
+      ctx.fillStyle = colors.danger;
+      ctx.font = font(18, 900);
+      ctx.fillText(`#${data.number}`, padding + 24, y + 30);
+
+      roundRect(padding + 76, y + 14, 174, 28, 14, colors.dangerSoft);
+      ctx.fillStyle = colors.danger;
+      ctx.font = font(12, 900);
+      ctx.textAlign = 'center';
+      ctx.fillText(statusLabel(data.result), padding + 163, y + 33);
+
+      // Metadatos de localización y dificultad
+      ctx.textAlign = 'right';
+      ctx.fillStyle = colors.muted;
+      ctx.font = font(12, 800);
+      const metaRight = width - padding - 22;
+      ctx.fillText(`Pregunta ${data.position}/${total} · ${data.block}`, metaRight, y + 25);
+      ctx.fillText(`${data.section} · ${data.difficulty}`, metaRight, y + 45);
+
+      // Prompt
+      ctx.textAlign = 'left';
+      ctx.fillStyle = colors.text;
+      ctx.font = font(23, 900);
+      drawWrapped(data.prompt, padding + 24, y + 78, 500, font(23, 900), colors.text, 28, 2);
+
+      // Respuesta esperada
+      ctx.fillStyle = colors.muted;
+      ctx.font = font(13, 900);
+      ctx.fillText('RESPUESTA CORRECTA', padding + 24, y + 128);
+      drawWrapped(data.answer, padding + 24, y + 151, 500, font(16, 700), colors.text, 20, 1);
+
+      // Respuesta del usuario
+      const rightX = 635;
+      roundRect(rightX, y + 62, width - rightX - padding - 22, 76, 16, colors.surfaceAlt, colors.border);
+      ctx.textAlign = 'left';
+      ctx.fillStyle = colors.muted;
+      ctx.font = font(12, 900);
+      ctx.fillText('TU RESPUESTA', rightX + 16, y + 84);
+      drawWrapped(data.userAnswer, rightX + 16, y + 108, width - rightX - padding - 54, font(17, 800), colors.text, 22, 1);
+
+      // Información de repetición/causa
+      ctx.fillStyle = colors.muted;
+      ctx.font = font(12, 600);
+      const hintText = data.result.usedHint ? 'Pista usada · ' : '';
+      const attemptsText = data.attempts ? `Historial: ${data.attempts} ${data.attempts === 1 ? 'intento' : 'intentos'} · ` : '';
+      const reason = `${hintText}${attemptsText}${reasonLabel(data.result)}`;
+      drawWrapped(reason, rightX, y + 158, width - rightX - padding - 22, font(12, 700), colors.muted, 16, 1);
+
+      // Nota/salida rápida
+      ctx.fillStyle = colors.border;
+      ctx.fillRect(rightX, y + 146, width - rightX - padding - 22, 1);
+    });
+
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    if (!blob) {
+      toast('No se pudo crear la imagen', 'error');
+      return;
+    }
+
+    try {
+      if (!navigator.clipboard?.write || !window.ClipboardItem) throw new Error('clipboard');
+      await navigator.clipboard.write([
+        new ClipboardItem({ 'image/png': blob })
+      ]);
+      toast('Imagen de errores copiada', 'success');
+    } catch {
+      // Fallback: descarga local, útil cuando el navegador bloquea Clipboard API.
+      try {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `repaso-errores-${new Date().toISOString().slice(0, 10)}.png`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        toast('El navegador bloqueó el portapapeles; guardé la imagen como archivo', 'info');
+      } catch {
+        toast('No se pudo copiar ni guardar la imagen', 'error');
+      }
+    }
+  }
+
+  /* ======================================================================
+     MODAL: GESTIONAR
+     ====================================================================== */
+  function buildManageModal() {
+    const body = document.createDocumentFragment();
+
+    const sections = [
+      { key: 'mistakes', title: 'Errores', items: mistakeItems() },
+      { key: 'review',   title: 'Revisar', items: reviewItems() }
+    ];
+
+    let hasAny = false;
+
+    sections.forEach(section => {
+      const title = document.createElement('div');
+      title.className = 'group-title';
+      const label = document.createElement('span');
+      label.textContent = section.title;
+      const count = document.createElement('span');
+      count.textContent = section.items.length;
+      title.append(label, count);
+      body.appendChild(title);
+
+      if (!section.items.length) {
+        const empty = document.createElement('div');
+        empty.className = 'empty-state';
+        empty.textContent = 'Sin elementos.';
+        body.appendChild(empty);
+        return;
+      }
+
+      hasAny = true;
+      const list = document.createElement('ul');
+      list.className = 'item-list';
+      list.dataset.source = section.key;
+
+      section.items.forEach(item => {
+        const li = document.createElement('li');
+        li.className = 'item-row';
+
+        const text = document.createElement('div');
+        text.className = 'item-text';
+
+        const en = document.createElement('span');
+        en.className = 'item-en';
+        en.textContent = item.english;
+
+        const es = document.createElement('span');
+        es.className = 'item-es';
+        es.textContent = item.spanish;
+
+        text.append(en, es);
+
+        const tag = document.createElement('span');
+        tag.className = difficultyTagClass(item.difficulty);
+        tag.textContent = difficultyLabel(item.difficulty);
+
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'icon-btn plain';
+        remove.dataset.remove = item.uid;
+        remove.dataset.from = section.key;
+        remove.setAttribute('aria-label', `Eliminar ${item.english}`);
+        remove.textContent = '\u2715';
+
+        li.append(text, tag, remove);
+        list.appendChild(li);
+      });
+
+      body.appendChild(list);
+    });
+
+    el.modalBody.replaceChildren(body);
+
+    const footer = [];
+    if (hasAny) {
+      const practice = document.createElement('button');
+      practice.type = 'button';
+      practice.className = 'btn btn-primary';
+      practice.textContent = 'Practicar todo';
+      practice.addEventListener('click', () => {
+        const all = [...mistakeItems(), ...reviewItems()];
+        const uniqueByUid = [...new Map(all.map(i => [i.uid, i])).values()];
+        closeModal();
+        startSession(uniqueByUid, 'practice');
+      });
+      footer.push(practice);
+
+      const clear = document.createElement('button');
+      clear.type = 'button';
+      clear.className = 'btn btn-danger';
+      clear.textContent = 'Vaciar todo';
+      clear.addEventListener('click', () => {
+        if (!confirm('¿Vaciar todos los errores y elementos en Revisar?')) return;
+        db.mistakes = {};
+        db.review = {};
+        saveDB();
+        updateCounters();
+        closeModal();
+        toast('Guardados vaciados', 'success');
+      });
+      footer.push(clear);
+    }
+
+    openModal({ title: 'Gestionar guardados', body: [], footer });
+
+    el.modalBody.onclick = event => {
+      const button = event.target.closest('[data-remove]');
+      if (!button) return;
+      const uid = button.dataset.remove;
+      const from = button.dataset.from;
+      if (from === 'mistakes') removeMistake(uid);
+      else removeFromReview(uid);
+      updateCounters();
+      buildManageModal();
+    };
+  }
+
+  /* ======================================================================
+     MODAL: EXPLORAR
+     ====================================================================== */
+  function buildExploreModal() {
+    const wrapper = document.createElement('div');
+
+    const search = document.createElement('input');
+    search.type = 'search';
+    search.className = 'input';
+    search.placeholder = 'Buscar en inglés o español…';
+    search.setAttribute('aria-label', 'Buscar vocabulario');
+    wrapper.appendChild(search);
+
+    const info = document.createElement('p');
+    info.className = 'hint-text';
+    wrapper.appendChild(info);
+
+    const list = document.createElement('ul');
+    list.className = 'item-list';
+    list.style.marginTop = '12px';
+    wrapper.appendChild(list);
+
+    const MAX = 80;
+
+    function render(query) {
+      const q = normalize(query);
+      const matches = q
+        ? QUESTIONS.filter(item =>
+            normalize(item.english).includes(q) || normalize(item.spanish).includes(q))
+        : QUESTIONS;
+
+      const shown = matches.slice(0, MAX);
+      info.textContent = matches.length
+        ? `${matches.length} resultado${matches.length === 1 ? '' : 's'}${matches.length > MAX ? ` · mostrando ${MAX}` : ''}`
+        : 'Sin resultados.';
+
+      list.replaceChildren();
+      shown.forEach(item => {
+        const li = document.createElement('li');
+        li.className = 'item-row';
+
+        const text = document.createElement('div');
+        text.className = 'item-text';
+
+        const en = document.createElement('span');
+        en.className = 'item-en';
+        en.textContent = item.english;
+
+        const es = document.createElement('span');
+        es.className = 'item-es';
+        es.textContent = item.spanish;
+
+        const meta = document.createElement('span');
+        meta.className = 'item-meta';
+        meta.textContent = item.section;
+
+        text.append(en, es, meta);
+
+        const tag = document.createElement('span');
+        tag.className = difficultyTagClass(item.difficulty);
+        tag.textContent = difficultyLabel(item.difficulty);
+
+        li.append(text, tag);
+        list.appendChild(li);
+      });
+    }
+
+    search.addEventListener('input', () => render(search.value));
+    render('');
+
+    openModal({ title: 'Explorar vocabulario', body: [wrapper] });
+  }
+
+  /* ======================================================================
+     TEMA
+     ====================================================================== */
+  const darkMedia = window.matchMedia('(prefers-color-scheme: dark)');
+
+  function applyTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+    const button = $('#btn-theme');
+    button.setAttribute('aria-label', theme === 'dark' ? 'Activar tema claro' : 'Activar tema oscuro');
+    db.settings.theme = theme;
+  }
+
+  function initTheme() {
+    const theme = db.settings.theme || (darkMedia.matches ? 'dark' : 'light');
+    applyTheme(theme);
+  }
+
+  $('#btn-theme').addEventListener('click', () => {
+    const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    saveDB();
+  });
+
+  darkMedia.addEventListener('change', () => {
+    if (!db.settings.theme) applyTheme(darkMedia.matches ? 'dark' : 'light');
+  });
+
+  /* ======================================================================
+     EVENTOS
+     ====================================================================== */
+  $('#btn-start').addEventListener('click', () => {
+    const value = el.blockSelect.value;
+    if (value === 'random') {
+      startSession(shuffle(QUESTIONS).slice(0, SESSION_SIZE), 'practice');
+      return;
+    }
+    const block = BLOCKS.find(b => b.id === value);
+    if (block) startSession(block.items, 'practice');
+  });
+
+  $$('.cat-btn').forEach(button => {
+    button.addEventListener('click', () => {
+      const category = button.dataset.category;
+      const items = getItemsForCategory(category);
+      if (items.length) startSession(items, category);
+    });
+  });
+
+  $('#btn-back').addEventListener('click', () => {
+    if (state.index > 0 && !state.answered) {
+      if (!confirm('¿Salir de la práctica? Se perderá el progreso de esta sesión.')) return;
+    }
+    updateCounters();
+    showView('setup');
+  });
+
+  $('#btn-finish').addEventListener('click', () => {
+    updateCounters();
+    showView('setup');
+  });
+
+  $('#btn-retry').addEventListener('click', () => {
+    const failed = state.results
+      .filter(r => r.status !== 'correct')
+      .map(r => r.item);
+    const unique = [...new Map(failed.map(i => [i.uid, i])).values()];
+    if (unique.length) startSession(unique, state.categoryMode);
+  });
+
+  $('#btn-repeat').addEventListener('click', () => {
+    if (state.lastItems.length) startSession(state.lastItems, state.lastCategory);
+  });
+
+  $('#btn-another').addEventListener('click', () => {
+    const wrap = document.createElement('div');
+    wrap.style.display = 'grid';
+    wrap.style.gap = '14px';
+
+    const mk = (text, node) => {
+      const box = document.createElement('div');
+      const lab = document.createElement('span');
+      lab.className = 'label';
+      lab.textContent = text;
+      box.append(lab, node);
+      return box;
+    };
+
+    const blockPick = document.createElement('select');
+    blockPick.innerHTML = el.blockSelect.innerHTML;
+    blockPick.value = el.blockSelect.value;
+
+    const modePick = document.createElement('select');
+    [['EN-ES', 'Inglés a Español'], ['ES-EN', 'Español a Inglés'], ['MIX', 'Mezcla aleatoria']].forEach(([v, t]) => {
+      const o = document.createElement('option');
+      o.value = v; o.textContent = t;
+      modePick.appendChild(o);
+    });
+    modePick.value = getMode();
+
+    wrap.append(mk('Sesión', blockPick), mk('Dirección', modePick));
+
+    const go = document.createElement('button');
+    go.type = 'button';
+    go.className = 'btn btn-primary';
+    go.textContent = 'Empezar';
+    go.addEventListener('click', () => {
+      closeModal();
+      el.blockSelect.value = blockPick.value;
+      setMode(modePick.value);
+      db.settings.mode = modePick.value;
+      saveDB();
+      $('#btn-start').click();
+    });
+
+    openModal({ title: 'Elegir otra sesión', body: [wrap], footer: [go] });
+  });
+
+  $('#btn-copy').addEventListener('click', copySummary);
+  el.btnCopyImage.addEventListener('click', copyMistakesImage);
+  $('#btn-manage').addEventListener('click', buildManageModal);
+  $('#btn-explore').addEventListener('click', buildExploreModal);
+
+  el.resetBtn.addEventListener('click', () => {
+    if (!confirm('¿Borrar TODO el progreso guardado? Esto incluye errores, revisar y estadísticas.')) return;
+    db.mistakes = {};
+    db.review = {};
+    db.stats = { answered: 0, correct: 0, bestStreak: 0, currentStreak: 0, sessions: 0 };
+    db.history = [];
+    saveDB();
+    updateCounters();
+    toast('Progreso borrado', 'success');
+  });
+
+  el.btnHint.addEventListener('click', useHint);
+  el.btnReveal.addEventListener('click', revealAnswer);
+  el.btnNext.addEventListener('click', goNext);
+
+  el.form.addEventListener('submit', event => {
+    event.preventDefault();
+    submitAnswer();
+  });
+
+  $$('input[name="mode"]').forEach(input => {
+    input.addEventListener('change', () => {
+      db.settings.mode = getMode();
+      saveDB();
+    });
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+      if (!el.modal.hidden) { closeModal(); return; }
+      if (views.practice.classList.contains('is-active')) {
+        if (state.index > 0 && !state.answered) {
+          if (!confirm('¿Salir de la práctica? Se perderá el progreso de esta sesión.')) return;
+        }
+        updateCounters();
+        showView('setup');
+      }
+      return;
+    }
+
+    const inResults = views.results.classList.contains('is-active');
+
+    if (inResults && event.ctrlKey && event.key.toLowerCase() === 'c') {
+      event.preventDefault();
+      copyMistakesImage();
+      return;
+    }
+
+    const inPractice = views.practice.classList.contains('is-active');
+    if (!inPractice) return;
+
+    if (state.answered && event.key === 'Enter') {
+      event.preventDefault();
+      goNext();
+      return;
+    }
+
+    if (event.altKey && !event.ctrlKey && !event.metaKey) {
+      const key = event.key.toLowerCase();
+      if (key === 'h') { event.preventDefault(); useHint(); return; }
+      if (key === 'r') { event.preventDefault(); revealAnswer(); return; }
+    }
+  });
+
+  /* ======================================================================
+     INIT
+     ====================================================================== */
+  function init() {
+    initTheme();
+    populateBlocks();
+    setMode(db.settings.mode || 'EN-ES');
+    updateCounters();
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
