@@ -431,11 +431,69 @@
   .menu-actions .sub { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .menu-actions .sub .btn { min-height: 40px; font-size: .82rem; }
 
+  /* Bloques especiales: ocupan el espacio muerto del menú y quedan siempre visibles. */
+  .pinned-blocks {
+    grid-area: pinned;
+    padding: 16px 17px 17px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: linear-gradient(145deg, var(--surface-2), rgba(255,255,255,.16));
+    box-shadow: 0 12px 30px rgba(47,57,101,.07);
+    position: relative;
+    overflow: hidden;
+  }
+  .pinned-blocks::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 10% 0%, rgba(145,133,255,.16), transparent 34%);
+    pointer-events: none;
+  }
+  .pinned-blocks-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; margin-bottom: 11px; position: relative; z-index: 1;
+  }
+  .pinned-blocks-head h3 { margin: 0; font-size: .86rem; font-weight: 950; letter-spacing: -.01em; }
+  .pinned-blocks-head p { margin: 3px 0 0; color: var(--muted); font-size: .68rem; }
+  .pinned-block-grid {
+    display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 9px;
+    position: relative; z-index: 1;
+  }
+  .pinned-block-card {
+    position: relative; min-width: 0; min-height: 94px; padding: 13px 12px 11px;
+    display: flex; flex-direction: column; justify-content: space-between; gap: 10px;
+    text-align: left; overflow: hidden; border-radius: 15px;
+    border: 1px solid var(--border); background: var(--surface-solid);
+    box-shadow: 0 9px 22px rgba(47,57,101,.07);
+    transition: transform .2s cubic-bezier(.2,.8,.2,1), border-color .2s, box-shadow .2s, background .2s;
+  }
+  .pinned-block-card::before {
+    content: ""; position: absolute; inset: 0 0 auto 0; height: 4px;
+    background: linear-gradient(90deg, var(--special-accent, var(--primary)), color-mix(in srgb, var(--special-accent, var(--primary)), white 40%));
+  }
+  .pinned-block-card:hover {
+    transform: translateY(-4px); border-color: color-mix(in srgb, var(--special-accent, var(--primary)), var(--border-2) 40%);
+    box-shadow: 0 16px 28px rgba(47,57,101,.13); background: var(--surface-3);
+  }
+  .pinned-block-card:active { transform: translateY(-1px) scale(.985); }
+  .pinned-block-name {
+    font-size: .72rem; font-weight: 900; line-height: 1.18; overflow-wrap: anywhere;
+  }
+  .pinned-block-count {
+    color: var(--muted); font-size: .63rem; font-weight: 800;
+  }
+  .pinned-block-open {
+    align-self: flex-start; padding: 5px 8px; border-radius: 8px;
+    background: var(--primary-soft); color: var(--primary); font-size: .62rem; font-weight: 950;
+    letter-spacing: .02em;
+  }
+  .tag-special { background: var(--primary-soft); color: var(--primary); }
+
   @media (min-width: 900px) {
     .menu {
       grid-template-columns: minmax(300px, 1fr) 1.3fr;
-      grid-template-areas: "block cats" "dir cats" "stats cats" "actions cats";
-      grid-template-rows: auto auto auto 1fr;
+      grid-template-areas: "block cats" "dir cats" "stats cats" "actions cats" "pinned pinned";
+      grid-template-rows: auto auto auto auto 1fr;
       column-gap: 28px; row-gap: 16px;
     }
     .m-block { grid-area: block; }
@@ -443,6 +501,7 @@
     .menu-cats { grid-area: cats; gap: 12px; }
     .menu-stats { grid-area: stats; }
     .menu-actions { grid-area: actions; align-self: end; }
+    .pinned-blocks { margin-top: 2px; }
     .cat-title { font-size: .7rem; }
     .cat-btn { min-height: 92px; padding: 15px 15px 12px; }
     .cat-btn .cat-name { font-size: .86rem; }
@@ -748,6 +807,7 @@
   .explore-divider { height: 1px; margin: 16px 0 14px; background: var(--border); }
   @media (max-width: 520px) {
     .explore-block-grid { grid-template-columns: 1fr; }
+    .pinned-block-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
   /* ======================================================================
      ESTUDIO · FLASHCARDS
@@ -928,7 +988,7 @@
 <div class="app">
   <header class="topbar">
     <div class="topbar-left">
-      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v1.3.7</span>
+      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v1.4.0</span>
       <div class="brand">
         <div class="brand-mark">V</div>
         <div>
@@ -1025,6 +1085,16 @@
             <button id="btn-explore" class="btn btn-ghost" type="button">Explorar vocabulario</button>
           </div>
         </div>
+
+        <section class="pinned-blocks" aria-labelledby="pinned-blocks-title">
+          <div class="pinned-blocks-head">
+            <div>
+              <h3 id="pinned-blocks-title">Bloques especiales</h3>
+              <p>Flashcards listas para abrir y estudiar directamente.</p>
+            </div>
+          </div>
+          <div id="special-block-grid" class="pinned-block-grid"></div>
+        </section>
 
       </div>
     </section>
@@ -1191,7 +1261,7 @@
 
   // VERSIÓN DE LA APP: 1.3.7
   // IMPORTANTE: CAMBIA APP_VERSION SIEMPRE QUE AGREGUES O MODIFIQUES FUNCIONALIDAD.
-  const APP_VERSION = '1.3.7';
+  const APP_VERSION = '1.4.0';
 
   /* ======================================================================
      DATOS · vocabData con las 504 entradas originales
@@ -1934,7 +2004,113 @@
   }
 
   const QUESTIONS = entries.flatMap(expandEntry);
-  const QUESTION_BY_UID = new Map(QUESTIONS.map(q => [q.uid, q]));
+
+  /* ======================================================================
+     BLOQUES ESPECIALES · flashcards fijadas en el menú
+     ====================================================================== */
+  const SPECIAL_BLOCK_DEFS = [
+    {
+      id: 'special-actions-verbs',
+      name: 'ACTIONS (VERBS) – ACCIONES (VERBOS)',
+      accent: '#8b5cf6',
+      items: [
+        ['Do', 'Hacer'], ['Make', 'Crear / Hacer'], ['Go', 'Ir'], ['Come', 'Venir'], ['Take', 'Tomar'],
+        ['Bring', 'Traer'], ['Give', 'Dar'], ['Get', 'Obtener'], ['Put', 'Poner'], ['Move', 'Mover'],
+        ['Open', 'Abrir'], ['Close', 'Cerrar'], ['Start', 'Empezar'], ['Stop', 'Detener'], ['Continue', 'Continuar'],
+        ['Follow', 'Seguir'], ['Read', 'Leer'], ['Write', 'Escribir'], ['Listen', 'Escuchar'], ['Speak', 'Hablar'],
+        ['Say', 'Decir'], ['Ask', 'Preguntar'], ['Answer', 'Responder'], ['Explain', 'Explicar'], ['Show', 'Mostrar'],
+        ['Watch', 'Observar'], ['Look', 'Mirar'], ['Check', 'Revisar'], ['Review', 'Repasar'], ['Study', 'Estudiar'],
+        ['Learn', 'Aprender'], ['Practice', 'Practicar'], ['Repeat', 'Repetir'], ['Remember', 'Recordar'], ['Forget', 'Olvidar'],
+        ['Understand', 'Entender'], ['Complete', 'Completar'], ['Finish', 'Terminar'], ['Submit', 'Entregar'], ['Send', 'Enviar'],
+        ['Receive', 'Recibir'], ['Choose', 'Elegir'], ['Select', 'Seleccionar'], ['Use', 'Usar'], ['Build', 'Construir'],
+        ['Create', 'Crear'], ['Organize', 'Organizar'], ['Arrange', 'Ordenar'], ['Compare', 'Comparar'], ['Discuss', 'Discutir / Conversar'],
+        ['Solve', 'Resolver'], ['Calculate', 'Calcular'], ['Measure', 'Medir'], ['Draw', 'Dibujar'], ['Cut', 'Cortar'],
+        ['Copy', 'Copiar'], ['Paste', 'Pegar'], ['Click', 'Hacer clic'], ['Download', 'Descargar'], ['Upload', 'Subir'],
+        ['Save', 'Guardar'], ['Print', 'Imprimir'], ['Sign', 'Firmar'], ['Fill out', 'Llenar'], ['Turn on', 'Encender'],
+        ['Turn off', 'Apagar'], ['Wait', 'Esperar'], ['Hurry', 'Apurarse'], ['Walk', 'Caminar'], ['Run', 'Correr']
+      ]
+    },
+    {
+      id: 'special-essential-nouns',
+      name: 'ESSENTIAL NOUNS – SUSTANTIVOS ESENCIALES',
+      accent: '#06b6d4',
+      items: [
+        ['Instruction', 'Instrucción'], ['Direction', 'Indicación'], ['Rule', 'Regla'], ['Step', 'Paso'], ['Task', 'Tarea'],
+        ['Assignment', 'Asignación'], ['Activity', 'Actividad'], ['Project', 'Proyecto'], ['Problem', 'Problema'], ['Solution', 'Solución'],
+        ['Question', 'Pregunta'], ['Answer', 'Respuesta'], ['Example', 'Ejemplo'], ['Information', 'Información'], ['Message', 'Mensaje'],
+        ['Note', 'Nota'], ['Report', 'Reporte'], ['Document', 'Documento'], ['Form', 'Formulario'], ['Application', 'Solicitud'],
+        ['Schedule', 'Horario'], ['Meeting', 'Reunión'], ['Deadline', 'Fecha límite'], ['Appointment', 'Cita'], ['Computer', 'Computadora'],
+        ['Keyboard', 'Teclado'], ['Screen', 'Pantalla'], ['File', 'Archivo'], ['Folder', 'Carpeta'], ['Tool', 'Herramienta']
+      ]
+    },
+    {
+      id: 'special-home-kitchen-office-university',
+      name: '50 ESSENTIAL WORDS ITEMS AT HOME, KITCHEN, OFFICE & UNIVERSITY MAJORS',
+      accent: '#f59e0b',
+      items: [
+        ['Chair', 'Silla'], ['Table', 'Mesa'], ['Desk', 'Escritorio'], ['Couch / Sofa', 'Sofá'], ['Bed', 'Cama'],
+        ['Pillow', 'Almohada'], ['Blanket', 'Cobija / Manta'], ['Lamp', 'Lámpara'], ['Clock', 'Reloj'], ['Mirror', 'Espejo'],
+        ['Refrigerator / Fridge', 'Refrigerador'], ['Stove', 'Estufa'], ['Oven', 'Horno'], ['Microwave', 'Microondas'], ['Sink', 'Fregadero'],
+        ['Faucet', 'Llave de agua / Grifo'], ['Plate', 'Plato'], ['Bowl', 'Tazón'], ['Cup', 'Taza'], ['Glass', 'Vaso'],
+        ['Fork', 'Tenedor'], ['Spoon', 'Cuchara'], ['Knife', 'Cuchillo'], ['Pan', 'Sartén'], ['Pot', 'Olla'],
+        ['Computer', 'Computadora'], ['Laptop', 'Computadora portátil'], ['Keyboard', 'Teclado'], ['Mouse', 'Ratón / Mouse'], ['Screen / Monitor', 'Pantalla / Monitor'],
+        ['Printer', 'Impresora'], ['Scanner', 'Escáner'], ['Phone', 'Teléfono'], ['Notebook', 'Cuaderno'], ['Pen', 'Bolígrafo / Pluma'],
+        ['Pencil', 'Lápiz'], ['Marker', 'Marcador'], ['Stapler', 'Engrapadora'], ['Folder', 'Carpeta'], ['File', 'Archivo'],
+        ['Business Administration', 'Administración de Empresas'], ['Accounting', 'Contabilidad'], ['Economics', 'Economía'], ['Marketing', 'Mercadotecnia'],
+        ['Finance', 'Finanzas'], ['Computer Science', 'Ciencias de la Computación'], ['Engineering', 'Ingeniería'], ['Psychology', 'Psicología'],
+        ['Nursing', 'Enfermería'], ['Education', 'Educación']
+      ]
+    },
+    {
+      id: 'special-american-english',
+      name: 'AMERICAN ENGLISH',
+      accent: '#22c55e',
+      items: [
+        ['Apartment', 'Apartamento'], ['Elevator', 'Ascensor'], ['Sidewalk', 'Banqueta / Acera'], ['Trash can', 'Bote de basura'],
+        ['Gasoline', 'Gasolina'], ['Truck', 'Camión'], ['Parking lot', 'Estacionamiento'], ['Diaper', 'Pañal'], ['Cookie', 'Galleta'],
+        ['Fries', 'Papas fritas'], ['Shopping cart', 'Carrito de compras'], ['Water fountain', 'Bebedero'], ['Sneakers', 'Tenis / Zapatillas'],
+        ['Vacation', 'Vacaciones'], ['Fall', 'Otoño'], ['Movie theater', 'Cine'], ['Credit card', 'Tarjeta de crédito'], ['Check (bill)', 'Cuenta (en restaurante)'],
+        ['Take a shower', 'Ducharse'], ['To go', 'Para llevar'], ['Pajamas', 'Pijamas'], ['Tire', 'Llanta'], ['Turn signal', 'Direccional'],
+        ['Pants', 'Pantalones'], ['Mailbox', 'Buzón'], ['Jello', 'Gelatina'], ['Cell phone', 'Teléfono celular'], ['Corn', 'Maíz'],
+        ['Attorney', 'Abogado'], ['Flashlight', 'Linterna']
+      ]
+    },
+    {
+      id: 'special-british-english',
+      name: 'BRITISH ENGLISH',
+      accent: '#ef4444',
+      items: [
+        ['Flat', 'Apartamento'], ['Lift', 'Ascensor'], ['Pavement', 'Banqueta / Acera'], ['Rubbish bin', 'Bote de basura'],
+        ['Petrol', 'Gasolina'], ['Lorry', 'Camión'], ['Car park', 'Estacionamiento'], ['Nappy', 'Pañal'], ['Biscuit', 'Galleta'],
+        ['Chips', 'Papas fritas'], ['Trolley', 'Carrito de compras'], ['Drinking fountain', 'Bebedero'], ['Trainers', 'Tenis / Zapatillas'],
+        ['Holiday', 'Vacaciones'], ['Autumn', 'Otoño'], ['Cinema', 'Cine'], ['Credit card', 'Tarjeta de crédito'], ['Bill', 'Cuenta (en restaurante)'],
+        ['To have a shower', 'Ducharse'], ['Takeaway', 'Para llevar'], ['Pyjamas', 'Pijamas'], ['Tyre', 'Llanta'], ['Indicator', 'Direccional'],
+        ['Trousers', 'Pantalones'], ['Postbox', 'Buzón'], ['Jelly', 'Gelatina'], ['Mobile phone', 'Teléfono celular'], ['Maize', 'Maíz'],
+        ['Solicitor', 'Abogado'], ['Torch', 'Linterna']
+      ]
+    }
+  ];
+
+  const SPECIAL_BLOCKS = SPECIAL_BLOCK_DEFS.map(block => ({
+    ...block,
+    items: block.items.map(([english, spanish], index) => ({
+      uid: `${block.id}::${index + 1}`,
+      sourceId: `${block.id}::${index + 1}`,
+      blockId: block.id,
+      section: block.name,
+      english,
+      spanish,
+      englishVariants: splitVariants(english),
+      spanishVariants: splitVariants(spanish),
+      difficulty: 'special',
+      repeated: false,
+      note: ''
+    }))
+  }));
+
+  const SPECIAL_QUESTIONS = SPECIAL_BLOCKS.flatMap(block => block.items);
+  const ALL_QUESTIONS = [...QUESTIONS, ...SPECIAL_QUESTIONS];
+  const QUESTION_BY_UID = new Map(ALL_QUESTIONS.map(q => [q.uid, q]));
 
   /* ======================================================================
      BLOQUES
@@ -1971,7 +2147,7 @@
 
   // Índice global (para avisar "esa traducción es válida pero de otro bloque")
   const GLOBAL_PROMPTS = { 'EN-ES': new Map(), 'ES-EN': new Map() };
-  QUESTIONS.forEach(q => ['EN-ES', 'ES-EN'].forEach(dir => {
+  ALL_QUESTIONS.forEach(q => ['EN-ES', 'ES-EN'].forEach(dir => {
     const k = normalize(promptOf(q, dir));
     const map = GLOBAL_PROMPTS[dir];
     if (!map.has(k)) map.set(k, []);
@@ -2213,7 +2389,7 @@
     return `tag tag-${difficulty}`;
   }
   function difficultyLabel(difficulty) {
-    return ({ easy: 'REGALADA', medium: 'INTERMEDIA', hard: 'DIFÍCIL' })[difficulty] || 'INTERMEDIA';
+    return ({ easy: 'REGALADA', medium: 'INTERMEDIA', hard: 'DIFÍCIL', special: 'BLOQUE ESPECIAL' })[difficulty] || 'INTERMEDIA';
   }
   function categoryLabel(mode) {
     return ({
@@ -2335,9 +2511,19 @@
       el.blockSelect.appendChild(group);
     });
 
+    const specialGroup = document.createElement('optgroup');
+    specialGroup.label = 'Bloques especiales · Flashcards';
+    SPECIAL_BLOCKS.forEach(block => {
+      const option = document.createElement('option');
+      option.value = block.id;
+      option.textContent = `${block.name} (${block.items.length} tarjetas)`;
+      specialGroup.appendChild(option);
+    });
+    el.blockSelect.appendChild(specialGroup);
+
     el.dataInfo.textContent =
       `${QUESTIONS.length} preguntas · ${entries.length} entradas únicas · ` +
-      `${BLOCKS.length} bloques`;
+      `${BLOCKS.length} bloques de práctica · ${SPECIAL_BLOCKS.length} bloques especiales (${SPECIAL_QUESTIONS.length} tarjetas)`;
   }
 
   /* ======================================================================
@@ -2492,6 +2678,36 @@
 
   function exitFlashcards() {
     showView('setup');
+  }
+
+  function renderPinnedSpecialBlocks() {
+    const grid = $('#special-block-grid');
+    if (!grid) return;
+
+    grid.replaceChildren();
+    SPECIAL_BLOCKS.forEach(block => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'pinned-block-card';
+      button.style.setProperty('--special-accent', block.accent || 'var(--primary)');
+      button.setAttribute('aria-label', `Abrir ${block.name} con flashcards`);
+
+      const name = document.createElement('span');
+      name.className = 'pinned-block-name';
+      name.textContent = block.name;
+
+      const count = document.createElement('span');
+      count.className = 'pinned-block-count';
+      count.textContent = `${block.items.length} flashcards`;
+
+      const open = document.createElement('span');
+      open.className = 'pinned-block-open';
+      open.textContent = 'Abrir ↗';
+
+      button.append(name, count, open);
+      button.addEventListener('click', () => startFlashcards(block.items, block.name));
+      grid.appendChild(button);
+    });
   }
 
   /* ======================================================================
@@ -3647,6 +3863,14 @@
       });
     });
 
+    addTitle('Bloques especiales · Flashcards');
+    SPECIAL_BLOCKS.forEach(block => {
+      addChoice(block.name, `${block.items.length} tarjetas · estudio directo`, () => {
+        closeModal();
+        startFlashcards(block.items, block.name);
+      });
+    });
+
     addTitle('Errores');
     for (const difficulty of DIFFICULTIES) {
       const category = `mistakes-${difficulty}`;
@@ -3731,6 +3955,43 @@
     });
 
     blocksSection.appendChild(blockGrid);
+
+    const specialTitle = document.createElement('h3');
+    specialTitle.textContent = 'Bloques especiales · Flashcards';
+    specialTitle.style.marginTop = '18px';
+    blocksSection.appendChild(specialTitle);
+
+    const specialGrid = document.createElement('div');
+    specialGrid.className = 'explore-block-grid';
+
+    SPECIAL_BLOCKS.forEach(block => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'explore-block-btn';
+      button.style.setProperty('--special-accent', block.accent || 'var(--primary)');
+      button.setAttribute('aria-label', `Estudiar ${block.name} con flashcards`);
+
+      const main = document.createElement('span');
+      main.className = 'explore-block-main';
+
+      const name = document.createElement('span');
+      name.className = 'explore-block-name';
+      name.textContent = block.name;
+
+      const count = document.createElement('span');
+      count.className = 'explore-block-count';
+      count.textContent = `${block.items.length} flashcards`;
+
+      main.append(name, count);
+      const play = document.createElement('span');
+      play.className = 'explore-block-play';
+      play.textContent = 'Abrir';
+      button.append(main, play);
+      button.addEventListener('click', () => startFlashcards(block.items, block.name));
+      specialGrid.appendChild(button);
+    });
+
+    blocksSection.appendChild(specialGrid);
     wrapper.appendChild(blocksSection);
 
     const divider = document.createElement('div');
@@ -3758,9 +4019,9 @@
     function render(query) {
       const q = normalize(query);
       const matches = q
-        ? QUESTIONS.filter(item =>
+        ? ALL_QUESTIONS.filter(item =>
             normalize(item.english).includes(q) || normalize(item.spanish).includes(q))
-        : QUESTIONS;
+        : ALL_QUESTIONS;
 
       const shown = matches.slice(0, MAX);
       info.textContent = matches.length
@@ -3853,6 +4114,11 @@
     const value = el.blockSelect.value;
     if (value === 'random') {
       startSession(shuffle(QUESTIONS).slice(0, SESSION_SIZE), 'practice');
+      return;
+    }
+    const specialBlock = SPECIAL_BLOCKS.find(b => b.id === value);
+    if (specialBlock) {
+      startFlashcards(specialBlock.items, specialBlock.name);
       return;
     }
     const block = BLOCKS.find(b => b.id === value);
@@ -3988,6 +4254,7 @@
   function init() {
     initTheme();
     populateBlocks();
+    renderPinnedSpecialBlocks();
     setMode(db.settings.mode || 'EN-ES');
     updateCounters();
   }
