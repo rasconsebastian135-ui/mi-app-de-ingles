@@ -220,6 +220,16 @@
   .brand h1 { margin: 0; font-size: 1.35rem; line-height: 1.2; letter-spacing: -.025em; }
   .brand p  { margin: 4px 0 0; font-size: .84rem; color: rgba(245,247,255,.78); }
 
+  .topbar-left {
+    display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1 1 auto; position: relative; z-index: 1;
+  }
+  .app-version {
+    flex: 0 0 auto; min-width: 56px; padding: 7px 9px; border-radius: 11px;
+    background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.18);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
+    color: rgba(255,255,255,.84); font-size: .68rem; font-weight: 900;
+    letter-spacing: .04em; text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums;
+  }
   .topbar-actions { display: flex; align-items: center; gap: 10px; flex: 0 0 auto; position: relative; z-index: 1; }
 
   .pill {
@@ -717,6 +727,28 @@
   .result-actions .btn-primary { min-width: 190px; }
   .result-actions .btn-secondary { min-width: 190px; }
 
+  .explore-blocks { margin-bottom: 18px; }
+  .explore-blocks h3 { margin: 0 0 6px; font-size: .9rem; font-weight: 900; letter-spacing: -.01em; }
+  .explore-blocks > p { margin: 0 0 11px; }
+  .explore-block-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+  .explore-block-btn {
+    width: 100%; padding: 12px; display: grid; grid-template-columns: 1fr auto; gap: 10px;
+    align-items: center; text-align: left; background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 13px; transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
+  }
+  .explore-block-btn:hover { transform: translateY(-2px); border-color: var(--border-2); background: var(--surface-3); box-shadow: var(--shadow-sm); }
+  .explore-block-main { min-width: 0; }
+  .explore-block-name { display: block; font-size: .82rem; font-weight: 850; line-height: 1.25; }
+  .explore-block-count { display: block; margin-top: 3px; font-size: .68rem; color: var(--muted); }
+  .explore-block-play {
+    display: grid; place-items: center; min-width: 34px; height: 34px; padding: 0 9px;
+    border-radius: 10px; background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    color: var(--on-primary); font-size: .76rem; font-weight: 900;
+  }
+  .explore-divider { height: 1px; margin: 16px 0 14px; background: var(--border); }
+  @media (max-width: 520px) {
+    .explore-block-grid { grid-template-columns: 1fr; }
+  }
   .modal[hidden] { display: none; }
   .modal { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 20px; }
   .modal-backdrop { position: absolute; inset: 0; background: rgba(4,7,20,.58); backdrop-filter: blur(8px); animation: backdropIn .2s ease-out; }
@@ -849,11 +881,14 @@
 
 <div class="app">
   <header class="topbar">
-    <div class="brand">
-      <div class="brand-mark">V</div>
-      <div>
-        <h1>Practicador de Vocabulario</h1>
-        <p>Practica, guarda tus errores y repásalos después.</p>
+    <div class="topbar-left">
+      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v1.3.4</span>
+      <div class="brand">
+        <div class="brand-mark">V</div>
+        <div>
+          <h1>Practicador de Vocabulario</h1>
+          <p>Practica, guarda tus errores y repásalos después.</p>
+        </div>
       </div>
     </div>
     <div class="topbar-actions">
@@ -1066,6 +1101,10 @@
 <script>
 (() => {
   'use strict';
+
+  // VERSIÓN DE LA APP: 1.3.4
+  // IMPORTANTE: CAMBIA APP_VERSION SIEMPRE QUE AGREGUES O MODIFIQUES FUNCIONALIDAD.
+  const APP_VERSION = '1.3.4';
 
   /* ======================================================================
      DATOS · vocabData con las 504 entradas originales
@@ -3379,6 +3418,69 @@
   function buildExploreModal() {
     const wrapper = document.createElement('div');
 
+    // Estudio directo por bloques desde Explorar. Usa la dirección seleccionada en el menú.
+    const blocksSection = document.createElement('section');
+    blocksSection.className = 'explore-blocks';
+
+    const blocksTitle = document.createElement('h3');
+    blocksTitle.textContent = 'Estudiar un bloque';
+    blocksSection.appendChild(blocksTitle);
+
+    const blocksHint = document.createElement('p');
+    blocksHint.className = 'hint-text';
+    const selectedMode = getMode();
+    const modeLabel = selectedMode === 'EN-ES'
+      ? 'Inglés → Español'
+      : selectedMode === 'ES-EN'
+        ? 'Español → Inglés'
+        : 'Mezcla';
+    blocksHint.textContent = `Elige un bloque para empezar directamente · Dirección: ${modeLabel}`;
+    blocksSection.appendChild(blocksHint);
+
+    const blockGrid = document.createElement('div');
+    blockGrid.className = 'explore-block-grid';
+
+    BLOCKS.forEach(block => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'explore-block-btn';
+      button.setAttribute('aria-label', `Estudiar ${block.name}`);
+
+      const main = document.createElement('span');
+      main.className = 'explore-block-main';
+
+      const name = document.createElement('span');
+      name.className = 'explore-block-name';
+      name.textContent = block.name;
+
+      const count = document.createElement('span');
+      count.className = 'explore-block-count';
+      count.textContent = `${block.items.length} tarjeta${block.items.length === 1 ? '' : 's'}`;
+
+      main.append(name, count);
+
+      const play = document.createElement('span');
+      play.className = `explore-block-play ${difficultyTagClass(block.difficulty)}`;
+      play.textContent = 'Estudiar';
+      // El botón exterior controla la acción; el tag solo aporta el aspecto.
+      play.classList.remove('tag', `tag-${block.difficulty}`);
+
+      button.append(main, play);
+      button.addEventListener('click', () => {
+        closeModal();
+        startSession(block.items, 'practice');
+      });
+
+      blockGrid.appendChild(button);
+    });
+
+    blocksSection.appendChild(blockGrid);
+    wrapper.appendChild(blocksSection);
+
+    const divider = document.createElement('div');
+    divider.className = 'explore-divider';
+    wrapper.appendChild(divider);
+
     const search = document.createElement('input');
     search.type = 'search';
     search.className = 'input';
@@ -3472,6 +3574,9 @@
   darkMedia.addEventListener('change', () => {
     if (!db.settings.theme) applyTheme(darkMedia.matches ? 'dark' : 'light');
   });
+
+  const versionBadge = document.getElementById('app-version');
+  if (versionBadge) versionBadge.textContent = `v${APP_VERSION}`;
 
   /* ======================================================================
      EVENTOS
