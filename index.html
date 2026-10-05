@@ -1102,9 +1102,9 @@
 (() => {
   'use strict';
 
-  // VERSIÓN DE LA APP: 1.3.5
+  // VERSIÓN DE LA APP: 1.3.6
   // IMPORTANTE: CAMBIA APP_VERSION SIEMPRE QUE AGREGUES O MODIFIQUES FUNCIONALIDAD.
-  const APP_VERSION = '1.3.5';
+  const APP_VERSION = '1.3.6';
 
   /* ======================================================================
      DATOS · vocabData con las 504 entradas originales
@@ -2049,6 +2049,8 @@
     resReview: $('#res-review'),
     resReviewList: $('#res-review-list'),
     btnRetry: $('#btn-retry'),
+    btnRepeat: $('#btn-repeat'),
+    btnAnother: $('#btn-another'),
     btnCopyImage: $('#btn-copy-image'),
     btnShareImage: $('#btn-share-image'),
 
@@ -3610,6 +3612,23 @@
       .map(r => r.item);
     const unique = [...new Map(failed.map(i => [i.uid, i])).values()];
     if (unique.length) startSession(unique, state.categoryMode);
+  });
+
+  // Repite exactamente el conjunto de tarjetas de la sesión recién terminada.
+  el.btnRepeat.addEventListener('click', () => {
+    const items = state.queue.map(entry => entry.item);
+    if (items.length) {
+      startSession(items, state.categoryMode);
+    } else {
+      showView('setup');
+    }
+  });
+
+  // Permite elegir una sesión distinta sin perder la configuración actual.
+  el.btnAnother.addEventListener('click', () => {
+    updateCounters();
+    showView('setup');
+    el.blockSelect.focus();
   });
 
   $('#btn-copy').addEventListener('click', copySummary);
