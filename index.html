@@ -256,9 +256,9 @@
   }
   .icon-btn.plain:hover { background: var(--surface-3); color: var(--danger); }
   .icon-btn svg { display: block; }
-  .icon-sun { display: none; }
-  [data-theme="dark"] .icon-moon { display: none; }
-  [data-theme="dark"] .icon-sun  { display: block; }
+  .icon-btn .icon-sun { display: none; }
+  [data-theme="dark"] .icon-btn .icon-moon { display: none; }
+  [data-theme="dark"] .icon-btn .icon-sun  { display: block; }
 
   main { flex: 1; overflow: auto; padding: 28px; scroll-behavior: smooth; position: relative; z-index: 1; }
 
@@ -345,105 +345,104 @@
     line-height: 1.5;
   }
 
-  .segmented {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    padding: 5px;
+  /* ---------- MENÚ COMPACTO (sin scroll) ---------- */
+  .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+
+  .menu { display: grid; gap: 12px; align-content: start; }
+  .menu .m-block .hint-text { display: none; margin-top: 8px; }
+
+  .seg {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 4px;
     background: rgba(127,127,127,.06);
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: 14px;
   }
-  .segmented label { position: relative; }
-  .segmented input { position: absolute; opacity: 0; pointer-events: none; }
-  .segmented span {
-    display: block;
-    padding: 12px 8px;
-    text-align: center;
-    border-radius: 12px;
-    font-size: .84rem; font-weight: 800;
-    color: var(--muted);
-    transition: transform .18s ease, background .18s ease, color .18s ease, box-shadow .18s ease;
+  .seg label { position: relative; }
+  .seg input { position: absolute; opacity: 0; pointer-events: none; }
+  .seg span {
+    display: block; padding: 11px 6px; text-align: center; white-space: nowrap;
+    border-radius: 10px; font-size: .84rem; font-weight: 850; color: var(--muted);
+    transition: background .18s ease, color .18s ease, box-shadow .18s ease;
   }
-  .segmented label:hover span { transform: translateY(-1px); color: var(--text-2); }
-  .segmented input:checked + span {
+  .seg label:hover span { color: var(--text-2); }
+  .seg input:checked + span {
     background: linear-gradient(135deg, var(--primary), var(--primary-2));
     color: var(--on-primary);
     box-shadow: 0 8px 18px rgba(104,88,255,.22);
-    animation: selectionPop .28s ease-out;
   }
-  .segmented input:focus-visible + span { box-shadow: var(--ring); }
+  .seg input:focus-visible + span { box-shadow: var(--ring); }
 
-  .cat-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 11px;
-  }
-  .cat-grid .cat-review { grid-column: 1 / -1; }
+  .menu-cats { display: grid; gap: 8px; align-content: start; }
+  .cat-title { margin: 2px 0 -2px; font-size: .64rem; font-weight: 900; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
+  .cat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .cat-row.single { grid-template-columns: 1fr; }
 
   .cat-btn {
     position: relative;
-    min-height: 112px;
-    padding: 16px 15px 13px;
-    display: flex; flex-direction: column; gap: 4px;
+    min-height: 66px;
+    padding: 11px 12px 9px;
+    display: flex; flex-direction: column; justify-content: space-between; gap: 2px;
     text-align: left;
     background: var(--surface-solid);
     border: 1px solid var(--border);
-    border-radius: 18px;
+    border-radius: 14px;
     overflow: hidden;
-    isolation: isolate;
-    transition: transform .22s cubic-bezier(.2,.8,.2,1), border-color .22s, box-shadow .22s, opacity .2s;
+    transition: transform .2s cubic-bezier(.2,.8,.2,1), border-color .2s, box-shadow .2s, opacity .2s;
   }
   .cat-btn::before {
-    content: ""; position: absolute; inset: 0 0 auto 0; height: 4px;
+    content: ""; position: absolute; inset: 0 0 auto 0; height: 3px;
     background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent), white 40%));
-    z-index: 2;
-  }
-  .cat-btn::after {
-    content: "";
-    position: absolute;
-    width: 90px; height: 90px;
-    border-radius: 50%;
-    right: -28px; bottom: -34px;
-    background: var(--accent);
-    opacity: .08;
-    transition: transform .3s ease, opacity .3s ease;
-    z-index: -1;
   }
   .cat-btn:hover:not(:disabled) {
-    transform: translateY(-5px) scale(1.012);
+    transform: translateY(-2px);
     border-color: color-mix(in srgb, var(--accent), var(--border-2) 38%);
-    box-shadow: 0 16px 28px color-mix(in srgb, var(--accent), transparent 84%);
+    box-shadow: 0 12px 22px color-mix(in srgb, var(--accent), transparent 84%);
   }
-  .cat-btn:hover::after { transform: scale(1.6); opacity: .14; }
-  .cat-btn:active:not(:disabled) { transform: translateY(-2px) scale(.99); }
+  .cat-btn:active:not(:disabled) { transform: scale(.98); }
   .cat-btn:disabled { opacity: .42; cursor: not-allowed; }
-  .cat-btn .cat-name { font-size: .82rem; font-weight: 850; line-height: 1.25; }
-  .cat-btn .cat-count { font-size: 1.9rem; font-weight: 950; line-height: 1; margin-top: 7px; font-variant-numeric: tabular-nums; }
-  .cat-btn .cat-foot { margin-top: auto; font-size: .64rem; font-weight: 850; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; }
+  .cat-btn .cat-name { font-size: .76rem; font-weight: 850; line-height: 1.2; }
+  .cat-btn .cat-count { font-size: 1.45rem; font-weight: 950; line-height: 1; font-variant-numeric: tabular-nums; }
+  .cat-btn.cat-wide { flex-direction: row; align-items: center; min-height: 48px; padding-top: 12px; }
+  .cat-btn.cat-wide .cat-count { font-size: 1.25rem; }
 
   .cat-easy   { --accent: #10b981; }
   .cat-medium { --accent: #f59e0b; }
   .cat-hard   { --accent: #f43f5e; }
   .cat-review { --accent: var(--primary); }
 
-  .mini-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-top: 14px;
+  .menu-stats { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 14px; padding: 0 4px; color: var(--muted); }
+  .mini-stat { display: inline-flex; align-items: baseline; gap: 5px; }
+  .mini-stat strong { font-size: .98rem; font-variant-numeric: tabular-nums; color: var(--text); }
+  .mini-stat span { font-size: .62rem; font-weight: 850; text-transform: uppercase; letter-spacing: .07em; }
+  .menu-stats .link-danger { margin-left: auto; align-self: center; font-size: .74rem; }
+
+  .menu-actions { display: grid; gap: 8px; }
+  .menu-actions .btn-lg { width: 100%; }
+  .menu-actions .sub { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .menu-actions .sub .btn { min-height: 40px; font-size: .82rem; }
+
+  @media (min-width: 900px) {
+    .menu {
+      grid-template-columns: minmax(300px, 1fr) 1.3fr;
+      grid-template-areas: "block cats" "dir cats" "stats cats" "actions cats";
+      grid-template-rows: auto auto auto 1fr;
+      column-gap: 28px; row-gap: 16px;
+    }
+    .m-block { grid-area: block; }
+    .m-dir { grid-area: dir; }
+    .menu-cats { grid-area: cats; gap: 12px; }
+    .menu-stats { grid-area: stats; }
+    .menu-actions { grid-area: actions; align-self: end; }
+    .cat-title { font-size: .7rem; }
+    .cat-btn { min-height: 92px; padding: 15px 15px 12px; }
+    .cat-btn .cat-name { font-size: .86rem; }
+    .cat-btn .cat-count { font-size: 2rem; }
+    .cat-btn.cat-wide { min-height: 62px; }
+    .seg span { padding: 13px 6px; font-size: .9rem; }
   }
-  .mini-stat {
-    padding: 13px;
-    text-align: center;
-    background: rgba(127,127,127,.055);
-    border: 1px solid var(--border);
-    border-radius: 15px;
-    transition: transform .2s ease, background .2s ease;
+  @media (min-width: 681px) {
+    .menu .m-block .hint-text { display: block; }
   }
-  .mini-stat:hover { transform: translateY(-2px); background: var(--surface-3); }
-  .mini-stat strong { display: block; font-size: 1.32rem; font-variant-numeric: tabular-nums; }
-  .mini-stat span { font-size: .62rem; font-weight: 850; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; }
 
   .row-actions { display: flex; flex-wrap: wrap; gap: 10px; }
   .row-actions .btn-primary { flex: 1 1 260px; }
@@ -767,6 +766,18 @@
   .toast .toast-action { padding: 4px 10px; border-radius: 8px; background: rgba(255,255,255,.18); font-size: .76rem; font-weight: 900; }
   .toast .toast-action:hover { background: rgba(255,255,255,.3); }
 
+  .used-box { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; margin: 0 0 14px; position: relative; z-index: 1; }
+  .used-box .used-label { font-size: .68rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .used-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 11px; border-radius: 999px;
+    background: var(--danger-soft); color: var(--danger);
+    border: 1px solid color-mix(in srgb, var(--danger), transparent 65%);
+    font-size: .84rem; font-weight: 800;
+    animation: chipIn .25s ease-out;
+  }
+  .used-chip .used-text { text-decoration: line-through; text-decoration-thickness: 1.5px; }
+
   .hidden { display: none !important; }
 
   @keyframes appEnter { from { opacity: 0; transform: translateY(14px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
@@ -795,9 +806,9 @@
   }
 
   @media (max-width: 680px) {
-    .app { width: 100%; min-height: 100vh; margin: 0; border-radius: 0; border-left: 0; border-right: 0; }
-    main { padding: 18px; }
-    .topbar { padding: 16px 18px; }
+    .app { width: 100%; height: 100vh; height: 100dvh; min-height: 0; margin: 0; border-radius: 0; border-left: 0; border-right: 0; }
+    main { padding: 14px 16px 16px; }
+    .topbar { padding: 12px 16px; }
     .brand p { display: none; }
     .pill { display: none; }
     .segmented { grid-template-columns: 1fr; }
@@ -811,8 +822,8 @@
     .cat-grid, .answer-grid, .mini-stats { grid-template-columns: 1fr; }
     .result-stats { grid-template-columns: repeat(2, 1fr); }
     .score-chips { display: none; }
-    .brand-mark { width: 43px; height: 43px; border-radius: 14px; }
-    .brand h1 { font-size: 1.12rem; }
+    .brand-mark { width: 38px; height: 38px; border-radius: 12px; font-size: 1rem; }
+    .brand h1 { font-size: 1.05rem; }
     .prompt { font-size: 1.65rem; }
     .review-list li { grid-template-columns: 1fr; }
     .review-list .rl-arrow { display: none; }
@@ -856,89 +867,78 @@
   <main>
     <!-- ============================ SETUP ============================ -->
     <section id="view-setup" class="view is-active" aria-labelledby="setup-title">
-      <div class="stack">
+      <h2 id="setup-title" class="sr-only">Menú de práctica</h2>
+      <div class="menu">
 
-        <article class="card">
-          <h2 id="setup-title" class="card-title"><span class="step">1</span> Selecciona un bloque</h2>
-          <label class="label" for="block-select">Contenido</label>
+        <div class="m-block">
+          <label class="sr-only" for="block-select">Bloque</label>
           <select id="block-select"></select>
           <p id="data-info" class="hint-text"></p>
-        </article>
-
-        <article class="card">
-          <h2 class="card-title"><span class="step">2</span> Dirección de la práctica</h2>
-          <div class="segmented" role="radiogroup" aria-label="Dirección de la práctica">
-            <label><input type="radio" name="mode" value="EN-ES" checked><span>Inglés a Español</span></label>
-            <label><input type="radio" name="mode" value="ES-EN"><span>Español a Inglés</span></label>
-            <label><input type="radio" name="mode" value="MIX"><span>Mezcla aleatoria</span></label>
-          </div>
-        </article>
-
-        <article class="card">
-          <div class="card-head">
-            <div>
-              <h2 class="card-title"><span class="step">3</span> Tus categorías</h2>
-              <p class="hint-text" style="margin-top:0">
-                Los errores conservan su dificultad. Las palabras con pista van a Revisar.
-              </p>
-            </div>
-            <span id="total-progress" class="pill on-surface">0 errores · 0 revisar</span>
-          </div>
-
-          <div class="cat-grid">
-            <button class="cat-btn cat-easy" data-category="easy" type="button">
-              <span class="cat-name">Regalada</span>
-              <span class="cat-count" id="count-easy">0</span>
-              <span class="cat-foot">estudiar</span>
-            </button>
-            <button class="cat-btn cat-medium" data-category="medium" type="button">
-              <span class="cat-name">Intermedia</span>
-              <span class="cat-count" id="count-medium">0</span>
-              <span class="cat-foot">estudiar</span>
-            </button>
-            <button class="cat-btn cat-hard" data-category="hard" type="button">
-              <span class="cat-name">Difícil</span>
-              <span class="cat-count" id="count-hard">0</span>
-              <span class="cat-foot">estudiar</span>
-            </button>
-
-            <button class="cat-btn cat-easy" data-category="mistakes-easy" type="button">
-              <span class="cat-name">Errores · Regalada</span>
-              <span class="cat-count" id="count-mistakes-easy">0</span>
-              <span class="cat-foot">repasar</span>
-            </button>
-            <button class="cat-btn cat-medium" data-category="mistakes-medium" type="button">
-              <span class="cat-name">Errores · Intermedia</span>
-              <span class="cat-count" id="count-mistakes-medium">0</span>
-              <span class="cat-foot">repasar</span>
-            </button>
-            <button class="cat-btn cat-hard" data-category="mistakes-hard" type="button">
-              <span class="cat-name">Errores · Difícil</span>
-              <span class="cat-count" id="count-mistakes-hard">0</span>
-              <span class="cat-foot">repasar</span>
-            </button>
-
-            <button class="cat-btn cat-review" data-category="review" type="button">
-              <span class="cat-name">Revisar · palabras con pista o reveladas</span>
-              <span class="cat-count" id="count-review">0</span>
-              <span class="cat-foot">estudiar · pista desactivada</span>
-            </button>
-          </div>
-
-          <div class="mini-stats">
-            <div class="mini-stat"><strong id="stat-total">0</strong><span>Respondidas</span></div>
-            <div class="mini-stat"><strong id="stat-accuracy">—</strong><span>Precisión</span></div>
-            <div class="mini-stat"><strong id="stat-streak">0</strong><span>Mejor racha</span></div>
-          </div>
-        </article>
-
-        <div class="row-actions">
-          <button id="btn-start" class="btn btn-primary btn-lg" type="button">Empezar práctica</button>
-          <button id="btn-manage" class="btn btn-ghost" type="button">Gestionar guardados</button>
-          <button id="btn-explore" class="btn btn-ghost" type="button">Explorar vocabulario</button>
         </div>
 
-        <button id="btn-reset" class="link-danger hidden" type="button">Borrar todo el progreso guardado</button>
+        <div class="m-dir seg" role="radiogroup" aria-label="Dirección de la práctica">
+          <label><input type="radio" name="mode" value="EN-ES" aria-label="Inglés a Español" checked><span>EN → ES</span></label>
+          <label><input type="radio" name="mode" value="ES-EN" aria-label="Español a Inglés"><span>ES → EN</span></label>
+          <label><input type="radio" name="mode" value="MIX" aria-label="Mezcla aleatoria"><span>Mezcla</span></label>
+        </div>
+
+        <div class="menu-cats">
+          <div class="cat-title">Estudiar</div>
+          <div class="cat-row">
+            <button class="cat-btn cat-easy" data-category="easy" type="button" aria-label="Estudiar Regalada">
+              <span class="cat-name">Regalada</span>
+              <span class="cat-count" id="count-easy">0</span>
+            </button>
+            <button class="cat-btn cat-medium" data-category="medium" type="button" aria-label="Estudiar Intermedia">
+              <span class="cat-name">Intermedia</span>
+              <span class="cat-count" id="count-medium">0</span>
+            </button>
+            <button class="cat-btn cat-hard" data-category="hard" type="button" aria-label="Estudiar Difícil">
+              <span class="cat-name">Difícil</span>
+              <span class="cat-count" id="count-hard">0</span>
+            </button>
+          </div>
+
+          <div class="cat-title">Errores</div>
+          <div class="cat-row">
+            <button class="cat-btn cat-easy" data-category="mistakes-easy" type="button" aria-label="Errores Regalada">
+              <span class="cat-name">Regalada</span>
+              <span class="cat-count" id="count-mistakes-easy">0</span>
+            </button>
+            <button class="cat-btn cat-medium" data-category="mistakes-medium" type="button" aria-label="Errores Intermedia">
+              <span class="cat-name">Intermedia</span>
+              <span class="cat-count" id="count-mistakes-medium">0</span>
+            </button>
+            <button class="cat-btn cat-hard" data-category="mistakes-hard" type="button" aria-label="Errores Difícil">
+              <span class="cat-name">Difícil</span>
+              <span class="cat-count" id="count-mistakes-hard">0</span>
+            </button>
+          </div>
+
+          <div class="cat-row single">
+            <button class="cat-btn cat-review cat-wide" data-category="review" type="button" aria-label="Revisar palabras con pista o reveladas">
+              <span class="cat-name">Revisar · con pista o reveladas</span>
+              <span class="cat-count" id="count-review">0</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="menu-stats">
+          <div class="mini-stat"><strong id="stat-total">0</strong><span>Respondidas</span></div>
+          <div class="mini-stat"><strong id="stat-accuracy">—</strong><span>Precisión</span></div>
+          <div class="mini-stat"><strong id="stat-streak">0</strong><span>Mejor racha</span></div>
+          <span id="total-progress" class="hidden"></span>
+          <button id="btn-reset" class="link-danger hidden" type="button" title="Borrar todo el progreso guardado">Borrar progreso</button>
+        </div>
+
+        <div class="menu-actions">
+          <button id="btn-start" class="btn btn-primary btn-lg" type="button">Empezar práctica</button>
+          <div class="sub">
+            <button id="btn-manage" class="btn btn-ghost" type="button">Gestionar guardados</button>
+            <button id="btn-explore" class="btn btn-ghost" type="button">Explorar vocabulario</button>
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -974,6 +974,7 @@
 
           <h2 id="word-prompt" class="prompt">—</h2>
           <p id="word-note" class="note hidden"></p>
+          <div id="used-box" class="used-box hidden"></div>
 
           <div id="hint-box" class="hint-box" hidden></div>
 
@@ -1029,11 +1030,12 @@
           <button id="btn-repeat" class="btn btn-primary" type="button">↻ Repetir sesión</button>
           <button id="btn-another" class="btn btn-secondary" type="button">＋ Elegir otra sesión</button>
           <button id="btn-retry" class="btn btn-secondary hidden" type="button">Repetir fallos</button>
+          <button id="btn-share-image" class="btn btn-secondary hidden" type="button">⇪ Compartir errores</button>
           <button id="btn-copy-image" class="btn btn-secondary hidden" type="button">▣ Copiar errores como imagen</button>
           <button id="btn-copy" class="btn btn-secondary" type="button">Copiar resumen</button>
           <button id="btn-finish" class="btn btn-ghost" type="button">Volver al menú</button>
         </div>
-        <p class="shortcuts">La imagen incluye bloque, sección, posición, dificultad, tu respuesta y la respuesta correcta. También puedes usar <kbd>Ctrl</kbd> + <kbd>C</kbd>.</p>
+        <p class="shortcuts">La imagen incluye bloque, sección, posición, dificultad, tu respuesta y la respuesta correcta. En el móvil usa "Compartir errores"; en la compu también puedes usar <kbd>Ctrl</kbd> + <kbd>C</kbd>.</p>
       </div>
     </section>
   </main>
@@ -1929,8 +1931,7 @@
     streak: 0,
     startedAt: 0,
     categoryMode: 'practice',
-    lastCategory: 'practice',
-    lastItems: []
+    lastCategory: 'practice'
   };
 
   /* ======================================================================
@@ -1978,6 +1979,7 @@
     flagDifficulty: $('#flag-difficulty'),
     wordPrompt: $('#word-prompt'),
     wordNote: $('#word-note'),
+    usedBox: $('#used-box'),
     hintBox: $('#hint-box'),
     shortcuts: $('#shortcuts'),
 
@@ -1999,6 +2001,7 @@
     resReviewList: $('#res-review-list'),
     btnRetry: $('#btn-retry'),
     btnCopyImage: $('#btn-copy-image'),
+    btnShareImage: $('#btn-share-image'),
 
     modal: $('#modal'),
     modalTitle: $('#modal-title'),
@@ -2163,7 +2166,7 @@
 
     const randomOption = document.createElement('option');
     randomOption.value = 'random';
-    randomOption.textContent = `Sesión aleatoria · ${SESSION_SIZE} preguntas de todo el vocabulario`;
+    randomOption.textContent = `Aleatoria · ${SESSION_SIZE} preguntas de todo`;
     el.blockSelect.appendChild(randomOption);
 
     DIFFICULTIES.forEach(diff => {
@@ -2286,7 +2289,6 @@
     state.startedAt = Date.now();
     state.categoryMode = categoryMode;
     state.lastCategory = categoryMode;
-    state.lastItems = items.slice();
 
     showView('practice');
     renderCurrent();
@@ -2339,6 +2341,32 @@
     } else {
       el.wordNote.textContent = '';
       el.wordNote.classList.add('hidden');
+    }
+
+    // Respuestas ya gastadas por otra tarjeta del mismo enunciado (en este bloque)
+    const usedNow = groupMembers.filter(m => m.claimed && m.usedText);
+    el.usedBox.replaceChildren();
+    if (usedNow.length) {
+      const usedLabel = document.createElement('span');
+      usedLabel.className = 'used-label';
+      usedLabel.textContent = 'Ya usadas';
+      el.usedBox.appendChild(usedLabel);
+      usedNow.forEach(m => {
+        const chip = document.createElement('span');
+        chip.className = 'used-chip';
+        chip.title = 'Ya no puedes repetir esta respuesta';
+        const ban = document.createElement('span');
+        ban.setAttribute('aria-hidden', 'true');
+        ban.textContent = '🚫';
+        const txt = document.createElement('span');
+        txt.className = 'used-text';
+        txt.textContent = m.usedText;
+        chip.append(ban, txt);
+        el.usedBox.appendChild(chip);
+      });
+      el.usedBox.classList.remove('hidden');
+    } else {
+      el.usedBox.classList.add('hidden');
     }
 
     el.hintBox.hidden = true;
@@ -2546,6 +2574,7 @@
 
     const slot = claimSlot(entry);
     const expected = expectedFor(entry, slot);
+    if (slot) slot.usedText = expected;
     state.answered = true;
     state.streak = 0;
 
@@ -2606,7 +2635,10 @@
     db.stats.answered += 1;
 
     if (result.correct) {
-      if (result.slot) result.slot.claimed = true;   // gasta esa respuesta del grupo
+      if (result.slot) {                              // gasta esa respuesta del grupo
+        result.slot.claimed = true;
+        result.slot.usedText = userAnswer.trim();
+      }
 
       state.streak += 1;
       db.stats.correct += 1;
@@ -2635,6 +2667,7 @@
       setTimeout(() => el.wordCard.classList.remove('shake'), 420);
 
       const slot = claimSlot(entry);
+      if (slot) slot.usedText = expectedFor(entry, slot);
       el.feedback.hidden = false;
       el.feedback.className = 'feedback error';
 
@@ -2731,10 +2764,12 @@
       el.resReview.classList.remove('hidden');
       el.btnRetry.classList.remove('hidden');
       el.btnCopyImage.classList.remove('hidden');
+      el.btnShareImage.classList.remove('hidden');
     } else {
       el.resReview.classList.add('hidden');
       el.btnRetry.classList.add('hidden');
       el.btnCopyImage.classList.add('hidden');
+      el.btnShareImage.classList.add('hidden');
     }
 
     updateCounters();
@@ -2795,7 +2830,7 @@
   /* ======================================================================
      COPIAR ERRORES COMO IMAGEN
      ====================================================================== */
-  async function copyMistakesImage() {
+  async function copyMistakesImage(mode = 'copy') {
     if (!views.results.classList.contains('is-active')) return;
 
     const failed = state.results.filter(r => r.status !== 'correct');
@@ -3097,6 +3132,24 @@
       return;
     }
 
+    // Compartir: abre el menú del teléfono (WhatsApp, Notas, etc.) sin guardar en la galería
+    if (mode === 'share') {
+      try {
+        const file = new File(
+          [blob],
+          `repaso-errores-${new Date().toISOString().slice(0, 10)}.png`,
+          { type: 'image/png' }
+        );
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: 'Repaso de errores' });
+          return;
+        }
+      } catch (err) {
+        if (err && err.name === 'AbortError') return; // cerraste el menú de compartir
+      }
+      // Si el dispositivo no puede compartir, sigue al respaldo de abajo (copiar o descargar)
+    }
+
     try {
       if (!navigator.clipboard?.write || !window.ClipboardItem) throw new Error('clipboard');
       await navigator.clipboard.write([
@@ -3381,56 +3434,9 @@
     if (unique.length) startSession(unique, state.categoryMode);
   });
 
-  $('#btn-repeat').addEventListener('click', () => {
-    if (state.lastItems.length) startSession(state.lastItems, state.lastCategory);
-  });
-
-  $('#btn-another').addEventListener('click', () => {
-    const wrap = document.createElement('div');
-    wrap.style.display = 'grid';
-    wrap.style.gap = '14px';
-
-    const mk = (text, node) => {
-      const box = document.createElement('div');
-      const lab = document.createElement('span');
-      lab.className = 'label';
-      lab.textContent = text;
-      box.append(lab, node);
-      return box;
-    };
-
-    const blockPick = document.createElement('select');
-    blockPick.innerHTML = el.blockSelect.innerHTML;
-    blockPick.value = el.blockSelect.value;
-
-    const modePick = document.createElement('select');
-    [['EN-ES', 'Inglés a Español'], ['ES-EN', 'Español a Inglés'], ['MIX', 'Mezcla aleatoria']].forEach(([v, t]) => {
-      const o = document.createElement('option');
-      o.value = v; o.textContent = t;
-      modePick.appendChild(o);
-    });
-    modePick.value = getMode();
-
-    wrap.append(mk('Sesión', blockPick), mk('Dirección', modePick));
-
-    const go = document.createElement('button');
-    go.type = 'button';
-    go.className = 'btn btn-primary';
-    go.textContent = 'Empezar';
-    go.addEventListener('click', () => {
-      closeModal();
-      el.blockSelect.value = blockPick.value;
-      setMode(modePick.value);
-      db.settings.mode = modePick.value;
-      saveDB();
-      $('#btn-start').click();
-    });
-
-    openModal({ title: 'Elegir otra sesión', body: [wrap], footer: [go] });
-  });
-
   $('#btn-copy').addEventListener('click', copySummary);
-  el.btnCopyImage.addEventListener('click', copyMistakesImage);
+  el.btnCopyImage.addEventListener('click', () => copyMistakesImage('copy'));
+  el.btnShareImage.addEventListener('click', () => copyMistakesImage('share'));
   $('#btn-manage').addEventListener('click', buildManageModal);
   $('#btn-explore').addEventListener('click', buildExploreModal);
 
