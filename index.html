@@ -639,10 +639,15 @@
   [data-theme="dark"] .answer-input { background: rgba(8,12,29,.48); }
   .answer-input:focus { border-color: var(--primary); box-shadow: var(--ring), 0 12px 30px rgba(104,88,255,.08); transform: translateY(-1px); }
   .answer-input.correct { border-color: var(--success); background: var(--success-soft); color: var(--success); animation: pop .35s ease-out; }
+  .answer-input.valid-other { border-color: var(--warn); background: var(--warn-soft); color: var(--warn); animation: validOtherPop .35s ease-out; }
   .answer-input.wrong { border-color: var(--danger); background: var(--danger-soft); color: var(--danger); }
   @keyframes pop {
     0% { box-shadow: 0 0 0 0 rgba(16,185,129,.42); }
     100% { box-shadow: 0 0 0 14px rgba(16,185,129,0); }
+  }
+  @keyframes validOtherPop {
+    0% { box-shadow: 0 0 0 0 rgba(245,158,11,.42); }
+    100% { box-shadow: 0 0 0 14px rgba(245,158,11,0); }
   }
 
   .feedback {
@@ -653,6 +658,7 @@
     border: 1px solid var(--border);
   }
   .feedback.success { background: var(--success-soft); color: var(--success); }
+  .feedback.warning { background: var(--warn-soft); color: var(--warn); }
   .feedback.error   { background: var(--danger-soft);  color: var(--danger); }
   .feedback.info    { background: var(--primary-soft); color: var(--primary); }
   .feedback .fb-line + .fb-line { margin-top: 4px; }
@@ -676,7 +682,7 @@
   .result h2 { margin: 0 0 6px; font-size: 2rem; letter-spacing: -.03em; }
   .result > p { margin: 0; color: var(--muted); }
 
-  .result-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 26px 0; }
+  .result-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 26px 0; }
   .stat {
     padding: 17px 10px;
     border-radius: 17px;
@@ -950,6 +956,7 @@
           <div class="score-chips">
             <span id="chip-ok" class="chip ok">0 correctas</span>
             <span id="chip-bad" class="chip bad">0 fallos</span>
+            <span id="chip-valid" class="chip streak hidden">0 válidas fuera de tarjeta</span>
             <span id="chip-streak" class="chip streak hidden">Racha 0</span>
           </div>
           <div class="progress-track" aria-hidden="true">
@@ -1017,6 +1024,7 @@
         <div class="result-stats">
           <div class="stat ok"><strong id="res-correct">0</strong><span>Correctas</span></div>
           <div class="stat bad"><strong id="res-wrong">0</strong><span>Fallos</span></div>
+          <div class="stat"><strong id="res-valid">0</strong><span>Válidas fuera de tarjeta</span></div>
           <div class="stat"><strong id="res-accuracy">—</strong><span>Precisión</span></div>
           <div class="stat"><strong id="res-time">—</strong><span>Tiempo</span></div>
         </div>
@@ -1969,6 +1977,7 @@
     progressText: $('#progress-text'),
     chipOk: $('#chip-ok'),
     chipBad: $('#chip-bad'),
+    chipValid: $('#chip-valid'),
     chipStreak: $('#chip-streak'),
 
     wordCard: $('#word-card'),
@@ -1994,6 +2003,7 @@
 
     resCorrect: $('#res-correct'),
     resWrong: $('#res-wrong'),
+    resValid: $('#res-valid'),
     resAccuracy: $('#res-accuracy'),
     resTime: $('#res-time'),
     resSummary: $('#results-summary'),
@@ -2420,9 +2430,13 @@
 
   function updateLiveChips() {
     const ok = state.results.filter(r => r.status === 'correct').length;
-    const bad = state.results.length - ok;
+    const validOther = state.results.filter(r => r.status === 'valid-other').length;
+    const bad = state.results.filter(r => r.status === 'wrong' || r.status === 'revealed').length;
+
     el.chipOk.textContent = `${ok} correctas`;
     el.chipBad.textContent = `${bad} fallos`;
+    el.chipValid.textContent = `${validOther} ${validOther === 1 ? 'válida fuera de tarjeta' : 'válidas fuera de tarjeta'}`;
+    el.chipValid.classList.toggle('hidden', validOther === 0);
     el.chipStreak.textContent = `Racha ${state.streak}`;
     el.chipStreak.classList.toggle('hidden', state.streak < 2);
   }
@@ -2457,7 +2471,15 @@
       ? formsOf(pool.map(m => ownOf(m.item, m.direction)))
       : formsOf(allOf(item, direction));
 
-    const miss = { correct: false, near: false, accepted, slot: null, alreadyUsed: false, otherBlock: null };
+    const miss = {
+      correct: false,
+      validOther: false,
+      near: false,
+      accepted,
+      slot: null,
+      alreadyUsed: false,
+      otherBlock: null
+    };
     if (!user) return miss;
 
     if (pool && pool.length) {
@@ -2472,16 +2494,30 @@
     const alreadyUsed = members.length > 1 &&
       members.some(m => m.claimed && slotForms(m).includes(user));
 
-    const otherQ = (GLOBAL_PROMPTS[direction].get(normalize(promptOf(item, direction))) || [])
-      .find(q => q.blockId !== item.blockId && formsOf([ownOf(q, direction)]).includes(user));
-    const otherBlock = otherQ ? (BLOCKS.find(b => b.id === otherQ.blockId)?.name || null) : null;
+    // La respuesta sí existe en el vocabulario, pero pertenece a otra tarjeta
+    // de otro bloque. No es un error del usuario: simplemente no corresponde
+    // al objetivo de esta tarjeta.
+    const otherQ = QUESTIONS.find(q =>
+      q.uid !== item.uid &&
+      q.blockId !== item.blockId &&
+      formsOf([ownOf(q, direction)]).includes(user)
+    );
+    const otherBlock = otherQ
+      ? (BLOCKS.find(b => b.id === otherQ.blockId)?.name || null)
+      : null;
 
     const near = accepted.some(a => {
       const tolerance = a.length <= 5 ? 1 : 2;
       return levenshtein(user, a) <= tolerance;
     });
 
-    return { ...miss, near, alreadyUsed, otherBlock };
+    return {
+      ...miss,
+      near,
+      alreadyUsed,
+      otherBlock,
+      validOther: Boolean(otherBlock)
+    };
   }
 
   /* ======================================================================
@@ -2658,6 +2694,38 @@
       updateHistoryFlag(item);
 
       state.results.push({ item, direction, status: 'correct', userAnswer, usedHint: state.usedHint });
+    } else if (result.validOther) {
+      // Respuesta válida en otro bloque: no es fallo y no se guarda como error.
+      state.streak = 0;
+      db.stats.currentStreak = 0;
+
+      el.input.classList.add('valid-other');
+      el.feedback.hidden = false;
+      el.feedback.className = 'feedback warning';
+
+      el.feedback.replaceChildren(
+        line('Es correcto, pero no es la respuesta que estoy buscando.'),
+        line(
+          `Tu respuesta corresponde a una tarjeta de otro bloque (${result.otherBlock}).`,
+          'fb-line fb-dim'
+        ),
+        line(
+          `Para esta tarjeta esperaba: ${expectedFor(entry)}.`,
+          'fb-line fb-dim'
+        )
+      );
+
+      updateCounters();
+      updateHistoryFlag(item);
+
+      state.results.push({
+        item,
+        direction,
+        status: 'valid-other',
+        userAnswer,
+        otherBlock: result.otherBlock,
+        usedHint: state.usedHint
+      });
     } else {
       state.streak = 0;
       db.stats.currentStreak = 0;
@@ -2675,8 +2743,6 @@
       if (result.near) nodes.push(line('Casi. Revisa la ortografía.', 'fb-line fb-dim'));
       if (result.alreadyUsed) {
         nodes.push(line('Esa respuesta ya la usaste en otra tarjeta de este bloque.', 'fb-line fb-dim'));
-      } else if (result.otherBlock) {
-        nodes.push(line(`Esa traducción existe, pero es de una tarjeta de otro bloque (${result.otherBlock}).`, 'fb-line fb-dim'));
       }
       extraLines(entry).forEach(t => nodes.push(line(t, 'fb-line fb-dim')));
       nodes.push(line(`Tu respuesta: ${userAnswer}`, 'fb-line fb-dim'));
@@ -2714,7 +2780,8 @@
   function finishSession() {
     const total = state.results.length;
     const correct = state.results.filter(r => r.status === 'correct').length;
-    const wrong = total - correct;
+    const validOther = state.results.filter(r => r.status === 'valid-other').length;
+    const wrong = state.results.filter(r => r.status === 'wrong' || r.status === 'revealed').length;
     const accuracy = total ? Math.round((correct / total) * 100) : 0;
 
     db.stats.sessions += 1;
@@ -2728,13 +2795,16 @@
 
     el.resCorrect.textContent = correct;
     el.resWrong.textContent = wrong;
+    el.resValid.textContent = validOther;
     el.resAccuracy.textContent = total ? `${accuracy}%` : '—';
     el.resTime.textContent = formatDuration(Date.now() - state.startedAt);
 
     const categoryName = categoryLabel(state.categoryMode).toLowerCase();
-    el.resSummary.textContent = `${total} preguntas de ${categoryName}.`;
+    el.resSummary.textContent = validOther
+      ? `${total} preguntas de ${categoryName} · ${validOther} ${validOther === 1 ? 'respuesta válida' : 'respuestas válidas'} fuera de su tarjeta.`
+      : `${total} preguntas de ${categoryName}.`;
 
-    const failed = state.results.filter(r => r.status !== 'correct');
+    const failed = state.results.filter(r => r.status === 'wrong' || r.status === 'revealed');
     el.resReviewList.replaceChildren();
     if (failed.length) {
       failed.forEach(r => {
@@ -2784,7 +2854,8 @@
     if (!total) { toast('Nada que copiar', 'info'); return; }
 
     const correct = state.results.filter(r => r.status === 'correct');
-    const failed = state.results.filter(r => r.status !== 'correct');
+    const validOther = state.results.filter(r => r.status === 'valid-other');
+    const failed = state.results.filter(r => r.status === 'wrong' || r.status === 'revealed');
 
     const lines = [
       `PRACTICADOR DE VOCABULARIO · ${new Date().toLocaleString()}`,
@@ -2800,6 +2871,14 @@
       });
       lines.push('');
     }
+    if (validOther.length) {
+      lines.push('VÁLIDAS, PERO DE OTRO BLOQUE');
+      validOther.forEach((r, i) => {
+        lines.push(`${i + 1}. ${r.item.english} — ${r.item.spanish} · Tu respuesta: ${r.userAnswer?.trim() || '—'} · ${r.otherBlock || 'Otro bloque'}`);
+      });
+      lines.push('');
+    }
+
     if (correct.length) {
       lines.push('CORRECTAS');
       correct.forEach((r, i) => lines.push(`${i + 1}. ${r.item.english} — ${r.item.spanish}`));
@@ -2833,7 +2912,7 @@
   async function copyMistakesImage(mode = 'copy') {
     if (!views.results.classList.contains('is-active')) return;
 
-    const failed = state.results.filter(r => r.status !== 'correct');
+    const failed = state.results.filter(r => r.status === 'wrong' || r.status === 'revealed');
     if (!failed.length) {
       toast('No hay errores que copiar', 'info');
       return;
@@ -2940,12 +3019,14 @@
 
     function statusLabel(result) {
       if (result.status === 'revealed') return 'RESPUESTA REVELADA';
+      if (result.status === 'valid-other') return 'VÁLIDA · OTRO BLOQUE';
       if (result.usedHint) return 'FALLO · CON PISTA';
       return 'FALLO';
     }
 
     function reasonLabel(result) {
       if (result.status === 'revealed') return 'La respuesta se reveló durante la sesión.';
+      if (result.status === 'valid-other') return `Respuesta válida, pero corresponde a ${result.otherBlock || 'otro bloque'}.`;
       if (result.usedHint) return 'Fallaste después de usar una pista.';
       return 'Respuesta incorrecta.';
     }
@@ -3428,7 +3509,7 @@
 
   $('#btn-retry').addEventListener('click', () => {
     const failed = state.results
-      .filter(r => r.status !== 'correct')
+      .filter(r => r.status === 'wrong' || r.status === 'revealed')
       .map(r => r.item);
     const unique = [...new Map(failed.map(i => [i.uid, i])).values()];
     if (unique.length) startSession(unique, state.categoryMode);
