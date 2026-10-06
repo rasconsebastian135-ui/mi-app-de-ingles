@@ -427,7 +427,8 @@
   .menu-stats .link-danger { margin-left: auto; align-self: center; font-size: .74rem; }
 
   .menu-actions { display: grid; gap: 8px; }
-  .menu-actions .btn-lg { width: 100%; }
+  .menu-start-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .menu-start-row .btn-lg { width: 100%; }
   .menu-actions .sub { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .menu-actions .sub .btn { min-height: 40px; font-size: .82rem; }
 
@@ -488,11 +489,13 @@
   }
   .pinned-block-count { color: var(--muted); font-size: .63rem; font-weight: 800; }
   .pinned-block-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-  .pinned-block-open {
-    align-self: flex-start; padding: 5px 8px; border-radius: 8px;
-    background: var(--surface-3); color: var(--text-2); font-size: .62rem; font-weight: 950;
-    letter-spacing: .02em;
+  .pinned-block-actions { display: flex; gap: 5px; min-width: 0; }
+  .pinned-block-open, .pinned-block-flash {
+    align-self: flex-start; padding: 5px 7px; border-radius: 8px;
+    background: var(--surface-3); color: var(--text-2); font-size: .58rem; font-weight: 950;
+    letter-spacing: .01em; white-space: nowrap;
   }
+  .pinned-block-flash { background: var(--primary-soft); color: var(--primary); }
   .pinned-block-unpin {
     flex: 0 0 auto; padding: 5px 7px; border-radius: 8px;
     background: var(--danger-soft); color: var(--danger); font-size: .62rem; font-weight: 950;
@@ -515,6 +518,15 @@
     background: var(--surface-3); color: var(--muted); border: 1px solid var(--border); font-size: .67rem; font-weight: 950;
   }
   .pin-toggle.is-pinned { background: var(--primary-soft); color: var(--primary); border-color: color-mix(in srgb, var(--primary), var(--border) 70%); }
+  .session-block-choice { cursor: default; }
+  .session-choice-actions { display: flex; gap: 6px; flex: 0 0 auto; }
+  .session-choice-action { padding: 7px 9px; border-radius: 9px; background: var(--primary-soft); color: var(--primary); font-size: .68rem; font-weight: 950; border: 1px solid var(--border); white-space: nowrap; }
+  .session-choice-action:hover { background: var(--surface-3); border-color: var(--border-2); }
+  .session-choice-flash { background: var(--surface-3); color: var(--text-2); }
+  .explore-block-wrap, .explore-special-wrap { min-width: 0; }
+  .explore-block-actions { display: flex; align-items: center; gap: 5px; }
+  .explore-block-flash, .explore-block-pin { min-width: 30px; height: 30px; padding: 0 7px; display: grid; place-items: center; border-radius: 9px; background: var(--surface-3); color: var(--text-2); border: 1px solid var(--border); font-size: .73rem; font-weight: 950; }
+  .explore-block-flash { background: var(--primary-soft); color: var(--primary); }
   .tag-special { background: var(--primary-soft); color: var(--primary); }
 
   @media (min-width: 900px) {
@@ -991,6 +1003,8 @@
     .practice-stage { min-height: 460px; }
     .pinned-blocks-head { align-items: flex-start; }
     .pinned-blocks-head p { max-width: 62vw; }
+    .menu-start-row { grid-template-columns: 1fr; }
+    .session-choice-actions { flex-wrap: wrap; justify-content: flex-end; }
   }
 
   @media (max-width: 460px) {
@@ -1110,7 +1124,10 @@
         </div>
 
         <div class="menu-actions">
-          <button id="btn-start" class="btn btn-primary btn-lg" type="button">Empezar práctica</button>
+          <div class="menu-start-row">
+            <button id="btn-start" class="btn btn-primary btn-lg" type="button">Empezar práctica</button>
+            <button id="btn-start-flashcards" class="btn btn-secondary btn-lg" type="button">🎴 Flashcards del bloque</button>
+          </div>
           <div class="sub">
             <button id="btn-manage" class="btn btn-ghost" type="button">Gestionar guardados</button>
             <button id="btn-explore" class="btn btn-ghost" type="button">Explorar vocabulario</button>
@@ -2038,7 +2055,7 @@
   const QUESTIONS = entries.flatMap(expandEntry);
 
   /* ======================================================================
-     BLOQUES ESPECIALES · flashcards fijadas en el menú
+     BLOQUES ESPECIALES · listas independientes, practicables y estudiables
      ====================================================================== */
   const SPECIAL_BLOCK_DEFS = [
     {
@@ -2545,18 +2562,18 @@
     });
 
     const specialGroup = document.createElement('optgroup');
-    specialGroup.label = 'Bloques especiales · Flashcards';
+    specialGroup.label = 'Bloques especiales';
     SPECIAL_BLOCKS.forEach(block => {
       const option = document.createElement('option');
       option.value = block.id;
-      option.textContent = `${block.name} (${block.items.length} tarjetas)`;
+      option.textContent = `${block.name} (${block.items.length} palabras)`;
       specialGroup.appendChild(option);
     });
     el.blockSelect.appendChild(specialGroup);
 
     el.dataInfo.textContent =
       `${QUESTIONS.length} preguntas · ${entries.length} entradas únicas · ` +
-      `${BLOCKS.length} bloques de práctica · ${SPECIAL_BLOCKS.length} bloques especiales (${SPECIAL_QUESTIONS.length} tarjetas)`;
+      `${BLOCKS.length} bloques de práctica · ${SPECIAL_BLOCKS.length} bloques especiales (${SPECIAL_QUESTIONS.length} palabras) · todos se pueden contestar o estudiar con flashcards`;
   }
 
   /* ======================================================================
@@ -2723,7 +2740,7 @@
       })),
       ...SPECIAL_BLOCKS.map(block => ({
         ...block,
-        kind: 'flashcards',
+        kind: 'practice',
         countLabel: `${block.items.length} palabras`,
         accent: block.accent || '#8b5cf6'
       }))
@@ -2743,9 +2760,9 @@
     renderPinnedBlocks();
   }
 
-  function openStudyBlock(block) {
+  function openStudyBlock(block, mode = 'practice') {
     if (!block) return;
-    if (block.kind === 'flashcards') {
+    if (mode === 'flashcards') {
       startFlashcards(block.items, block.name);
     } else {
       startSession(block.items, 'practice');
@@ -2775,17 +2792,10 @@
       const card = document.createElement('article');
       card.className = 'pinned-block-card';
       card.style.setProperty('--special-accent', block.accent || 'var(--primary)');
-      card.tabIndex = 0;
-      card.setAttribute('role', 'button');
-      card.setAttribute('aria-label', `Abrir ${block.name}`);
 
       const name = document.createElement('div');
       name.className = 'pinned-block-name';
       name.textContent = block.name;
-
-      const kind = document.createElement('span');
-      kind.className = 'pinned-block-kind';
-      kind.textContent = block.kind === 'flashcards' ? 'Flashcards' : 'Práctica';
 
       const count = document.createElement('div');
       count.className = 'pinned-block-count';
@@ -2794,29 +2804,42 @@
       const foot = document.createElement('div');
       foot.className = 'pinned-block-foot';
 
-      const open = document.createElement('span');
-      open.className = 'pinned-block-open';
-      open.textContent = 'Abrir ↗';
+      const actions = document.createElement('div');
+      actions.className = 'pinned-block-actions';
+
+      const practice = document.createElement('button');
+      practice.type = 'button';
+      practice.className = 'pinned-block-open';
+      practice.textContent = 'Contestar';
+      practice.setAttribute('aria-label', `Contestar ${block.name}`);
+      practice.addEventListener('click', event => {
+        event.stopPropagation();
+        openStudyBlock(block, 'practice');
+      });
+
+      const flash = document.createElement('button');
+      flash.type = 'button';
+      flash.className = 'pinned-block-flash';
+      flash.textContent = '🎴 Flashcards';
+      flash.setAttribute('aria-label', `Estudiar ${block.name} con flashcards`);
+      flash.addEventListener('click', event => {
+        event.stopPropagation();
+        openStudyBlock(block, 'flashcards');
+      });
 
       const unpin = document.createElement('button');
       unpin.type = 'button';
       unpin.className = 'pinned-block-unpin';
-      unpin.textContent = '✕ Quitar';
+      unpin.textContent = '✕';
       unpin.setAttribute('aria-label', `Quitar ${block.name} de bloques fijados`);
       unpin.addEventListener('click', event => {
         event.stopPropagation();
         setBlockPinned(block.id, false);
       });
 
-      foot.append(open, unpin);
-      card.append(name, kind, count, foot);
-      card.addEventListener('click', () => openStudyBlock(block));
-      card.addEventListener('keydown', event => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          openStudyBlock(block);
-        }
-      });
+      actions.append(practice, flash);
+      foot.append(actions, unpin);
+      card.append(name, count, foot);
       grid.appendChild(card);
     });
   }
@@ -2868,7 +2891,7 @@
 
         const meta = document.createElement('span');
         meta.className = 'pin-choice-meta';
-        meta.textContent = `${block.countLabel} · ${block.kind === 'flashcards' ? 'flashcards' : 'práctica'}`;
+        meta.textContent = `${block.countLabel} · puedes contestarlo o abrirlo como flashcards`;
 
         main.append(name, meta);
 
@@ -3127,13 +3150,13 @@
     // La respuesta sí existe en el vocabulario, pero pertenece a otra tarjeta
     // de otro bloque. No es un error del usuario: simplemente no corresponde
     // al objetivo de esta tarjeta.
-    const otherQ = QUESTIONS.find(q =>
+    const otherQ = ALL_QUESTIONS.find(q =>
       q.uid !== item.uid &&
       q.blockId !== item.blockId &&
       formsOf([ownOf(q, direction)]).includes(user)
     );
     const otherBlock = otherQ
-      ? (BLOCKS.find(b => b.id === otherQ.blockId)?.name || null)
+      ? (BLOCKS.find(b => b.id === otherQ.blockId)?.name || SPECIAL_BLOCKS.find(b => b.id === otherQ.blockId)?.name || null)
       : null;
 
     const near = accepted.some(a => {
@@ -3443,7 +3466,7 @@
 
         const meta = document.createElement('span');
         meta.className = 'rl-meta';
-        const blockName = BLOCKS.find(b => b.id === r.item.blockId)?.name || r.item.blockId || 'Bloque';
+        const blockName = BLOCKS.find(b => b.id === r.item.blockId)?.name || SPECIAL_BLOCKS.find(b => b.id === r.item.blockId)?.name || r.item.blockId || 'Bloque';
         const position = state.results.indexOf(r) + 1;
         const answerText = r.userAnswer?.trim()
           ? `Tu respuesta: ${r.userAnswer.trim()}`
@@ -3635,7 +3658,7 @@
     }
 
     function blockLabel(item) {
-      const block = BLOCKS.find(b => b.id === item.blockId);
+      const block = BLOCKS.find(b => b.id === item.blockId) || SPECIAL_BLOCKS.find(b => b.id === item.blockId);
       return block ? block.name : (item.blockId || 'Bloque no identificado');
     }
 
@@ -4044,21 +4067,48 @@
       });
     }
 
-    addTitle('Por bloque');
-    BLOCKS.forEach(block => {
-      addChoice(block.name, `${block.items.length} tarjetas · práctica con respuestas`, () => {
+    const addBlockChoice = (block, special = false) => {
+      const row = document.createElement('div');
+      row.className = 'session-choice session-block-choice';
+
+      const text = document.createElement('span');
+      const strong = document.createElement('strong');
+      strong.textContent = block.name;
+      const small = document.createElement('small');
+      small.textContent = `${block.items.length} ${special ? 'palabras' : 'tarjetas'} · práctica y flashcards disponibles`;
+      text.append(strong, small);
+
+      const actions = document.createElement('span');
+      actions.className = 'session-choice-actions';
+
+      const practice = document.createElement('button');
+      practice.type = 'button';
+      practice.className = 'session-choice-action';
+      practice.textContent = 'Contestar';
+      practice.addEventListener('click', () => {
         closeModal();
         startSession(block.items, 'practice');
       });
-    });
 
-    addTitle('Bloques especiales');
-    SPECIAL_BLOCKS.forEach(block => {
-      addChoice(block.name, `${block.items.length} tarjetas · estudio directo`, () => {
+      const flash = document.createElement('button');
+      flash.type = 'button';
+      flash.className = 'session-choice-action session-choice-flash';
+      flash.textContent = '🎴 Flashcards';
+      flash.addEventListener('click', () => {
         closeModal();
         startFlashcards(block.items, block.name);
       });
-    });
+
+      actions.append(practice, flash);
+      row.append(text, actions);
+      body.appendChild(row);
+    };
+
+    addTitle('Por bloque');
+    BLOCKS.forEach(block => addBlockChoice(block, false));
+
+    addTitle('Bloques especiales');
+    SPECIAL_BLOCKS.forEach(block => addBlockChoice(block, true));
 
     addTitle('Errores');
     for (const difficulty of DIFFICULTIES) {
@@ -4088,7 +4138,6 @@
   function buildExploreModal() {
     const wrapper = document.createElement('div');
 
-    // Estudio directo por bloques desde Explorar. Usa la dirección seleccionada en el menú.
     const blocksSection = document.createElement('section');
     blocksSection.className = 'explore-blocks';
 
@@ -4104,18 +4153,19 @@
       : selectedMode === 'ES-EN'
         ? 'Español → Inglés'
         : 'Mezcla';
-    blocksHint.textContent = `Elige un bloque para empezar directamente · Dirección: ${modeLabel}`;
+    blocksHint.textContent = `Cada bloque puede contestarse normalmente o abrirse como flashcards · Dirección: ${modeLabel}`;
     blocksSection.appendChild(blocksHint);
 
-    const blockGrid = document.createElement('div');
-    blockGrid.className = 'explore-block-grid';
+    const renderBlockButton = (block, special = false) => {
+      const wrap = document.createElement('div');
+      wrap.className = special ? 'explore-special-wrap' : 'explore-block-wrap';
 
-    BLOCKS.forEach(block => {
       const button = document.createElement('div');
       button.className = 'explore-block-btn';
       button.tabIndex = 0;
       button.setAttribute('role', 'button');
-      button.setAttribute('aria-label', `Abrir ${block.name}`);
+      button.setAttribute('aria-label', `Contestar ${block.name}`);
+      if (special) button.style.setProperty('--special-accent', block.accent || 'var(--primary)');
 
       const main = document.createElement('span');
       main.className = 'explore-block-main';
@@ -4126,23 +4176,30 @@
 
       const count = document.createElement('span');
       count.className = 'explore-block-count';
-      count.textContent = `${block.items.length} preguntas`;
-
+      count.textContent = `${block.items.length} ${special ? 'palabras' : 'tarjetas'} · práctica`;
       main.append(name, count);
 
       const actionWrap = document.createElement('span');
-      actionWrap.style.display = 'flex';
-      actionWrap.style.alignItems = 'center';
-      actionWrap.style.gap = '6px';
+      actionWrap.className = 'explore-block-actions';
 
-      const play = document.createElement('span');
-      play.className = `explore-block-play ${difficultyTagClass(block.difficulty)}`;
-      play.textContent = 'Abrir';
-      play.classList.remove('tag', `tag-${block.difficulty}`);
+      const practice = document.createElement('span');
+      practice.className = 'explore-block-play';
+      practice.textContent = 'Contestar';
+
+      const flash = document.createElement('button');
+      flash.type = 'button';
+      flash.className = 'explore-block-flash';
+      flash.textContent = '🎴';
+      flash.title = 'Abrir como flashcards';
+      flash.setAttribute('aria-label', `Abrir ${block.name} como flashcards`);
+      flash.addEventListener('click', event => {
+        event.stopPropagation();
+        startFlashcards(block.items, block.name);
+      });
 
       const pin = document.createElement('button');
       pin.type = 'button';
-      pin.className = 'explore-block-play';
+      pin.className = 'explore-block-pin';
       pin.textContent = isBlockPinned(block.id) ? '📌' : '＋';
       pin.title = isBlockPinned(block.id) ? 'Quitar de fijados' : 'Fijar bloque';
       pin.setAttribute('aria-label', pin.title);
@@ -4154,86 +4211,35 @@
         pin.setAttribute('aria-label', pin.title);
       });
 
-      actionWrap.append(play, pin);
+      actionWrap.append(practice, flash, pin);
       button.append(main, actionWrap);
-      button.addEventListener('click', () => openStudyBlock({ ...block, kind: 'practice' }));
+      button.addEventListener('click', () => startSession(block.items, 'practice'));
       button.addEventListener('keydown', event => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault();
-          openStudyBlock({ ...block, kind: 'practice' });
+          startSession(block.items, 'practice');
         }
       });
 
-      blockGrid.appendChild(button);
-    });
+      wrap.appendChild(button);
+      return wrap;
+    };
 
-    blocksSection.appendChild(blockGrid);
+    const regularGrid = document.createElement('div');
+    regularGrid.className = 'explore-block-grid';
+    BLOCKS.forEach(block => regularGrid.appendChild(renderBlockButton(block, false)));
+    blocksSection.appendChild(regularGrid);
 
     const specialTitle = document.createElement('h3');
-    specialTitle.textContent = 'Bloques especiales · Flashcards';
+    specialTitle.textContent = 'Bloques especiales';
     specialTitle.style.marginTop = '18px';
     blocksSection.appendChild(specialTitle);
 
     const specialGrid = document.createElement('div');
     specialGrid.className = 'explore-block-grid';
-
-    SPECIAL_BLOCKS.forEach(block => {
-      const button = document.createElement('div');
-      button.className = 'explore-block-btn';
-      button.tabIndex = 0;
-      button.setAttribute('role', 'button');
-      button.style.setProperty('--special-accent', block.accent || 'var(--primary)');
-      button.setAttribute('aria-label', `Abrir ${block.name}`);
-
-      const main = document.createElement('span');
-      main.className = 'explore-block-main';
-
-      const name = document.createElement('span');
-      name.className = 'explore-block-name';
-      name.textContent = block.name;
-
-      const count = document.createElement('span');
-      count.className = 'explore-block-count';
-      count.textContent = `${block.items.length} palabras · flashcards`;
-
-      main.append(name, count);
-
-      const actionWrap = document.createElement('span');
-      actionWrap.style.display = 'flex';
-      actionWrap.style.alignItems = 'center';
-      actionWrap.style.gap = '6px';
-
-      const play = document.createElement('span');
-      play.className = 'explore-block-play';
-      play.textContent = 'Abrir';
-
-      const pin = document.createElement('button');
-      pin.type = 'button';
-      pin.className = 'explore-block-play';
-      pin.textContent = isBlockPinned(block.id) ? '📌' : '＋';
-      pin.title = isBlockPinned(block.id) ? 'Quitar de fijados' : 'Fijar bloque';
-      pin.setAttribute('aria-label', pin.title);
-      pin.addEventListener('click', event => {
-        event.stopPropagation();
-        setBlockPinned(block.id, !isBlockPinned(block.id));
-        pin.textContent = isBlockPinned(block.id) ? '📌' : '＋';
-        pin.title = isBlockPinned(block.id) ? 'Quitar de fijados' : 'Fijar bloque';
-        pin.setAttribute('aria-label', pin.title);
-      });
-
-      actionWrap.append(play, pin);
-      button.append(main, actionWrap);
-      button.addEventListener('click', () => openStudyBlock({ ...block, kind: 'flashcards' }));
-      button.addEventListener('keydown', event => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          openStudyBlock({ ...block, kind: 'flashcards' });
-        }
-      });
-      specialGrid.appendChild(button);
-    });
-
+    SPECIAL_BLOCKS.forEach(block => specialGrid.appendChild(renderBlockButton(block, true)));
     blocksSection.appendChild(specialGrid);
+
     wrapper.appendChild(blocksSection);
 
     const divider = document.createElement('div');
@@ -4243,8 +4249,8 @@
     const search = document.createElement('input');
     search.type = 'search';
     search.className = 'input';
-    search.placeholder = 'Buscar en inglés o español…';
-    search.setAttribute('aria-label', 'Buscar vocabulario');
+    search.placeholder = 'Buscar palabra...';
+    search.setAttribute('aria-label', 'Buscar palabra');
     wrapper.appendChild(search);
 
     const info = document.createElement('p');
@@ -4257,12 +4263,10 @@
     wrapper.appendChild(list);
 
     const MAX = 80;
-
     function render(query) {
       const q = normalize(query);
       const matches = q
-        ? ALL_QUESTIONS.filter(item =>
-            normalize(item.english).includes(q) || normalize(item.spanish).includes(q))
+        ? ALL_QUESTIONS.filter(item => normalize(item.english).includes(q) || normalize(item.spanish).includes(q))
         : ALL_QUESTIONS;
 
       const shown = matches.slice(0, MAX);
@@ -4352,19 +4356,29 @@
   /* ======================================================================
      EVENTOS
      ====================================================================== */
-  $('#btn-start').addEventListener('click', () => {
+  function selectedStudyBlock() {
     const value = el.blockSelect.value;
     if (value === 'random') {
-      startSession(shuffle(QUESTIONS).slice(0, SESSION_SIZE), 'practice');
-      return;
+      return {
+        id: 'random',
+        name: 'Aleatoria',
+        items: shuffle(QUESTIONS).slice(0, SESSION_SIZE),
+        accent: 'var(--primary)'
+      };
     }
-    const specialBlock = SPECIAL_BLOCKS.find(b => b.id === value);
-    if (specialBlock) {
-      startFlashcards(specialBlock.items, specialBlock.name);
-      return;
-    }
-    const block = BLOCKS.find(b => b.id === value);
-    if (block) startSession(block.items, 'practice');
+    return BLOCKS.find(b => b.id === value) || SPECIAL_BLOCKS.find(b => b.id === value) || null;
+  }
+
+  $('#btn-start').addEventListener('click', () => {
+    const block = selectedStudyBlock();
+    if (!block) return;
+    startSession(block.items, 'practice');
+  });
+
+  $('#btn-start-flashcards').addEventListener('click', () => {
+    const block = selectedStudyBlock();
+    if (!block) return;
+    startFlashcards(block.items, block.name);
   });
 
   $$('.cat-btn').forEach(button => {
