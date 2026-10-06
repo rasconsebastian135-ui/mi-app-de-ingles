@@ -431,7 +431,7 @@
   .menu-actions .sub { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .menu-actions .sub .btn { min-height: 40px; font-size: .82rem; }
 
-  /* Bloques especiales: ocupan el espacio muerto del menú y quedan siempre visibles. */
+  /* Bloques fijados: accesos rápidos configurables por el usuario. */
   .pinned-blocks {
     grid-area: pinned;
     padding: 16px 17px 17px;
@@ -443,26 +443,30 @@
     overflow: hidden;
   }
   .pinned-blocks::before {
-    content: "";
-    position: absolute;
-    inset: 0;
+    content: ""; position: absolute; inset: 0;
     background: radial-gradient(circle at 10% 0%, rgba(145,133,255,.16), transparent 34%);
     pointer-events: none;
   }
   .pinned-blocks-head {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 12px; margin-bottom: 11px; position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    margin-bottom: 11px; position: relative; z-index: 1;
   }
   .pinned-blocks-head h3 { margin: 0; font-size: .86rem; font-weight: 950; letter-spacing: -.01em; }
   .pinned-blocks-head p { margin: 3px 0 0; color: var(--muted); font-size: .68rem; }
+  .pinned-manage-btn {
+    flex: 0 0 auto; min-height: 34px; padding: 7px 10px; border-radius: 10px;
+    background: var(--surface-3); color: var(--text-2); border: 1px solid var(--border);
+    font-size: .68rem; font-weight: 900; transition: transform .18s ease, background .18s ease, border-color .18s ease;
+  }
+  .pinned-manage-btn:hover { transform: translateY(-2px); background: var(--surface-solid); border-color: var(--border-2); }
   .pinned-block-grid {
     display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 9px;
     position: relative; z-index: 1;
   }
   .pinned-block-card {
-    position: relative; min-width: 0; min-height: 94px; padding: 13px 12px 11px;
-    display: flex; flex-direction: column; justify-content: space-between; gap: 10px;
-    text-align: left; overflow: hidden; border-radius: 15px;
+    position: relative; min-width: 0; min-height: 108px; padding: 13px 12px 11px;
+    display: flex; flex-direction: column; justify-content: space-between; gap: 8px;
+    text-align: left; overflow: hidden; border-radius: 15px; cursor: pointer;
     border: 1px solid var(--border); background: var(--surface-solid);
     box-shadow: 0 9px 22px rgba(47,57,101,.07);
     transition: transform .2s cubic-bezier(.2,.8,.2,1), border-color .2s, box-shadow .2s, background .2s;
@@ -476,17 +480,41 @@
     box-shadow: 0 16px 28px rgba(47,57,101,.13); background: var(--surface-3);
   }
   .pinned-block-card:active { transform: translateY(-1px) scale(.985); }
-  .pinned-block-name {
-    font-size: .72rem; font-weight: 900; line-height: 1.18; overflow-wrap: anywhere;
+  .pinned-block-name { font-size: .72rem; font-weight: 900; line-height: 1.18; overflow-wrap: anywhere; }
+  .pinned-block-kind {
+    display: inline-flex; align-self: flex-start; padding: 4px 7px; border-radius: 8px;
+    background: var(--primary-soft); color: var(--primary); font-size: .58rem; font-weight: 950;
+    text-transform: uppercase; letter-spacing: .04em;
   }
-  .pinned-block-count {
-    color: var(--muted); font-size: .63rem; font-weight: 800;
-  }
+  .pinned-block-count { color: var(--muted); font-size: .63rem; font-weight: 800; }
+  .pinned-block-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
   .pinned-block-open {
     align-self: flex-start; padding: 5px 8px; border-radius: 8px;
-    background: var(--primary-soft); color: var(--primary); font-size: .62rem; font-weight: 950;
+    background: var(--surface-3); color: var(--text-2); font-size: .62rem; font-weight: 950;
     letter-spacing: .02em;
   }
+  .pinned-block-unpin {
+    flex: 0 0 auto; padding: 5px 7px; border-radius: 8px;
+    background: var(--danger-soft); color: var(--danger); font-size: .62rem; font-weight: 950;
+  }
+  .pinned-empty {
+    padding: 18px 12px; border: 1px dashed var(--border-2); border-radius: 14px;
+    text-align: center; color: var(--muted); font-size: .74rem; line-height: 1.45;
+  }
+  .pin-choice {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px;
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px;
+    transition: transform .16s ease, background .16s ease, border-color .16s ease;
+  }
+  .pin-choice:hover { transform: translateX(2px); background: var(--surface-3); border-color: var(--border-2); }
+  .pin-choice-main { min-width: 0; flex: 1; }
+  .pin-choice-name { display: block; font-size: .82rem; font-weight: 850; line-height: 1.25; overflow-wrap: anywhere; }
+  .pin-choice-meta { display: block; margin-top: 3px; color: var(--muted); font-size: .68rem; }
+  .pin-toggle {
+    flex: 0 0 auto; min-width: 72px; min-height: 34px; padding: 7px 9px; border-radius: 9px;
+    background: var(--surface-3); color: var(--muted); border: 1px solid var(--border); font-size: .67rem; font-weight: 950;
+  }
+  .pin-toggle.is-pinned { background: var(--primary-soft); color: var(--primary); border-color: color-mix(in srgb, var(--primary), var(--border) 70%); }
   .tag-special { background: var(--primary-soft); color: var(--primary); }
 
   @media (min-width: 900px) {
@@ -791,11 +819,12 @@
   .explore-blocks > p { margin: 0 0 11px; }
   .explore-block-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
   .explore-block-btn {
-    width: 100%; padding: 12px; display: grid; grid-template-columns: 1fr auto; gap: 10px;
+    width: 100%; padding: 12px; display: grid; grid-template-columns: 1fr auto; gap: 10px; cursor: pointer;
     align-items: center; text-align: left; background: var(--surface-2); border: 1px solid var(--border);
     border-radius: 13px; transition: transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
   }
   .explore-block-btn:hover { transform: translateY(-2px); border-color: var(--border-2); background: var(--surface-3); box-shadow: var(--shadow-sm); }
+  .explore-block-btn:focus-visible { outline: none; border-color: var(--primary); box-shadow: var(--ring), var(--shadow-sm); }
   .explore-block-main { min-width: 0; }
   .explore-block-name { display: block; font-size: .82rem; font-weight: 850; line-height: 1.25; }
   .explore-block-count { display: block; margin-top: 3px; font-size: .68rem; color: var(--muted); }
@@ -960,6 +989,8 @@
     .progress-track { width: 100px; }
     .word-card { padding: 23px; border-radius: 22px; }
     .practice-stage { min-height: 460px; }
+    .pinned-blocks-head { align-items: flex-start; }
+    .pinned-blocks-head p { max-width: 62vw; }
   }
 
   @media (max-width: 460px) {
@@ -988,7 +1019,7 @@
 <div class="app">
   <header class="topbar">
     <div class="topbar-left">
-      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v1.4.0</span>
+      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v1.4.1</span>
       <div class="brand">
         <div class="brand-mark">V</div>
         <div>
@@ -1089,9 +1120,10 @@
         <section class="pinned-blocks" aria-labelledby="pinned-blocks-title">
           <div class="pinned-blocks-head">
             <div>
-              <h3 id="pinned-blocks-title">Bloques especiales</h3>
-              <p>Flashcards listas para abrir y estudiar directamente.</p>
+              <h3 id="pinned-blocks-title">Bloques fijados</h3>
+              <p>Fija cualquier bloque para tenerlo aquí como acceso rápido.</p>
             </div>
+            <button id="btn-manage-pinned" class="pinned-manage-btn" type="button">＋ Fijar bloques</button>
           </div>
           <div id="special-block-grid" class="pinned-block-grid"></div>
         </section>
@@ -1261,7 +1293,7 @@
 
   // VERSIÓN DE LA APP: 1.3.7
   // IMPORTANTE: CAMBIA APP_VERSION SIEMPRE QUE AGREGUES O MODIFIQUES FUNCIONALIDAD.
-  const APP_VERSION = '1.4.0';
+  const APP_VERSION = '1.4.1';
 
   /* ======================================================================
      DATOS · vocabData con las 504 entradas originales
@@ -2167,7 +2199,7 @@
     review: {},
     stats: { answered: 0, correct: 0, bestStreak: 0, currentStreak: 0, sessions: 0 },
     history: [],
-    settings: { theme: null, mode: 'EN-ES' }
+    settings: { theme: null, mode: 'EN-ES', pinnedBlocks: [] }
   });
 
   function readJSON(key) {
@@ -2276,6 +2308,7 @@
     statStreak: $('#stat-streak'),
 
     resetBtn: $('#btn-reset'),
+    btnManagePinned: $('#btn-manage-pinned'),
 
     progressFill: $('#progress-fill'),
     progressText: $('#progress-text'),
@@ -2680,34 +2713,190 @@
     showView('setup');
   }
 
-  function renderPinnedSpecialBlocks() {
+  function allStudyBlocks() {
+    return [
+      ...BLOCKS.map(block => ({
+        ...block,
+        kind: 'practice',
+        countLabel: `${block.items.length} preguntas`,
+        accent: block.difficulty === 'easy' ? '#10b981' : block.difficulty === 'medium' ? '#f59e0b' : '#f43f5e'
+      })),
+      ...SPECIAL_BLOCKS.map(block => ({
+        ...block,
+        kind: 'flashcards',
+        countLabel: `${block.items.length} palabras`,
+        accent: block.accent || '#8b5cf6'
+      }))
+    ];
+  }
+
+  function isBlockPinned(blockId) {
+    return Array.isArray(db.settings.pinnedBlocks) && db.settings.pinnedBlocks.includes(blockId);
+  }
+
+  function setBlockPinned(blockId, pinned) {
+    const current = Array.isArray(db.settings.pinnedBlocks) ? db.settings.pinnedBlocks : [];
+    const next = current.filter(id => id !== blockId);
+    if (pinned) next.push(blockId);
+    db.settings.pinnedBlocks = next;
+    saveDB();
+    renderPinnedBlocks();
+  }
+
+  function openStudyBlock(block) {
+    if (!block) return;
+    if (block.kind === 'flashcards') {
+      startFlashcards(block.items, block.name);
+    } else {
+      startSession(block.items, 'practice');
+    }
+  }
+
+  function renderPinnedBlocks() {
     const grid = $('#special-block-grid');
     if (!grid) return;
 
-    grid.replaceChildren();
-    SPECIAL_BLOCKS.forEach(block => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'pinned-block-card';
-      button.style.setProperty('--special-accent', block.accent || 'var(--primary)');
-      button.setAttribute('aria-label', `Abrir ${block.name} con flashcards`);
+    const all = allStudyBlocks();
+    const pinned = (db.settings.pinnedBlocks || [])
+      .map(id => all.find(block => block.id === id))
+      .filter(Boolean);
 
-      const name = document.createElement('span');
+    grid.replaceChildren();
+
+    if (!pinned.length) {
+      const empty = document.createElement('div');
+      empty.className = 'pinned-empty';
+      empty.textContent = 'No tienes bloques fijados todavía. Pulsa “＋ Fijar bloques” y elige cualquiera.';
+      grid.appendChild(empty);
+      return;
+    }
+
+    pinned.forEach(block => {
+      const card = document.createElement('article');
+      card.className = 'pinned-block-card';
+      card.style.setProperty('--special-accent', block.accent || 'var(--primary)');
+      card.tabIndex = 0;
+      card.setAttribute('role', 'button');
+      card.setAttribute('aria-label', `Abrir ${block.name}`);
+
+      const name = document.createElement('div');
       name.className = 'pinned-block-name';
       name.textContent = block.name;
 
-      const count = document.createElement('span');
+      const kind = document.createElement('span');
+      kind.className = 'pinned-block-kind';
+      kind.textContent = block.kind === 'flashcards' ? 'Flashcards' : 'Práctica';
+
+      const count = document.createElement('div');
       count.className = 'pinned-block-count';
-      count.textContent = `${block.items.length} flashcards`;
+      count.textContent = block.countLabel;
+
+      const foot = document.createElement('div');
+      foot.className = 'pinned-block-foot';
 
       const open = document.createElement('span');
       open.className = 'pinned-block-open';
       open.textContent = 'Abrir ↗';
 
-      button.append(name, count, open);
-      button.addEventListener('click', () => startFlashcards(block.items, block.name));
-      grid.appendChild(button);
+      const unpin = document.createElement('button');
+      unpin.type = 'button';
+      unpin.className = 'pinned-block-unpin';
+      unpin.textContent = '✕ Quitar';
+      unpin.setAttribute('aria-label', `Quitar ${block.name} de bloques fijados`);
+      unpin.addEventListener('click', event => {
+        event.stopPropagation();
+        setBlockPinned(block.id, false);
+      });
+
+      foot.append(open, unpin);
+      card.append(name, kind, count, foot);
+      card.addEventListener('click', () => openStudyBlock(block));
+      card.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          openStudyBlock(block);
+        }
+      });
+      grid.appendChild(card);
     });
+  }
+
+  function renderPinnedSpecialBlocks() {
+    renderPinnedBlocks();
+  }
+
+  function buildPinnedBlocksModal() {
+    const wrapper = document.createElement('div');
+
+    const hint = document.createElement('p');
+    hint.className = 'hint-text';
+    hint.style.marginTop = '0';
+    hint.textContent = 'Elige cualquier bloque. Los fijados aparecerán en el menú principal para abrirlos directamente.';
+    wrapper.appendChild(hint);
+
+    const groups = [
+      { title: 'Bloques de práctica', items: BLOCKS },
+      { title: 'Bloques especiales', items: SPECIAL_BLOCKS }
+    ];
+
+    groups.forEach(group => {
+      const title = document.createElement('div');
+      title.className = 'group-title';
+      title.textContent = group.title;
+      wrapper.appendChild(title);
+
+      const list = document.createElement('div');
+      list.className = 'item-list';
+
+      group.items.forEach(rawBlock => {
+        const block = rawBlock.kind ? rawBlock : {
+          ...rawBlock,
+          kind: SPECIAL_BLOCKS.some(b => b.id === rawBlock.id) ? 'flashcards' : 'practice',
+          countLabel: `${rawBlock.items.length} ${SPECIAL_BLOCKS.some(b => b.id === rawBlock.id) ? 'palabras' : 'preguntas'}`,
+          accent: rawBlock.accent || (rawBlock.difficulty === 'easy' ? '#10b981' : rawBlock.difficulty === 'medium' ? '#f59e0b' : '#f43f5e')
+        };
+
+        const row = document.createElement('div');
+        row.className = 'pin-choice';
+
+        const main = document.createElement('div');
+        main.className = 'pin-choice-main';
+
+        const name = document.createElement('span');
+        name.className = 'pin-choice-name';
+        name.textContent = block.name;
+
+        const meta = document.createElement('span');
+        meta.className = 'pin-choice-meta';
+        meta.textContent = `${block.countLabel} · ${block.kind === 'flashcards' ? 'flashcards' : 'práctica'}`;
+
+        main.append(name, meta);
+
+        const toggle = document.createElement('button');
+        toggle.type = 'button';
+        toggle.className = 'pin-toggle';
+
+        const refreshToggle = () => {
+          const pinned = isBlockPinned(block.id);
+          toggle.classList.toggle('is-pinned', pinned);
+          toggle.textContent = pinned ? '📌 Fijado' : '＋ Fijar';
+          toggle.setAttribute('aria-pressed', String(pinned));
+        };
+
+        refreshToggle();
+        toggle.addEventListener('click', () => {
+          setBlockPinned(block.id, !isBlockPinned(block.id));
+          refreshToggle();
+        });
+
+        row.append(main, toggle);
+        list.appendChild(row);
+      });
+
+      wrapper.appendChild(list);
+    });
+
+    openModal({ title: 'Fijar bloques', body: [wrapper] });
   }
 
   /* ======================================================================
@@ -3863,7 +4052,7 @@
       });
     });
 
-    addTitle('Bloques especiales · Flashcards');
+    addTitle('Bloques especiales');
     SPECIAL_BLOCKS.forEach(block => {
       addChoice(block.name, `${block.items.length} tarjetas · estudio directo`, () => {
         closeModal();
@@ -3922,10 +4111,11 @@
     blockGrid.className = 'explore-block-grid';
 
     BLOCKS.forEach(block => {
-      const button = document.createElement('button');
-      button.type = 'button';
+      const button = document.createElement('div');
       button.className = 'explore-block-btn';
-      button.setAttribute('aria-label', `Estudiar ${block.name}`);
+      button.tabIndex = 0;
+      button.setAttribute('role', 'button');
+      button.setAttribute('aria-label', `Abrir ${block.name}`);
 
       const main = document.createElement('span');
       main.className = 'explore-block-main';
@@ -3936,19 +4126,42 @@
 
       const count = document.createElement('span');
       count.className = 'explore-block-count';
-      count.textContent = `${block.items.length} tarjeta${block.items.length === 1 ? '' : 's'}`;
+      count.textContent = `${block.items.length} preguntas`;
 
       main.append(name, count);
 
+      const actionWrap = document.createElement('span');
+      actionWrap.style.display = 'flex';
+      actionWrap.style.alignItems = 'center';
+      actionWrap.style.gap = '6px';
+
       const play = document.createElement('span');
       play.className = `explore-block-play ${difficultyTagClass(block.difficulty)}`;
-      play.textContent = 'Estudiar';
-      // El botón exterior controla la acción; el tag solo aporta el aspecto.
+      play.textContent = 'Abrir';
       play.classList.remove('tag', `tag-${block.difficulty}`);
 
-      button.append(main, play);
-      button.addEventListener('click', () => {
-        startFlashcards(block.items, block.name);
+      const pin = document.createElement('button');
+      pin.type = 'button';
+      pin.className = 'explore-block-play';
+      pin.textContent = isBlockPinned(block.id) ? '📌' : '＋';
+      pin.title = isBlockPinned(block.id) ? 'Quitar de fijados' : 'Fijar bloque';
+      pin.setAttribute('aria-label', pin.title);
+      pin.addEventListener('click', event => {
+        event.stopPropagation();
+        setBlockPinned(block.id, !isBlockPinned(block.id));
+        pin.textContent = isBlockPinned(block.id) ? '📌' : '＋';
+        pin.title = isBlockPinned(block.id) ? 'Quitar de fijados' : 'Fijar bloque';
+        pin.setAttribute('aria-label', pin.title);
+      });
+
+      actionWrap.append(play, pin);
+      button.append(main, actionWrap);
+      button.addEventListener('click', () => openStudyBlock({ ...block, kind: 'practice' }));
+      button.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          openStudyBlock({ ...block, kind: 'practice' });
+        }
       });
 
       blockGrid.appendChild(button);
@@ -3965,11 +4178,12 @@
     specialGrid.className = 'explore-block-grid';
 
     SPECIAL_BLOCKS.forEach(block => {
-      const button = document.createElement('button');
-      button.type = 'button';
+      const button = document.createElement('div');
       button.className = 'explore-block-btn';
+      button.tabIndex = 0;
+      button.setAttribute('role', 'button');
       button.style.setProperty('--special-accent', block.accent || 'var(--primary)');
-      button.setAttribute('aria-label', `Estudiar ${block.name} con flashcards`);
+      button.setAttribute('aria-label', `Abrir ${block.name}`);
 
       const main = document.createElement('span');
       main.className = 'explore-block-main';
@@ -3980,14 +4194,42 @@
 
       const count = document.createElement('span');
       count.className = 'explore-block-count';
-      count.textContent = `${block.items.length} flashcards`;
+      count.textContent = `${block.items.length} palabras · flashcards`;
 
       main.append(name, count);
+
+      const actionWrap = document.createElement('span');
+      actionWrap.style.display = 'flex';
+      actionWrap.style.alignItems = 'center';
+      actionWrap.style.gap = '6px';
+
       const play = document.createElement('span');
       play.className = 'explore-block-play';
       play.textContent = 'Abrir';
-      button.append(main, play);
-      button.addEventListener('click', () => startFlashcards(block.items, block.name));
+
+      const pin = document.createElement('button');
+      pin.type = 'button';
+      pin.className = 'explore-block-play';
+      pin.textContent = isBlockPinned(block.id) ? '📌' : '＋';
+      pin.title = isBlockPinned(block.id) ? 'Quitar de fijados' : 'Fijar bloque';
+      pin.setAttribute('aria-label', pin.title);
+      pin.addEventListener('click', event => {
+        event.stopPropagation();
+        setBlockPinned(block.id, !isBlockPinned(block.id));
+        pin.textContent = isBlockPinned(block.id) ? '📌' : '＋';
+        pin.title = isBlockPinned(block.id) ? 'Quitar de fijados' : 'Fijar bloque';
+        pin.setAttribute('aria-label', pin.title);
+      });
+
+      actionWrap.append(play, pin);
+      button.append(main, actionWrap);
+      button.addEventListener('click', () => openStudyBlock({ ...block, kind: 'flashcards' }));
+      button.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          openStudyBlock({ ...block, kind: 'flashcards' });
+        }
+      });
       specialGrid.appendChild(button);
     });
 
@@ -4173,6 +4415,7 @@
   el.btnCopyImage.addEventListener('click', () => copyMistakesImage('copy'));
   el.btnShareImage.addEventListener('click', () => copyMistakesImage('share'));
   $('#btn-manage').addEventListener('click', buildManageModal);
+  el.btnManagePinned.addEventListener('click', buildPinnedBlocksModal);
   $('#btn-explore').addEventListener('click', buildExploreModal);
 
   el.resetBtn.addEventListener('click', () => {
