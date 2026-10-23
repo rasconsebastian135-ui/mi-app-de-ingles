@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Practicador de vocabulario inglés-español con categorías de dificultad, errores, repaso y estadísticas.">
 <meta name="theme-color" content="#4f46e5">
-<title>Practicador de Vocabulario</title>
+<title>Practicador de Vocabulario · Versión 2.0</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; }
 
@@ -1026,6 +1026,312 @@
       scroll-behavior: auto !important;
     }
   }
+
+
+  /* ====================== VERSIÓN 2.0 · MODOS AVANZADOS ====================== */
+  .btn-v2 { border-color: color-mix(in srgb, var(--primary), var(--border) 35%); color: var(--primary); }
+  .advanced-modes { display: grid; gap: 16px; }
+  .advanced-controls {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px;
+    padding: 14px; border-radius: var(--r-sm); border: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+  .advanced-controls label { display: grid; gap: 6px; min-width: 0; }
+  .advanced-controls label span { font-size: .68rem; font-weight: 900; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  .advanced-controls select {
+    width: 100%; min-width: 0; padding: 9px 10px; border-radius: 10px;
+    border: 1px solid var(--border-2); background: var(--surface-solid); color: var(--text); font: inherit; font-size: .82rem;
+  }
+  .advanced-category { display: grid; gap: 9px; }
+  .advanced-category-head { display: flex; gap: 10px; align-items: baseline; }
+  .advanced-category-head h3 { margin: 0; font-size: .96rem; }
+  .advanced-category-head p { margin: 0; color: var(--muted); font-size: .74rem; }
+  .advanced-mode-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+  .advanced-mode-card {
+    min-width: 0; display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 10px;
+    padding: 13px; border: 1px solid var(--border); background: var(--surface-solid);
+    border-radius: 14px; transition: border-color .16s, transform .16s, box-shadow .16s;
+  }
+  .advanced-mode-card:hover { border-color: var(--border-2); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+  .advanced-mode-icon { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 12px; background: var(--primary-soft); font-size: 1.25rem; }
+  .advanced-mode-content { min-width: 0; display: grid; gap: 5px; }
+  .advanced-mode-content h4 { margin: 0; font-size: .86rem; line-height: 1.25; }
+  .advanced-mode-content p { margin: 0; font-size: .74rem; color: var(--muted); line-height: 1.4; }
+  .advanced-mode-meta { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+  .advanced-tag { padding: 3px 7px; border-radius: 999px; background: var(--surface-3); color: var(--text-2); font-size: .62rem; font-weight: 850; }
+  .advanced-mode-start { grid-column: 1 / -1; width: 100%; margin-top: 4px; }
+  .advanced-footnote { margin: 0; font-size: .72rem; color: var(--muted); line-height: 1.5; }
+  .similar-blocks-title { margin-top: 18px !important; }
+  .version-watermark { font-size: .7rem; font-weight: 850; color: var(--muted); letter-spacing: .05em; }
+  .answer-input.neutral { border-color: var(--border); background: var(--surface-solid); color: var(--text); }
+  .hidden { display: none !important; }
+  @media (max-width: 560px) {
+    .advanced-controls { grid-template-columns: 1fr; }
+    .advanced-mode-grid { grid-template-columns: 1fr; }
+    .advanced-mode-card { grid-template-columns: 34px minmax(0,1fr); padding: 11px; }
+    .advanced-mode-icon { width: 34px; height: 34px; }
+  }
+
+
+  /* ================================================================
+     REDISEÑO COMPLETO DE MENÚ · Versión 2.0
+     Flujo reducido: contenido → dirección → empezar. Otras funciones
+     quedan agrupadas en accesos secundarios para evitar saturación.
+     ================================================================ */
+  body {
+    background: #f4f6fb;
+    background-image: radial-gradient(ellipse at 12% 0%, rgba(104,88,255,.08), transparent 34%),
+                      radial-gradient(ellipse at 100% 100%, rgba(14,165,233,.06), transparent 32%);
+  }
+  [data-theme="dark"] body { background: #0b1020; background-image: radial-gradient(ellipse at 12% 0%, rgba(104,88,255,.10), transparent 34%); }
+  body::before, body::after { display: none; }
+  .app {
+    width: min(1160px, calc(100% - 32px)); min-height: min(860px, calc(100vh - 32px));
+    margin: 16px auto; border-radius: 24px; border-color: var(--border);
+    box-shadow: 0 20px 70px rgba(31,42,81,.09); background: var(--surface-solid);
+    backdrop-filter: none; -webkit-backdrop-filter: none; animation: none;
+  }
+  .app::before { display: none; }
+  .topbar {
+    min-height: 74px; padding: 15px 26px; background: var(--surface-solid); color: var(--text);
+    border-bottom: 1px solid var(--border); overflow: visible;
+  }
+  .topbar::after { display: none; }
+  .brand-mark {
+    width: 40px; height: 40px; border-radius: 12px; transform: none; animation: none;
+    color: #fff; background: var(--primary); border: 0; box-shadow: none;
+  }
+  .brand h1 { font-size: 1.03rem; letter-spacing: -.025em; }
+  .brand p { color: var(--muted); font-size: .75rem; margin-top: 3px; }
+  .app-version { min-width: 50px; color: var(--primary); background: var(--primary-soft); border-color: transparent; box-shadow: none; }
+  .topbar-actions .pill { background: var(--surface-3); color: var(--muted); border-color: var(--border); box-shadow: none; font-size: .7rem; }
+  .topbar-actions .icon-btn { background: var(--surface-3); border-color: var(--border); color: var(--text-2); box-shadow: none; }
+  main { padding: 30px clamp(18px, 3.6vw, 42px) 34px; overflow: visible; }
+  #view-setup { max-width: 1040px; margin: 0 auto; }
+  .home-dashboard { display: grid; gap: 22px; }
+  .home-intro { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; padding: 0 2px 2px; }
+  .home-intro-copy { max-width: 570px; }
+  .home-eyebrow, .picker-eyebrow { margin: 0 0 9px; color: var(--primary); font-size: .67rem; font-weight: 900; letter-spacing: .12em; }
+  .home-eyebrow span { color: var(--border-2); padding: 0 4px; }
+  .home-intro h2 { margin: 0; font-size: clamp(1.75rem, 3vw, 2.25rem); line-height: 1.12; letter-spacing: -.045em; }
+  .home-intro-copy > p:last-child { margin: 10px 0 0; color: var(--muted); font-size: .89rem; line-height: 1.55; max-width: 560px; }
+  .home-metrics { display: flex; align-items: stretch; gap: 0; padding: 13px 0; border: 1px solid var(--border); border-radius: 15px; background: var(--surface-2); flex: 0 0 auto; }
+  .home-metric { display: grid; gap: 3px; min-width: 86px; padding: 0 15px; align-content: center; }
+  .home-metric + .home-metric { border-left: 1px solid var(--border); }
+  .home-metric strong { font-size: 1.18rem; line-height: 1.15; font-weight: 900; font-variant-numeric: tabular-nums; }
+  .home-metric span { color: var(--muted); font-size: .65rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+  .home-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(320px, .85fr); gap: 17px; align-items: stretch; }
+  .setup-panel, .quick-panel { border: 1px solid var(--border); border-radius: 19px; background: var(--surface-solid); padding: 22px; min-width: 0; }
+  .setup-panel { box-shadow: 0 10px 30px rgba(37,49,91,.045); }
+  .quick-panel { background: var(--surface-2); }
+  .panel-heading { display: flex; align-items: flex-start; gap: 11px; margin-bottom: 21px; }
+  .panel-step { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 10px; flex: 0 0 auto; background: var(--primary-soft); color: var(--primary); font-size: .72rem; font-weight: 950; }
+  .panel-step-muted { background: var(--surface-3); color: var(--muted); }
+  .panel-heading h3, .direction-heading h3 { margin: 0; font-size: .97rem; font-weight: 900; letter-spacing: -.02em; }
+  .panel-heading p, .direction-heading p { margin: 4px 0 0; color: var(--muted); font-size: .75rem; line-height: 1.4; }
+  .field-label { display: block; margin: 0 0 8px 1px; color: var(--text-2); font-size: .74rem; font-weight: 850; }
+  #block-select.block-select { width: 100%; min-height: 48px; padding: 12px 38px 12px 14px; color: var(--text); border: 1px solid var(--border-2); border-radius: 12px; background: var(--surface-solid); font-size: .86rem; font-weight: 700; box-shadow: none; }
+  #block-select.block-select:focus { outline: none; border-color: var(--primary); box-shadow: var(--ring); }
+  .data-info { margin: 9px 1px 0; color: var(--muted); font-size: .69rem; line-height: 1.5; }
+  .direction-heading { display: flex; align-items: flex-start; gap: 11px; margin: 22px 0 11px; }
+  .m-dir.seg { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 4px; padding: 4px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; }
+  .m-dir.seg span { white-space: normal; padding: 10px 5px; color: var(--muted); font-size: .74rem; line-height: 1.25; }
+  .m-dir.seg input:checked + span { background: var(--primary); color: #fff; box-shadow: 0 3px 9px rgba(104,88,255,.16); }
+  [data-theme="dark"] .m-dir.seg input:checked + span { color: #fff; }
+  .setup-actions { display: grid; grid-template-columns: 1.15fr .95fr; gap: 9px; margin-top: 22px; }
+  .setup-actions .btn { width: 100%; min-height: 50px; padding: 12px 14px; border-radius: 12px; font-size: .84rem; gap: 9px; }
+  #btn-start { justify-content: space-between; box-shadow: none; }
+  #btn-start .arrow { margin-left: auto; }
+  .btn-primary { background: var(--primary); box-shadow: none; }
+  .btn-primary:hover:not(:disabled) { background: color-mix(in srgb, var(--primary), #111 10%); box-shadow: none; }
+  .btn-secondary { background: var(--surface-3); color: var(--text-2); border-color: var(--border); }
+  .btn-secondary:hover:not(:disabled) { background: var(--surface-2); }
+  .setup-reassurance { display: flex; gap: 7px; align-items: center; margin: 13px 0 0; color: var(--muted); font-size: .69rem; }
+  .setup-reassurance span { display: grid; place-items: center; width: 17px; height: 17px; color: var(--success); background: var(--success-soft); border-radius: 50%; font-size: .65rem; font-weight: 900; }
+  .quick-heading { margin-bottom: 18px; }
+  .quick-section-title { display: flex; flex-wrap: wrap; gap: 7px; align-items: baseline; justify-content: space-between; margin-bottom: 10px; }
+  .quick-section-title h4 { margin: 0; font-size: .77rem; font-weight: 900; }
+  .quick-section-title span { color: var(--muted); font-size: .65rem; }
+  .quick-level-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 7px; }
+  .quick-level-grid .cat-btn { min-height: 78px; padding: 12px 10px 10px; border-radius: 12px; box-shadow: none; background: var(--surface-solid); border-color: var(--border); }
+  .quick-level-grid .cat-btn::before { height: 3px; }
+  .quick-level-grid .cat-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 15px rgba(31,42,81,.06); }
+  .quick-level-grid .cat-name { font-size: .68rem; color: var(--text-2); }
+  .quick-level-grid .cat-count { font-size: 1.25rem; margin-top: 5px; }
+  .cat-easy { --accent: #169d78; } .cat-medium { --accent: #bd8214; } .cat-hard { --accent: #dc4d66; }
+  .mistake-shortcut.cat-btn::before, .review-shortcut.cat-btn::before { display: none; }
+  .mistake-shortcut.cat-btn { min-height: 0; flex-direction: row; justify-content: initial; padding: 8px 9px; border-radius: 9px; background: transparent; border: 0; box-shadow: none; text-align: left; }
+  .review-shortcut.cat-btn { min-height: 0; flex-direction: row; justify-content: initial; padding: 10px; border: 1px solid var(--border); border-radius: 11px; background: rgba(255,255,255,.36); box-shadow: none; }
+  .review-shortcut.cat-btn:hover:not(:disabled) { background: var(--surface-solid); box-shadow: none; }
+  .mistake-shortcut.cat-btn:hover:not(:disabled) { transform: none; box-shadow: none; background: var(--surface-solid); }
+  .quick-divider { height: 1px; background: var(--border); margin: 20px 0 18px; }
+  .mistake-shortcuts { display: grid; gap: 5px; }
+  .mistake-shortcut { display: grid; grid-template-columns: 8px minmax(0,1fr) auto 13px; align-items: center; gap: 9px; width: 100%; padding: 8px 9px; text-align: left; border-radius: 9px; color: var(--text-2); font-size: .74rem; transition: background .15s ease; }
+  .mistake-shortcut:hover:not(:disabled), .review-shortcut:hover:not(:disabled) { background: var(--surface-solid); }
+  .mistake-shortcut:disabled, .review-shortcut:disabled { opacity: .38; cursor: not-allowed; }
+  .mistake-shortcut strong { font-size: .75rem; font-variant-numeric: tabular-nums; }
+  .mistake-dot { width: 7px; height: 7px; display: block; border-radius: 50%; }
+  .dot-easy { background: #169d78; } .dot-medium { background: #bd8214; } .dot-hard { background: #dc4d66; }
+  .shortcut-arrow { color: var(--muted); font-size: .9rem; }
+  .review-shortcut { display: grid; grid-template-columns: 30px minmax(0,1fr) auto 13px; align-items: center; gap: 9px; width: 100%; margin-top: 10px; padding: 10px; border: 1px solid var(--border); border-radius: 11px; background: rgba(255,255,255,.36); text-align: left; }
+  [data-theme="dark"] .review-shortcut { background: rgba(0,0,0,.09); }
+  .review-shortcut-icon { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; background: var(--primary-soft); color: var(--primary); font-size: 1rem; }
+  .review-shortcut strong { display: block; font-size: .7rem; line-height: 1.3; }
+  .review-shortcut small { display: block; margin-top: 2px; color: var(--muted); font-size: .63rem; }
+  .review-shortcut .review-count { font-size: .8rem; }
+  .tools-panel { padding: 18px 0 0; border-top: 1px solid var(--border); }
+  .tools-intro { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .tools-spark { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 10px; background: var(--primary-soft); color: var(--primary); }
+  .tools-intro h3 { margin: 0; font-size: .88rem; font-weight: 900; }
+  .tools-intro p { margin: 3px 0 0; color: var(--muted); font-size: .72rem; }
+  .tools-actions { display: grid; grid-template-columns: 1.12fr 1fr 1fr; gap: 9px; }
+  .mode-launch-card, .tool-link { min-width: 0; display: flex; align-items: center; gap: 10px; text-align: left; border-radius: 13px; padding: 13px 14px; border: 1px solid var(--border); background: var(--surface-solid); transition: border-color .15s, background .15s; }
+  .mode-launch-card { border-color: color-mix(in srgb, var(--primary), var(--border) 55%); background: var(--primary-soft); }
+  .mode-launch-card:hover, .tool-link:hover { border-color: var(--border-2); background: var(--surface-2); }
+  .mode-launch-icon, .tool-link-icon { display: grid; place-items: center; width: 34px; height: 34px; flex: 0 0 auto; border-radius: 10px; background: var(--surface-solid); color: var(--primary); font-size: 1rem; font-weight: 900; }
+  .tool-link-icon { color: var(--muted); border: 1px solid var(--border); }
+  .mode-launch-copy, .tool-link > span:nth-child(2) { min-width: 0; flex: 1; }
+  .mode-launch-copy strong, .tool-link strong { display: block; font-size: .75rem; font-weight: 900; line-height: 1.3; }
+  .mode-launch-copy small, .tool-link small { display: block; margin-top: 3px; color: var(--muted); font-size: .63rem; line-height: 1.35; }
+  .tool-arrow { color: var(--muted); flex: 0 0 auto; font-size: .95rem; }
+  .pinned-details { border: 1px solid var(--border); border-radius: 14px; background: var(--surface-2); overflow: hidden; }
+  .pinned-details > summary { display: flex; align-items: center; gap: 11px; padding: 14px 16px; list-style: none; cursor: pointer; }
+  .pinned-details > summary::-webkit-details-marker { display: none; }
+  .pinned-summary-icon { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; background: var(--surface-solid); color: var(--primary); font-size: 1.1rem; }
+  .pinned-summary-main { flex: 1; min-width: 0; }
+  .pinned-summary-main strong { display: block; font-size: .77rem; }
+  .pinned-summary-main small { display: block; margin-top: 3px; color: var(--muted); font-size: .67rem; }
+  .pinned-summary-chevron { color: var(--muted); transition: transform .16s; }
+  .pinned-details[open] .pinned-summary-chevron { transform: rotate(180deg); }
+  .pinned-details .pinned-blocks { margin: 0 12px 12px; padding: 15px; border-radius: 12px; box-shadow: none; background: var(--surface-solid); }
+  .pinned-details .pinned-block-grid { grid-template-columns: repeat(4,minmax(0,1fr)); }
+  .home-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; color: var(--muted); font-size: .65rem; }
+  .home-footer strong { color: var(--primary); font-weight: 900; }
+  .home-footer .link-danger { margin-left: auto; color: var(--danger); font-size: .65rem; font-weight: 850; }
+
+  .block-picker-button { width: 100%; display: flex; align-items: center; gap: 11px; padding: 13px 14px; border: 1px solid var(--border-2); border-radius: 12px; background: var(--surface-solid); text-align: left; transition: border-color .15s, background .15s; }
+  .block-picker-button:hover { border-color: var(--primary); background: var(--surface-2); }
+  .block-picker-button:focus-visible { outline: none; box-shadow: var(--ring); border-color: var(--primary); }
+  .block-picker-icon { display: grid; place-items: center; width: 34px; height: 34px; flex: 0 0 auto; border-radius: 10px; background: var(--primary-soft); color: var(--primary); font-size: 1rem; }
+  .block-picker-copy { display: grid; gap: 4px; min-width: 0; flex: 1; }
+  .block-picker-copy small { font-size: .58rem; font-weight: 900; letter-spacing: .08em; color: var(--muted); }
+  .block-picker-copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .82rem; font-weight: 850; }
+  .block-picker-action { display: flex; align-items: center; gap: 7px; color: var(--primary); font-size: .7rem; font-weight: 850; white-space: nowrap; }
+  .block-picker-action b { font-size: .95rem; }
+  .block-picker-modal { display: grid; gap: 13px; }
+  .block-picker-modal-intro { margin: 0; color: var(--muted); font-size: .76rem; line-height: 1.5; }
+  .block-search-wrap { display: flex; align-items: center; gap: 9px; min-width: 0; height: 44px; padding: 0 12px; border: 1px solid var(--border-2); border-radius: 11px; background: var(--surface-solid); color: var(--muted); }
+  .block-search-wrap > span { font-size: 1.15rem; }
+  .block-search-wrap input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--text); font-size: .8rem; }
+  .block-search-wrap:focus-within { border-color: var(--primary); box-shadow: var(--ring); }
+  .block-chooser-results { display: grid; gap: 16px; max-height: 55vh; overflow: auto; padding-right: 3px; }
+  .block-chooser-group { display: grid; gap: 7px; }
+  .block-chooser-group h3 { margin: 0; font-size: .69rem; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .block-chooser-list { display: grid; gap: 5px; }
+  .block-choice { display: grid; grid-template-columns: minmax(0,1fr) auto 14px; align-items: center; gap: 10px; width: 100%; padding: 11px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-solid); text-align: left; }
+  .block-choice:hover { background: var(--surface-2); border-color: var(--border-2); }
+  .block-choice.is-selected { border-color: var(--primary); background: var(--primary-soft); }
+  .block-choice-name { min-width: 0; font-size: .77rem; font-weight: 850; overflow-wrap: anywhere; }
+  .block-choice-count { font-size: .65rem; color: var(--muted); white-space: nowrap; }
+  .block-choice-arrow { color: var(--muted); }
+  .block-chooser-empty { margin: 0; padding: 22px 10px; text-align: center; color: var(--muted); font-size: .77rem; }
+
+  /* Selector de modos: categorías filtrables y filas compactas, nunca una pared de tarjetas. */
+  .modal-panel { width: min(790px, 100%); max-height: min(88vh, 900px); border-radius: 20px; }
+  .modal-head { padding: 17px 21px; }
+  .modal-head h2 { font-size: 1rem; }
+  .modal-body { padding: 18px 21px 20px; }
+  .mode-picker { display: grid; gap: 14px; }
+  .mode-picker-top { display: grid; grid-template-columns: 1fr minmax(200px, .68fr); align-items: end; gap: 16px; }
+  .mode-picker-intro .picker-eyebrow { margin-bottom: 6px; }
+  .mode-picker-intro h3 { margin: 0; font-size: 1.15rem; letter-spacing: -.03em; }
+  .mode-picker-intro > p:last-child { margin: 5px 0 0; color: var(--muted); font-size: .75rem; line-height: 1.4; }
+  .mode-search-wrap { display: flex; align-items: center; gap: 9px; min-width: 0; padding: 0 12px; height: 43px; border: 1px solid var(--border-2); border-radius: 11px; background: var(--surface-solid); color: var(--muted); }
+  .mode-search-wrap > span { font-size: 1.15rem; }
+  .mode-search-wrap input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--text); font-size: .78rem; }
+  .mode-search-wrap:focus-within { border-color: var(--primary); box-shadow: var(--ring); }
+  .mode-settings { border: 1px solid var(--border); border-radius: 12px; background: var(--surface-2); }
+  .mode-settings summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 13px; list-style: none; cursor: pointer; }
+  .mode-settings summary::-webkit-details-marker { display: none; }
+  .mode-settings summary strong { display: block; font-size: .75rem; }
+  .mode-settings summary small { display: block; margin-top: 2px; font-size: .66rem; color: var(--muted); }
+  .mode-settings[open] .settings-chevron { transform: rotate(180deg); }
+  .settings-chevron { color: var(--muted); transition: transform .15s; }
+  .mode-settings .advanced-controls { display: grid; grid-template-columns: 1.2fr 1fr 1.1fr; gap: 10px; padding: 0 13px 13px; border: 0; background: transparent; }
+  .mode-settings .advanced-controls label span { font-size: .62rem; }
+  .mode-settings .advanced-controls select { padding: 10px; background: var(--surface-solid); border-radius: 9px; font-size: .74rem; }
+  .mode-filter-bar { display: flex; gap: 6px; padding: 0 0 10px; overflow-x: auto; border-bottom: 1px solid var(--border); scrollbar-width: thin; }
+  .mode-filter { flex: 0 0 auto; border: 1px solid var(--border); border-radius: 999px; padding: 7px 11px; color: var(--muted); background: var(--surface-solid); font-size: .69rem; font-weight: 850; white-space: nowrap; }
+  .mode-filter:hover { border-color: var(--border-2); color: var(--text); }
+  .mode-filter.is-active { color: var(--on-primary); background: var(--primary); border-color: var(--primary); }
+  .mode-list { display: grid; gap: 6px; max-height: 36vh; overflow-y: auto; padding-right: 3px; }
+  .mode-row { display: grid; grid-template-columns: 38px minmax(0,1fr) auto; gap: 10px; align-items: center; min-width: 0; padding: 10px 11px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-solid); }
+  .mode-row:hover { border-color: var(--border-2); }
+  .mode-row-icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; background: var(--surface-3); font-size: 1.1rem; }
+  .mode-row-body { min-width: 0; }
+  .mode-row-body h4 { margin: 0; font-size: .77rem; line-height: 1.25; }
+  .mode-row-body p { margin: 3px 0 5px; color: var(--muted); font-size: .68rem; line-height: 1.38; }
+  .mode-row-tag { display: inline-block; padding: 3px 7px; border-radius: 6px; background: var(--surface-3); color: var(--text-2); font-size: .59rem; font-weight: 800; }
+  .mode-row-start { min-width: 76px; padding: 8px 11px; font-size: .69rem; }
+  .mode-empty { padding: 24px 12px; text-align: center; color: var(--muted); font-size: .78rem; }
+  .advanced-footnote { margin: 0; padding-top: 2px; color: var(--muted); font-size: .67rem; line-height: 1.45; }
+
+  @media (max-width: 900px) {
+    .home-intro { align-items: flex-start; flex-direction: column; gap: 16px; }
+    .home-metrics { align-self: stretch; }
+    .home-metric { flex: 1; }
+    .home-grid { grid-template-columns: 1fr; }
+    .quick-panel { display: grid; grid-template-columns: 1fr 1fr; column-gap: 20px; }
+    .quick-heading { grid-column: 1 / -1; margin-bottom: 5px; }
+    .quick-divider { display: none; }
+    .quick-section:last-child { border-left: 1px solid var(--border); padding-left: 20px; }
+    .tools-actions { grid-template-columns: 1fr 1fr; }
+    .mode-launch-card { grid-column: 1 / -1; }
+  }
+  @media (max-width: 620px) {
+    .app { width: 100%; min-height: 100vh; margin: 0; border-radius: 0; border-left: 0; border-right: 0; }
+    .topbar { padding: 12px 15px; min-height: 64px; }
+    .brand-mark { width: 34px; height: 34px; border-radius: 10px; }
+    .brand h1 { font-size: .88rem; }
+    .brand p { display: none; }
+    .topbar-left { gap: 8px; }
+    .app-version { min-width: 43px; padding: 6px 7px; font-size: .62rem; }
+    .topbar-actions { gap: 6px; }
+    .topbar-actions .pill { display: none; }
+    main { padding: 22px 15px 24px; }
+    .home-dashboard { gap: 16px; }
+    .home-intro h2 { font-size: 1.72rem; }
+    .home-intro-copy > p:last-child { font-size: .82rem; }
+    .home-metric { min-width: 0; padding: 0 10px; }
+    .home-metric strong { font-size: 1.05rem; }
+    .home-metric span { font-size: .58rem; }
+    .home-metrics { padding: 12px 0; }
+    .setup-panel, .quick-panel { padding: 16px; border-radius: 16px; }
+    .setup-actions { grid-template-columns: 1fr; }
+    .quick-panel { display: block; }
+    .quick-heading { margin-bottom: 18px; }
+    .quick-section:last-child { border-left: 0; padding-left: 0; margin-top: 18px; }
+    .quick-divider { display: block; margin: 17px 0; }
+    .tools-panel { padding-top: 15px; }
+    .tools-actions { grid-template-columns: 1fr; }
+    .mode-launch-card { grid-column: auto; }
+    .pinned-details .pinned-block-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    .home-footer { align-items: flex-start; }
+    .home-footer > span:nth-child(2) { display: none; }
+    .mode-picker-top { grid-template-columns: 1fr; gap: 10px; }
+    .mode-settings .advanced-controls { grid-template-columns: 1fr; }
+    .mode-list { max-height: 42vh; }
+    .mode-row { grid-template-columns: 33px minmax(0,1fr); gap: 9px; padding: 10px; }
+    .mode-row-icon { width: 32px; height: 32px; font-size: 1rem; }
+    .mode-row-start { grid-column: 2; justify-self: start; min-width: 0; }
+    .modal-panel { max-height: 92vh; border-radius: 16px; }
+    .modal-body { padding: 15px; }
+    .modal-head { padding: 14px 15px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+  }
+
 </style>
 </head>
 <body>
@@ -1033,12 +1339,12 @@
 <div class="app">
   <header class="topbar">
     <div class="topbar-left">
-      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v1.4.2</span>
+      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v2.0</span>
       <div class="brand">
         <div class="brand-mark">V</div>
         <div>
           <h1>Practicador de Vocabulario</h1>
-          <p>Practica, guarda tus errores y repásalos después.</p>
+          <p>Vocabulario, modos avanzados y repaso adaptativo.</p>
         </div>
       </div>
     </div>
@@ -1059,92 +1365,97 @@
   <main>
     <!-- ============================ SETUP ============================ -->
     <section id="view-setup" class="view is-active" aria-labelledby="setup-title">
-      <h2 id="setup-title" class="sr-only">Menú de práctica</h2>
-      <div class="menu">
-
-        <div class="m-block">
-          <label class="sr-only" for="block-select">Bloque</label>
-          <select id="block-select"></select>
-          <p id="data-info" class="hint-text"></p>
-        </div>
-
-        <div class="m-dir seg" role="radiogroup" aria-label="Dirección de la práctica">
-          <label><input type="radio" name="mode" value="EN-ES" aria-label="Inglés a Español" checked><span>EN → ES</span></label>
-          <label><input type="radio" name="mode" value="ES-EN" aria-label="Español a Inglés"><span>ES → EN</span></label>
-          <label><input type="radio" name="mode" value="MIX" aria-label="Mezcla aleatoria"><span>Mezcla</span></label>
-        </div>
-
-        <div class="menu-cats">
-          <div class="cat-title">Estudiar</div>
-          <div class="cat-row">
-            <button class="cat-btn cat-easy" data-category="easy" type="button" aria-label="Estudiar Regalada">
-              <span class="cat-name">Regalada</span>
-              <span class="cat-count" id="count-easy">0</span>
-            </button>
-            <button class="cat-btn cat-medium" data-category="medium" type="button" aria-label="Estudiar Intermedia">
-              <span class="cat-name">Intermedia</span>
-              <span class="cat-count" id="count-medium">0</span>
-            </button>
-            <button class="cat-btn cat-hard" data-category="hard" type="button" aria-label="Estudiar Difícil">
-              <span class="cat-name">Difícil</span>
-              <span class="cat-count" id="count-hard">0</span>
-            </button>
+      <div class="home-dashboard">
+        <header class="home-intro">
+          <div class="home-intro-copy">
+            <p class="home-eyebrow">TU ESPACIO DE ESTUDIO <span>·</span> VERSIÓN 2.0</p>
+            <h2 id="setup-title">¿Qué vas a practicar hoy?</h2>
+            <p>Elige el vocabulario, selecciona la dirección y empieza. Las opciones avanzadas están aparte para que no estorben.</p>
           </div>
-
-          <div class="cat-title">Errores</div>
-          <div class="cat-row">
-            <button class="cat-btn cat-easy" data-category="mistakes-easy" type="button" aria-label="Errores Regalada">
-              <span class="cat-name">Regalada</span>
-              <span class="cat-count" id="count-mistakes-easy">0</span>
-            </button>
-            <button class="cat-btn cat-medium" data-category="mistakes-medium" type="button" aria-label="Errores Intermedia">
-              <span class="cat-name">Intermedia</span>
-              <span class="cat-count" id="count-mistakes-medium">0</span>
-            </button>
-            <button class="cat-btn cat-hard" data-category="mistakes-hard" type="button" aria-label="Errores Difícil">
-              <span class="cat-name">Difícil</span>
-              <span class="cat-count" id="count-mistakes-hard">0</span>
-            </button>
+          <div class="home-metrics" aria-label="Tu progreso">
+            <div class="home-metric"><strong id="stat-total">0</strong><span>respondidas</span></div>
+            <div class="home-metric"><strong id="stat-accuracy">—</strong><span>precisión</span></div>
+            <div class="home-metric"><strong id="stat-streak">0</strong><span>mejor racha</span></div>
           </div>
+        </header>
 
-          <div class="cat-row single">
-            <button class="cat-btn cat-review cat-wide" data-category="review" type="button" aria-label="Revisar palabras con pista o reveladas">
-              <span class="cat-name">Revisar · con pista o reveladas</span>
-              <span class="cat-count" id="count-review">0</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="menu-stats">
-          <div class="mini-stat"><strong id="stat-total">0</strong><span>Respondidas</span></div>
-          <div class="mini-stat"><strong id="stat-accuracy">—</strong><span>Precisión</span></div>
-          <div class="mini-stat"><strong id="stat-streak">0</strong><span>Mejor racha</span></div>
-          <span id="total-progress" class="hidden"></span>
-          <button id="btn-reset" class="link-danger hidden" type="button" title="Borrar todo el progreso guardado">Borrar progreso</button>
-        </div>
-
-        <div class="menu-actions">
-          <div class="menu-start-row">
-            <button id="btn-start" class="btn btn-primary btn-lg" type="button">Empezar práctica</button>
-            <button id="btn-start-flashcards" class="btn btn-secondary btn-lg" type="button">🎴 Flashcards del bloque</button>
-          </div>
-          <div class="sub">
-            <button id="btn-manage" class="btn btn-ghost" type="button">Gestionar guardados</button>
-            <button id="btn-explore" class="btn btn-ghost" type="button">Explorar vocabulario</button>
-          </div>
-        </div>
-
-        <section class="pinned-blocks" aria-labelledby="pinned-blocks-title">
-          <div class="pinned-blocks-head">
-            <div>
-              <h3 id="pinned-blocks-title">Bloques fijados</h3>
-              <p>Fija cualquier bloque para tenerlo aquí como acceso rápido.</p>
+        <div class="home-grid">
+          <section class="setup-panel" aria-labelledby="choose-content-title">
+            <div class="panel-heading">
+              <span class="panel-step">01</span>
+              <div><h3 id="choose-content-title">Elige tu vocabulario</h3><p>Selecciona un bloque o una colección completa.</p></div>
             </div>
-            <button id="btn-manage-pinned" class="pinned-manage-btn" type="button">＋ Fijar bloques</button>
+            <div class="field-label" id="block-picker-label">Contenido para practicar</div>
+            <button id="btn-choose-block" class="block-picker-button" type="button" aria-haspopup="dialog" aria-labelledby="block-picker-label selected-block-name" aria-describedby="data-info">
+              <span class="block-picker-icon" aria-hidden="true">▦</span>
+              <span class="block-picker-copy"><small>VOCABULARIO SELECCIONADO</small><strong id="selected-block-name">Aleatoria</strong></span>
+              <span class="block-picker-action">Cambiar <b aria-hidden="true">⌄</b></span>
+            </button>
+            <select id="block-select" class="sr-only" aria-hidden="true" tabindex="-1"></select>
+            <p id="data-info" class="data-info"></p>
+
+            <div class="direction-heading"><span class="panel-step panel-step-muted">02</span><div><h3>Dirección de respuesta</h3><p>¿Qué quieres recordar?</p></div></div>
+            <div class="m-dir seg" role="radiogroup" aria-label="Dirección de la práctica">
+              <label><input type="radio" name="mode" value="EN-ES" aria-label="Inglés a Español" checked><span>Inglés → español</span></label>
+              <label><input type="radio" name="mode" value="ES-EN" aria-label="Español a Inglés"><span>Español → inglés</span></label>
+              <label><input type="radio" name="mode" value="MIX" aria-label="Mezcla aleatoria"><span>Mezclada</span></label>
+            </div>
+
+            <div class="setup-actions">
+              <button id="btn-start" class="btn btn-primary btn-lg" type="button"><span>Empezar práctica</span><span class="arrow" aria-hidden="true">→</span></button>
+              <button id="btn-start-flashcards" class="btn btn-secondary btn-lg" type="button"><span aria-hidden="true">▤</span><span>Estudiar con flashcards</span></button>
+            </div>
+            <p class="setup-reassurance"><span aria-hidden="true">✓</span> Tu progreso se guarda automáticamente en este dispositivo.</p>
+          </section>
+
+          <aside class="quick-panel" aria-label="Accesos rápidos">
+            <div class="panel-heading quick-heading">
+              <span class="panel-step">03</span>
+              <div><h3>Práctica rápida</h3><p>Empieza directamente sin cambiar el bloque elegido.</p></div>
+            </div>
+            <div class="quick-section">
+              <div class="quick-section-title"><h4>Por dificultad</h4><span>Vocabulario principal</span></div>
+              <div class="quick-level-grid">
+                <button class="cat-btn cat-easy" data-category="easy" type="button" aria-label="Practicar dificultad regalada"><span class="cat-name">Regalada</span><span class="cat-count" id="count-easy">0</span></button>
+                <button class="cat-btn cat-medium" data-category="medium" type="button" aria-label="Practicar dificultad intermedia"><span class="cat-name">Intermedia</span><span class="cat-count" id="count-medium">0</span></button>
+                <button class="cat-btn cat-hard" data-category="hard" type="button" aria-label="Practicar dificultad difícil"><span class="cat-name">Difícil</span><span class="cat-count" id="count-hard">0</span></button>
+              </div>
+            </div>
+
+            <div class="quick-divider"></div>
+            <div class="quick-section">
+              <div class="quick-section-title"><h4>Reforzar lo difícil</h4><span>Solo tus errores</span></div>
+              <div class="mistake-shortcuts">
+                <button class="mistake-shortcut cat-btn" data-category="mistakes-easy" type="button"><span class="mistake-dot dot-easy"></span><span>Regalada</span><strong id="count-mistakes-easy">0</strong><span class="shortcut-arrow">→</span></button>
+                <button class="mistake-shortcut cat-btn" data-category="mistakes-medium" type="button"><span class="mistake-dot dot-medium"></span><span>Intermedia</span><strong id="count-mistakes-medium">0</strong><span class="shortcut-arrow">→</span></button>
+                <button class="mistake-shortcut cat-btn" data-category="mistakes-hard" type="button"><span class="mistake-dot dot-hard"></span><span>Difícil</span><strong id="count-mistakes-hard">0</strong><span class="shortcut-arrow">→</span></button>
+              </div>
+              <button class="review-shortcut cat-btn" data-category="review" type="button"><span class="review-shortcut-icon" aria-hidden="true">↻</span><span><strong>Revisar tarjetas guardadas</strong><small>Con pista o respuesta revelada</small></span><strong id="count-review" class="review-count">0</strong><span class="shortcut-arrow">→</span></button>
+            </div>
+          </aside>
+        </div>
+
+        <section class="tools-panel" aria-label="Herramientas adicionales">
+          <div class="tools-intro"><span class="tools-spark" aria-hidden="true">✦</span><div><h3>¿Quieres practicar de otra forma?</h3><p>Elige un modo específico o consulta tus palabras.</p></div></div>
+          <div class="tools-actions">
+            <button id="btn-advanced-modes" class="mode-launch-card" type="button"><span class="mode-launch-icon" aria-hidden="true">✦</span><span class="mode-launch-copy"><strong>Modos de estudio</strong><small>Examen a ciegas, repaso adaptativo y más</small></span><span class="tool-arrow" aria-hidden="true">↗</span></button>
+            <button id="btn-explore" class="tool-link" type="button"><span class="tool-link-icon" aria-hidden="true">⌕</span><span><strong>Explorar vocabulario</strong><small>Buscar palabras y expresiones</small></span><span class="tool-arrow" aria-hidden="true">→</span></button>
+            <button id="btn-manage" class="tool-link" type="button"><span class="tool-link-icon" aria-hidden="true">▣</span><span><strong>Tarjetas guardadas</strong><small>Gestionar tu lista de repaso</small></span><span class="tool-arrow" aria-hidden="true">→</span></button>
           </div>
-          <div id="special-block-grid" class="pinned-block-grid"></div>
         </section>
 
+        <details class="pinned-details">
+          <summary><span class="pinned-summary-icon" aria-hidden="true">☆</span><span class="pinned-summary-main"><strong>Bloques fijados</strong><small>Accesos rápidos a tus bloques favoritos</small></span><span class="pinned-summary-chevron" aria-hidden="true">⌄</span></summary>
+          <section class="pinned-blocks" aria-labelledby="pinned-blocks-title">
+            <div class="pinned-blocks-head">
+              <div><h3 id="pinned-blocks-title">Tus bloques fijados</h3><p>Fija cualquier bloque para tenerlo aquí como acceso rápido.</p></div>
+              <button id="btn-manage-pinned" class="pinned-manage-btn" type="button">＋ Gestionar</button>
+            </div>
+            <div id="special-block-grid" class="pinned-block-grid"></div>
+          </section>
+        </details>
+
+        <div class="home-footer"><span>Practicador de Vocabulario <strong>v2.0</strong></span><span>El avance se guarda localmente.</span><button id="btn-reset" class="link-danger hidden" type="button" title="Borrar todo el progreso guardado">Borrar progreso</button><span id="total-progress" class="hidden"></span></div>
       </div>
     </section>
 
@@ -1308,9 +1619,9 @@
 (() => {
   'use strict';
 
-  // VERSIÓN DE LA APP: 1.3.7
+  // VERSIÓN DE LA APP: 2.0
   // IMPORTANTE: CAMBIA APP_VERSION SIEMPRE QUE AGREGUES O MODIFIQUES FUNCIONALIDAD.
-  const APP_VERSION = '1.4.2';
+  const APP_VERSION = '2.0';
 
   /* ======================================================================
      DATOS · vocabData con las 504 entradas originales
@@ -2524,6 +2835,231 @@
     }
   });
 
+
+  /* ======================================================================
+     VERSIÓN 2.0 · BLOQUES NORMALES DE EXPRESIONES SIMILARES
+     Reutilizan exclusivamente tarjetas del vocabulario principal. No son
+     bloques especiales y una tarjeta puede aparecer en varios grupos.
+     ====================================================================== */
+  const SIMILAR_BLOCK_DEFS = [
+    {
+      id: 'similar-proximity',
+      name: 'Proximidad · next to / beside / near / close to',
+      accent: '#0ea5e9',
+      expressions: ['Next to', 'Beside', 'Near', 'Close to', 'Far from', "It's nearby.", "It's far away."]
+    },
+    {
+      id: 'similar-position',
+      name: 'Posición · across from / opposite / in front of / behind',
+      accent: '#8b5cf6',
+      expressions: ['Across from', 'Opposite', 'In front of', 'Behind']
+    },
+    {
+      id: 'similar-between-among',
+      name: 'Entre · between / among',
+      accent: '#d97706',
+      expressions: ['Between', 'Among']
+    },
+    {
+      id: 'similar-passing-crossing',
+      name: 'Movimiento · go past / walk past / cross / go across',
+      accent: '#e11d48',
+      expressions: ['Go past', 'Walk past', 'Cross the street', 'Go across']
+    },
+    {
+      id: 'similar-straight',
+      name: 'Seguir recto · straight ahead / go straight / continue straight',
+      accent: '#059669',
+      expressions: ['Straight ahead', 'Go straight', 'Keep going', 'Continue straight', 'Follow this road']
+    },
+    {
+      id: 'similar-left-right',
+      name: 'Orientación · left / right',
+      accent: '#4f46e5',
+      expressions: ['On the left', 'On the right', 'To your left', 'To your right', "It's on your left.", "It's on your right."]
+    },
+    {
+      id: 'similar-turn-order',
+      name: 'Giros · first left / first right / second left / second right',
+      accent: '#c026d3',
+      expressions: ['Take the first left', 'Take the first right', 'Take the second left', 'Take the second right']
+    },
+    {
+      id: 'similar-road-types',
+      name: 'Tipos de vía · street / avenue / road / highway',
+      accent: '#0f766e',
+      expressions: ['Street', 'Avenue', 'Road', 'Highway', 'Freeway', 'Boulevard', 'One-way street', 'Two-way street', 'Dead-end street', 'Alley']
+    },
+    {
+      id: 'similar-road-signs',
+      name: 'Señalización · stop / yield / traffic / direction signs',
+      accent: '#dc2626',
+      expressions: ['Stop sign', 'Yield sign', 'Traffic sign', 'Street sign', 'Street name sign', 'Direction sign', 'Speed limit sign', 'Traffic light']
+    },
+    {
+      id: 'similar-crossings',
+      name: 'Cruces viales · crosswalk / crossing / intersection',
+      accent: '#ea580c',
+      expressions: ['Crosswalk', 'Pedestrian crossing', 'Railroad crossing', 'Intersection', 'Corner', 'Roundabout']
+    },
+    {
+      id: 'similar-road-infrastructure',
+      name: 'Infraestructura · bridge / overpass / underpass / tunnel',
+      accent: '#475569',
+      expressions: ['Bridge', 'Overpass', 'Underpass', 'Pedestrian bridge', 'Tunnel']
+    },
+    {
+      id: 'similar-airport-process',
+      name: 'Aeropuerto · check-in / baggage claim / departure gate',
+      accent: '#0369a1',
+      expressions: ['Airport', 'Check-in counter', 'Baggage claim', 'Luggage claim area', 'Departure gate', 'Airport lounge', 'VIP lounge', 'Immigration hall', 'Customs inspection area', 'Customs office', 'Security checkpoint', 'Border checkpoint', 'Waiting area', 'Lost and found office', 'Information desk']
+    },
+    {
+      id: 'similar-transport-hubs',
+      name: 'Transporte · bus / train / subway stations and stops',
+      accent: '#7c3aed',
+      expressions: ['Bus station', 'Bus stop', 'Train station', 'Subway station', 'Taxi stand', 'Parking lot', 'Parking control booth', 'Runway', 'Tarmac', 'Harbor', 'Port']
+    },
+    {
+      id: 'similar-shops',
+      name: 'Comercios · bakery / butcher / bookstore / library',
+      accent: '#a16207',
+      expressions: ['Bakery', 'Butcher shop', 'Bookstore', 'Library', 'Hardware store', 'Jewelry store', 'Shoe store', 'Pet shop', 'Pharmacy', 'Drugstore', 'Beauty salon', 'Barbershop', 'Flower shop', 'Florist']
+    },
+    {
+      id: 'similar-health-facilities',
+      name: 'Salud · hospital / clinic / infirmary / emergency room',
+      accent: '#be123c',
+      expressions: ['Hospital', 'Clinic', 'Infirmary', 'Emergency room', 'Veterinary clinic', 'Pharmacy', 'Laboratory']
+    },
+    {
+      id: 'similar-water-features',
+      name: 'Agua y costa · creek / stream / river / lake / bay',
+      accent: '#0284c7',
+      expressions: ['Creek', 'Stream', 'River', 'Lake', 'Canal', 'Bay', 'Beach', 'Ocean', 'Sea', 'Swamp', 'Marsh', 'Waterfall', 'Harbor', 'Port']
+    },
+    {
+      id: 'similar-landforms',
+      name: 'Relieve y paisaje · hill / mountain / valley / canyon',
+      accent: '#15803d',
+      expressions: ['Hill', 'Mountain', 'Valley', 'Canyon', 'Cliff', 'Glacier', 'Volcano', 'Forest', 'Jungle', 'Meadow', 'Orchard', 'Vineyard']
+    },
+    {
+      id: 'similar-manners',
+      name: 'Trato personal · friendly / kind / nice / polite',
+      accent: '#9333ea',
+      expressions: ['Friendly', 'Kind', 'Nice', 'Polite', 'Helpful', 'Generous', 'Selfish']
+    },
+    {
+      id: 'similar-ability',
+      name: 'Capacidad · smart / clever / creative / talented',
+      accent: '#4f46e5',
+      expressions: ['Smart', 'Clever', 'Creative', 'Talented', 'Hardworking', 'Brave']
+    },
+    {
+      id: 'similar-appearance',
+      name: 'Apariencia · beautiful / handsome / pretty / cute',
+      accent: '#db2777',
+      expressions: ['Beautiful', 'Handsome', 'Pretty', 'Cute', 'Attractive', 'Ugly']
+    },
+    {
+      id: 'similar-physique',
+      name: 'Características físicas · tall / short / thin / slim / fit',
+      accent: '#c026d3',
+      expressions: ['Tall', 'Short', 'Thin', 'Slim', 'Fat', 'Fit']
+    },
+    {
+      id: 'similar-size-dimensions',
+      name: 'Tamaño y dimensiones · big / tiny / huge / wide / narrow',
+      accent: '#64748b',
+      expressions: ['Big', 'Small', 'Tiny', 'Huge', 'Wide', 'Narrow', 'Long', 'Brief', 'Heavy', 'Light']
+    },
+    {
+      id: 'similar-temperature',
+      name: 'Temperatura · hot / warm / cool / cold',
+      accent: '#ea580c',
+      expressions: ['Hot', 'Warm', 'Cool', 'Cold']
+    },
+    {
+      id: 'similar-texture',
+      name: 'Textura · soft / hard / smooth / rough',
+      accent: '#78716c',
+      expressions: ['Soft', 'Hard', 'Smooth', 'Rough']
+    },
+    {
+      id: 'similar-condition',
+      name: 'Estado físico · clean / dirty / wet / dry',
+      accent: '#0d9488',
+      expressions: ['Clean', 'Dirty', 'Wet', 'Dry']
+    },
+    {
+      id: 'similar-flavors',
+      name: 'Sabores · sweet / bitter / sour / salty / spicy',
+      accent: '#be123c',
+      expressions: ['Sweet', 'Bitter', 'Sour', 'Salty', 'Spicy']
+    },
+    {
+      id: 'similar-food-quality',
+      name: 'Comida · fresh / tasty / delicious / healthy',
+      accent: '#16a34a',
+      expressions: ['Fresh', 'Tasty', 'Delicious', 'Healthy']
+    },
+    {
+      id: 'similar-complexity',
+      name: 'Dificultad · easy / simple / difficult / complicated',
+      accent: '#d97706',
+      expressions: ['Easy', 'Simple', 'Difficult', 'Complicated', 'Possible', 'Impossible']
+    },
+    {
+      id: 'similar-truth',
+      name: 'Verdad y realidad · true / false / real / fake',
+      accent: '#2563eb',
+      expressions: ['True', 'False', 'Real', 'Fake']
+    },
+    {
+      id: 'similar-correctness',
+      name: 'Corrección · correct / wrong',
+      accent: '#dc2626',
+      expressions: ['Correct', 'Wrong']
+    },
+    {
+      id: 'similar-work-habits',
+      name: 'Hábitos personales · careful / careless / patient / impatient',
+      accent: '#9333ea',
+      expressions: ['Careful', 'Careless', 'Patient', 'Impatient', 'Lazy', 'Hardworking']
+    },
+    {
+      id: 'similar-moods',
+      name: 'Estados de ánimo · happy / sad / angry / calm',
+      accent: '#0d9488',
+      expressions: ['Happy', 'Sad', 'Angry', 'Calm']
+    }
+  ];
+
+  const SIMILAR_BLOCKS = SIMILAR_BLOCK_DEFS.map(def => {
+    const wanted = new Set(def.expressions.map(normalize));
+    const seen = new Set();
+    const items = QUESTIONS.filter(q => wanted.has(normalize(q.english)) && !seen.has(q.uid) && seen.add(q.uid));
+    items.forEach(q => {
+      q.extraBlockIds = [...new Set([...(q.extraBlockIds || []), def.id])];
+    });
+    return {
+      id: def.id, name: def.name, difficulty: 'medium', items,
+      isConfusion: true, isSpecial: false, accent: def.accent,
+      kind: 'practice', countLabel: `${items.length} tarjetas`
+    };
+  }).filter(block => block.items.length > 0);
+
+  const findStudyBlock = id =>
+    BLOCKS.find(b => b.id === id) ||
+    SIMILAR_BLOCKS.find(b => b.id === id) ||
+    SPECIAL_BLOCKS.find(b => b.id === id) || null;
+
+  function blockNamesForQuestion(q) {
+    const ids = [...new Set([q.blockId, ...(q.extraBlockIds || []), ...(q.blockId ? [] : [])].filter(Boolean))];
+    return ids.map(id => findStudyBlock(id)?.name || id);
+  }
+
   /* ---- Ayudantes de dirección y grupos ---- */
   const promptOf = (q, dir) => dir === 'EN-ES' ? q.english : q.spanish;
   const ownOf    = (q, dir) => dir === 'EN-ES' ? q.spanish : q.english;           // variante de ESTA tarjeta
@@ -2554,6 +3090,7 @@
     mistakes: {},
     review: {},
     stats: { answered: 0, correct: 0, bestStreak: 0, currentStreak: 0, sessions: 0 },
+    itemStats: {},
     history: [],
     settings: { theme: null, mode: 'EN-ES', pinnedBlocks: [] }
   });
@@ -2597,6 +3134,7 @@
     if (saved.mistakes && typeof saved.mistakes === 'object') base.mistakes = saved.mistakes;
     if (saved.review && typeof saved.review === 'object') base.review = saved.review;
     if (saved.stats && typeof saved.stats === 'object') Object.assign(base.stats, saved.stats);
+    if (saved.itemStats && typeof saved.itemStats === 'object') base.itemStats = saved.itemStats;
     if (saved.settings && typeof saved.settings === 'object') Object.assign(base.settings, saved.settings);
     if (Array.isArray(saved.history)) base.history = saved.history.slice(-20);
     return base;
@@ -2630,6 +3168,11 @@
     startedAt: 0,
     categoryMode: 'practice',
     lastCategory: 'practice',
+    studyMode: null,
+    failuresRepeated: false,
+    cardTimerHandle: null,
+    timerTickHandle: null,
+    timerEndsAt: 0,
     flashcards: { items: [], index: 0, directions: [], blockName: '' }
   };
 
@@ -2736,6 +3279,10 @@
     Object.entries(views).forEach(([key, node]) => {
       node.classList.toggle('is-active', key === name);
     });
+    // El contador global de errores cambia al responder. Ocultarlo durante
+    // un examen a ciegas evita que revele fallos antes de los resultados.
+    const blindSessionActive = name === 'practice' && state.studyMode?.feedback === 'blind';
+    el.headerStatus.classList.toggle('hidden', blindSessionActive);
     main.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -2836,7 +3383,11 @@
 
   function updateCounters() {
     const byDifficulty = { easy: 0, medium: 0, hard: 0 };
-    mistakeItems().forEach(item => { byDifficulty[item.difficulty] += 1; });
+    mistakeItems().forEach(item => {
+      if (Object.prototype.hasOwnProperty.call(byDifficulty, item.difficulty)) {
+        byDifficulty[item.difficulty] += 1;
+      }
+    });
 
     const totals = {
       easy: QUESTIONS.filter(q => q.difficulty === 'easy').length,
@@ -2853,7 +3404,9 @@
     el.countMistakesHard.textContent = byDifficulty.hard;
     el.countReview.textContent = reviewTotal;
 
-    const totalErrors = byDifficulty.easy + byDifficulty.medium + byDifficulty.hard;
+    // Incluye también fallos de los bloques especiales, aunque los botones
+    // de errores por dificultad correspondan únicamente al vocabulario principal.
+    const totalErrors = Object.keys(db.mistakes).length;
     const statusText = `${totalErrors} ${totalErrors === 1 ? 'error' : 'errores'} · ${reviewTotal} revisar`;
     el.headerStatus.textContent = statusText;
     el.totalProgress.textContent = statusText;
@@ -2872,7 +3425,7 @@
       button.disabled = available === 0;
     });
 
-    el.resetBtn.classList.toggle('hidden', totalErrors === 0 && reviewTotal === 0);
+    el.resetBtn.classList.toggle('hidden', totalErrors === 0 && reviewTotal === 0 && !(db.stats?.answered > 0) && !Object.keys(db.itemStats || {}).length);
 
     const { answered, correct, bestStreak } = db.stats;
     el.statTotal.textContent = answered;
@@ -2900,6 +3453,16 @@
       el.blockSelect.appendChild(group);
     });
 
+    const similarGroup = document.createElement('optgroup');
+    similarGroup.label = 'Bloques normales · expresiones similares';
+    SIMILAR_BLOCKS.forEach(block => {
+      const option = document.createElement('option');
+      option.value = block.id;
+      option.textContent = `${block.name} (${block.items.length} tarjetas)`;
+      similarGroup.appendChild(option);
+    });
+    el.blockSelect.appendChild(similarGroup);
+
     const specialGroup = document.createElement('optgroup');
     specialGroup.label = 'Bloques especiales';
     SPECIAL_BLOCKS.forEach(block => {
@@ -2912,7 +3475,8 @@
 
     el.dataInfo.textContent =
       `${QUESTIONS.length} preguntas · ${entries.length} entradas únicas · ` +
-      `${BLOCKS.length} bloques de práctica · ${SPECIAL_BLOCKS.length} bloques especiales (${SPECIAL_QUESTIONS.length} palabras) · todos se pueden contestar o estudiar con flashcards`;
+      `${BLOCKS.length} bloques por dificultad · ${SIMILAR_BLOCKS.length} bloques normales de expresiones similares · ` +
+      `${SPECIAL_BLOCKS.length} bloques especiales (${SPECIAL_QUESTIONS.length} palabras)`;
   }
 
   /* ======================================================================
@@ -3077,6 +3641,12 @@
         countLabel: `${block.items.length} preguntas`,
         accent: block.difficulty === 'easy' ? '#10b981' : block.difficulty === 'medium' ? '#f59e0b' : '#f43f5e'
       })),
+      ...SIMILAR_BLOCKS.map(block => ({
+        ...block,
+        kind: 'practice',
+        countLabel: `${block.items.length} tarjetas similares`,
+        accent: block.accent || '#0ea5e9'
+      })),
       ...SPECIAL_BLOCKS.map(block => ({
         ...block,
         kind: 'practice',
@@ -3198,6 +3768,7 @@
 
     const groups = [
       { title: 'Bloques de práctica', items: BLOCKS },
+      { title: 'Bloques normales · expresiones similares', items: SIMILAR_BLOCKS },
       { title: 'Bloques especiales', items: SPECIAL_BLOCKS }
     ];
 
@@ -3264,14 +3835,18 @@
   /* ======================================================================
      SESIÓN
      ====================================================================== */
-  function startSession(items, categoryMode = 'practice') {
+  function startSession(items, categoryMode = 'practice', studyMode = null) {
     if (!items || !items.length) {
       toast('No hay preguntas disponibles', 'error');
       return;
     }
 
-    const mode = getMode();
-    state.queue = shuffle(items).map(item => ({
+    clearCardTimers();
+    state.studyMode = studyMode;
+    state.failuresRepeated = false;
+    const mode = studyMode?.direction || getMode();
+    const preparedItems = studyMode?.preserveOrder ? items.slice() : shuffle(items);
+    state.queue = preparedItems.map(item => ({
       item,
       direction: mode === 'MIX' ? (Math.random() < 0.5 ? 'EN-ES' : 'ES-EN') : mode,
       claimed: false,
@@ -3307,14 +3882,18 @@
     el.progressFill.style.width = `${((state.index + 1) / total) * 100}%`;
 
     const isReview = state.categoryMode === 'review';
-    el.flagMode.textContent = isReview ? 'REVISAR · SIN PISTA' : categoryLabel(state.categoryMode);
+    const isBlind = state.studyMode?.feedback === 'blind';
+    el.flagMode.textContent = state.studyMode?.name || (isReview ? 'REVISAR · SIN PISTA' : categoryLabel(state.categoryMode));
     el.flagMode.className = `tag ${isReview ? 'tag-review' : 'tag-primary'}`;
+    $('.score-chips')?.classList.toggle('hidden', isBlind);
 
     el.flagRepeat.classList.toggle('hidden', !item.repeated);
 
     const savedMistake = db.mistakes[item.uid];
     const savedReview = db.review[item.uid];
-    if (savedMistake) {
+    if (isBlind) {
+      el.flagHistory.classList.add('hidden');
+    } else if (savedMistake) {
       const n = savedMistake.attempts || 1;
       el.flagHistory.textContent = `ERROR · ${n} ${n === 1 ? 'intento' : 'intentos'}`;
       el.flagHistory.classList.remove('hidden');
@@ -3371,6 +3950,11 @@
       el.usedBox.classList.add('hidden');
     }
 
+    if (isBlind) {
+      el.wordNote.classList.add('hidden');
+      el.usedBox.classList.add('hidden');
+    }
+
     el.hintBox.hidden = true;
     el.hintBox.textContent = '';
 
@@ -3383,27 +3967,40 @@
     el.feedback.className = 'feedback';
     el.feedback.textContent = '';
 
-    el.answerIdle.classList.remove('hidden');
+    const hintsAllowed = state.studyMode ? state.studyMode.allowHints !== false : true;
+    el.answerIdle.classList.toggle('hidden', isBlind || !hintsAllowed);
     el.btnSubmit.classList.remove('hidden');
     el.btnNext.classList.add('hidden');
-    el.btnHint.disabled = isReview;
+    el.btnHint.disabled = isReview || !hintsAllowed;
+    el.btnReveal.disabled = isBlind || !hintsAllowed;
 
-    el.shortcuts.textContent = isReview ? 'En Revisar la pista está desactivada. · ' : '';
-    appendKbdHint(el.shortcuts);
+    el.shortcuts.replaceChildren();
+    if (isBlind) {
+      el.shortcuts.append(document.createTextNode('Sin feedback hasta el final. '));
+    } else if (isReview) {
+      el.shortcuts.append(document.createTextNode('En Revisar la pista está desactivada. '));
+    }
+    if (state.studyMode?.timeLimit) {
+      const timerLabel = document.createElement('span');
+      timerLabel.className = 'timer-label';
+      timerLabel.textContent = `Tiempo: ${state.studyMode.timeLimit}s. `;
+      el.shortcuts.append(timerLabel);
+    }
+    appendKbdHint(el.shortcuts, { allowHints: hintsAllowed && !isBlind });
 
     state.answered = false;
     state.usedHint = false;
 
     el.wordCard.classList.remove('shake');
     updateLiveChips();
+    startCardTimer();
 
     requestAnimationFrame(() => el.input.focus());
   }
 
-  function appendKbdHint(container) {
+  function appendKbdHint(container, options = {}) {
     const parts = [
-      ['Alt', 'H', 'pista'],
-      ['Alt', 'R', 'revelar'],
+      ...(options.allowHints === false ? [] : [['Alt', 'H', 'pista'], ['Alt', 'R', 'revelar']]),
       ['Enter', null, 'continuar'],
       ['Esc', null, 'salir']
     ];
@@ -3454,15 +4051,24 @@
     return slot;
   }
 
+  function strictNormalize(value) {
+    return String(value ?? '').trim().toLocaleLowerCase().replace(/\s+/g, ' ');
+  }
+
+  function answersEqual(a, b) {
+    return state.studyMode?.strict
+      ? strictNormalize(a) === strictNormalize(b)
+      : normalize(a) === normalize(b);
+  }
+
   function checkAnswer(value, entry) {
     const { item, direction } = entry;
     const user = normalize(value);
     const pool = livePool(entry);
-
-    const accepted = pool && pool.length
-      ? formsOf(pool.map(m => ownOf(m.item, m.direction)))
-      : formsOf(allOf(item, direction));
-
+    const rawAccepted = pool && pool.length
+      ? pool.map(m => ownOf(m.item, m.direction))
+      : allOf(item, direction);
+    const accepted = formsOf(rawAccepted);
     const miss = {
       correct: false,
       validOther: false,
@@ -3470,33 +4076,33 @@
       accepted,
       slot: null,
       alreadyUsed: false,
-      otherBlock: null
+      otherBlock: null,
+      otherBlocks: []
     };
-    if (!user) return miss;
+    if (!String(value ?? '').trim()) return miss;
 
     if (pool && pool.length) {
-      // Orden libre: vale la respuesta de cualquier tarjeta pendiente del grupo (primero la propia)
-      const slot = [entry, ...pool].find(m => pool.includes(m) && slotForms(m).includes(user));
+      const slot = [entry, ...pool].find(m => pool.includes(m) && answersEqual(ownOf(m.item, m.direction), value));
       if (slot) return { ...miss, correct: true, slot };
-    } else if (accepted.includes(user)) {
+    } else if (rawAccepted.some(answer => answersEqual(answer, value))) {
       return { ...miss, correct: true };
     }
 
     const members = state.groups.get(entry.groupKey) || [];
     const alreadyUsed = members.length > 1 &&
-      members.some(m => m.claimed && slotForms(m).includes(user));
+      members.some(m => m.claimed && answersEqual(ownOf(m.item, m.direction), value));
 
-    // La respuesta sí existe en el vocabulario, pero pertenece a otra tarjeta
-    // de otro bloque. No es un error del usuario: simplemente no corresponde
-    // al objetivo de esta tarjeta.
-    const otherQ = ALL_QUESTIONS.find(q =>
-      q.uid !== item.uid &&
-      q.blockId !== item.blockId &&
-      formsOf([ownOf(q, direction)]).includes(user)
-    );
-    const otherBlock = otherQ
-      ? (BLOCKS.find(b => b.id === otherQ.blockId)?.name || SPECIAL_BLOCKS.find(b => b.id === otherQ.blockId)?.name || null)
-      : null;
+    // Busca coincidencias exactas/aceptadas en otras tarjetas y devuelve
+    // TODOS los bloques normales/especiales en que aparece esa respuesta.
+    const otherMatches = ALL_QUESTIONS.filter(q => {
+      if (q.uid === item.uid) return false;
+      if (q.blockId === item.blockId && !(q.extraBlockIds || []).length) return false;
+      const options = allOf(q, direction);
+      return options.some(answer => answersEqual(answer, value));
+    });
+    const blockNameSet = new Set();
+    otherMatches.forEach(q => blockNamesForQuestion(q).forEach(name => blockNameSet.add(name)));
+    const otherBlocks = [...blockNameSet];
 
     const near = accepted.some(a => {
       const tolerance = a.length <= 5 ? 1 : 2;
@@ -3507,8 +4113,9 @@
       ...miss,
       near,
       alreadyUsed,
-      otherBlock,
-      validOther: Boolean(otherBlock)
+      otherBlock: otherBlocks.join(' · '),
+      otherBlocks,
+      validOther: otherBlocks.length > 0
     };
   }
 
@@ -3538,6 +4145,10 @@
 
   function useHint() {
     if (state.answered || state.usedHint) return;
+    if (state.studyMode && (state.studyMode.allowHints === false || state.studyMode.feedback === 'blind')) {
+      toast('Este modo no permite pistas', 'info');
+      return;
+    }
     if (state.categoryMode === 'review') {
       toast('La pista está desactivada en Revisar', 'info');
       return;
@@ -3581,6 +4192,12 @@
   }
 
   function updateHistoryFlag(item) {
+    // En un examen a ciegas no se muestra el estado histórico de la tarjeta:
+    // una insignia de ERROR/EN REVISAR permitiría deducir el resultado.
+    if (state.studyMode?.feedback === 'blind') {
+      el.flagHistory.classList.add('hidden');
+      return;
+    }
     const savedMistake = db.mistakes[item.uid];
     const savedReview = db.review[item.uid];
     if (savedMistake) {
@@ -3597,6 +4214,10 @@
 
   function revealAnswer() {
     if (state.answered) return;
+    if (state.studyMode && (state.studyMode.allowHints === false || state.studyMode.feedback === 'blind')) {
+      toast('Este modo no permite revelar respuestas', 'info');
+      return;
+    }
     const entry = currentEntry();
     const { item, direction } = entry;
 
@@ -3604,7 +4225,9 @@
     const expected = expectedFor(entry, slot);
     if (slot) slot.usedText = expected;
     state.answered = true;
+    clearCardTimers();
     state.streak = 0;
+    recordItemAttempt(item, 'wrong', '', false);
 
     el.input.disabled = true;
     el.input.classList.add('wrong');
@@ -3627,7 +4250,7 @@
 
     state.results.push({
       item, direction, status: 'revealed',
-      userAnswer: '', usedHint: state.usedHint
+      userAnswer: '', expectedAnswer: expected, usedHint: state.usedHint
     });
 
     db.stats.answered += 1;
@@ -3638,14 +4261,66 @@
     el.btnNext.focus();
   }
 
-  function submitAnswer() {
+  function recordItemAttempt(item, resultStatus, userAnswer = '', usedHint = false) {
+    if (!db.itemStats || typeof db.itemStats !== 'object') db.itemStats = {};
+    const stat = db.itemStats[item.uid] || {
+      attempts: 0, correct: 0, wrong: 0, hinted: 0, lastSeenAt: null,
+      lastResult: null, lastAnswer: '', streak: 0, mastery: 0
+    };
+    stat.attempts += 1;
+    if (resultStatus === 'correct') {
+      stat.correct += 1;
+      stat.streak = (stat.streak || 0) + 1;
+      if (!usedHint) stat.mastery = Math.min(5, (stat.mastery || 0) + 1);
+      else stat.hinted += 1;
+    } else {
+      stat.wrong += 1;
+      stat.streak = 0;
+      stat.mastery = 0;
+    }
+    stat.lastSeenAt = new Date().toISOString();
+    stat.lastResult = resultStatus;
+    stat.lastAnswer = String(userAnswer || '').slice(0, 160);
+    db.itemStats[item.uid] = stat;
+    saveDB();
+  }
+
+  function clearCardTimers() {
+    if (state.cardTimerHandle) clearTimeout(state.cardTimerHandle);
+    if (state.timerTickHandle) clearInterval(state.timerTickHandle);
+    state.cardTimerHandle = null;
+    state.timerTickHandle = null;
+    state.timerEndsAt = 0;
+  }
+
+  function startCardTimer() {
+    clearCardTimers();
+    const seconds = Number(state.studyMode?.timeLimit) || 0;
+    if (!seconds || state.answered) return;
+    state.timerEndsAt = Date.now() + seconds * 1000;
+    const label = $('.timer-label', el.shortcuts);
+    const updateLabel = () => {
+      const remaining = Math.max(0, Math.ceil((state.timerEndsAt - Date.now()) / 1000));
+      if (label) label.textContent = `Tiempo: ${remaining}s. `;
+    };
+    updateLabel();
+    state.timerTickHandle = setInterval(updateLabel, 250);
+    state.cardTimerHandle = setTimeout(() => {
+      if (!state.answered && views.practice.classList.contains('is-active')) {
+        el.input.value = '';
+        submitAnswer(true);
+      }
+    }, seconds * 1000);
+  }
+
+  function submitAnswer(isTimeout = false) {
     if (state.answered) return;
 
     const entry = currentEntry();
     const { item, direction } = entry;
     const userAnswer = el.input.value;
 
-    if (!normalize(userAnswer)) {
+    if (!normalize(userAnswer) && !isTimeout) {
       el.input.focus();
       el.wordCard.classList.add('shake');
       setTimeout(() => el.wordCard.classList.remove('shake'), 400);
@@ -3653,6 +4328,7 @@
     }
 
     const result = checkAnswer(userAnswer, entry);
+    const isBlind = state.studyMode?.feedback === 'blind';
 
     // Respuesta válida, pero de otra tarjeta/bloque: NO termina la tarjeta.
     // No revela la respuesta esperada, no cuenta como fallo ni como intento
@@ -3665,12 +4341,17 @@
       el.feedback.replaceChildren(
         line('Es correcto, pero no es la respuesta que estoy buscando.'),
         line(
-          `Esa traducción corresponde a una tarjeta de otro bloque (${result.otherBlock}).`,
+          result.otherBlocks?.length > 1
+            ? `Esa respuesta también aparece en estos bloques: ${result.otherBlocks.join(' · ')}.`
+            : `Esa respuesta corresponde a este bloque: ${result.otherBlock}.`,
           'fb-line fb-dim'
         )
       );
       el.input.disabled = false;
-      el.answerIdle.classList.remove('hidden');
+      const canUseHints = !state.studyMode || (state.studyMode.allowHints !== false && state.studyMode.feedback !== 'blind');
+      el.answerIdle.classList.toggle('hidden', !canUseHints);
+      el.btnHint.disabled = !canUseHints || state.categoryMode === 'review';
+      el.btnReveal.disabled = !canUseHints;
       el.btnSubmit.classList.remove('hidden');
       el.btnNext.classList.add('hidden');
       el.input.focus();
@@ -3678,7 +4359,12 @@
       return;
     }
 
+    // La advertencia de una respuesta válida de otro bloque solo debe
+    // colorear el campo mientras se muestra esa advertencia. Al enviar una
+    // nueva respuesta real, se elimina para que no contamine el feedback.
+    el.input.classList.remove('valid-other');
     state.answered = true;
+    clearCardTimers();
     el.input.disabled = true;
     el.answerIdle.classList.add('hidden');
     el.btnSubmit.classList.add('hidden');
@@ -3697,47 +4383,62 @@
       db.stats.currentStreak += 1;
       db.stats.bestStreak = Math.max(db.stats.bestStreak, db.stats.currentStreak);
 
-      el.input.classList.add('correct');
-      el.feedback.hidden = false;
-      el.feedback.className = 'feedback success';
-      el.feedback.replaceChildren(
-        line(state.usedHint ? 'Correcto (con pista)' : 'Correcto')
-      );
+      if (isBlind) {
+        el.input.classList.add('neutral');
+        el.feedback.hidden = true;
+        el.feedback.replaceChildren();
+      } else {
+        el.input.classList.add('correct');
+        el.feedback.hidden = false;
+        el.feedback.className = 'feedback success';
+        el.feedback.replaceChildren(
+          line(state.usedHint ? 'Correcto (con pista)' : 'Correcto')
+        );
+      }
+      recordItemAttempt(item, 'correct', userAnswer, state.usedHint);
 
       removeMistake(item.uid);
       if (!state.usedHint) removeFromReview(item.uid);
       updateCounters();
       updateHistoryFlag(item);
 
-      state.results.push({ item, direction, status: 'correct', userAnswer, usedHint: state.usedHint });
+      state.results.push({ item, direction, status: 'correct', userAnswer, expectedAnswer: result.slot ? expectedFor(entry, result.slot) : ownOf(item, direction), usedHint: state.usedHint });
     } else {
       state.streak = 0;
       db.stats.currentStreak = 0;
 
-      el.input.classList.add('wrong');
-      el.wordCard.classList.add('shake');
-      setTimeout(() => el.wordCard.classList.remove('shake'), 420);
+      if (isBlind) {
+        el.input.classList.add('neutral');
+        el.feedback.hidden = true;
+        el.feedback.replaceChildren();
+      } else {
+        el.input.classList.add('wrong');
+        el.wordCard.classList.add('shake');
+        setTimeout(() => el.wordCard.classList.remove('shake'), 420);
+      }
 
       const slot = claimSlot(entry);
       if (slot) slot.usedText = expectedFor(entry, slot);
-      el.feedback.hidden = false;
-      el.feedback.className = 'feedback error';
-
-      const nodes = [line(`Respuesta correcta: ${expectedFor(entry, slot)}`)];
-      if (result.near) nodes.push(line('Casi. Revisa la ortografía.', 'fb-line fb-dim'));
-      if (result.alreadyUsed) {
-        nodes.push(line('Esa respuesta ya la usaste en otra tarjeta de este bloque.', 'fb-line fb-dim'));
+      if (!isBlind) {
+        el.feedback.hidden = false;
+        el.feedback.className = 'feedback error';
+        const nodes = [line(isTimeout ? `Se acabó el tiempo. Respuesta correcta: ${expectedFor(entry, slot)}` : `Respuesta correcta: ${expectedFor(entry, slot)}`)];
+        if (!isTimeout && result.near) nodes.push(line('Casi. Revisa la ortografía.', 'fb-line fb-dim'));
+        if (result.alreadyUsed) {
+          nodes.push(line('Esa respuesta ya la usaste en otra tarjeta de este bloque.', 'fb-line fb-dim'));
+        }
+        extraLines(entry).forEach(t => nodes.push(line(t, 'fb-line fb-dim')));
+        if (userAnswer.trim()) nodes.push(line(`Tu respuesta: ${userAnswer}`, 'fb-line fb-dim'));
+        el.feedback.replaceChildren(...nodes);
       }
-      extraLines(entry).forEach(t => nodes.push(line(t, 'fb-line fb-dim')));
-      nodes.push(line(`Tu respuesta: ${userAnswer}`, 'fb-line fb-dim'));
-      el.feedback.replaceChildren(...nodes);
+      recordItemAttempt(item, 'wrong', userAnswer, state.usedHint);
 
-      if (!state.usedHint) saveMistake(item, userAnswer, 'answer');
+      if (!state.usedHint) saveMistake(item, userAnswer, isTimeout ? 'timeout' : 'answer');
       else saveForReview(item, 'hint');
       updateCounters();
       updateHistoryFlag(item);
 
-      state.results.push({ item, direction, status: 'wrong', userAnswer, usedHint: state.usedHint });
+      state.results.push({ item, direction, status: 'wrong', userAnswer, expectedAnswer: expectedFor(entry, slot), usedHint: state.usedHint });
     }
 
     saveDB();
@@ -3756,12 +4457,47 @@
      NAVEGACIÓN
      ====================================================================== */
   function goNext() {
+    clearCardTimers();
     state.index += 1;
-    if (state.index < state.queue.length) renderCurrent();
-    else finishSession();
+    if (state.index < state.queue.length) {
+      renderCurrent();
+      return;
+    }
+    if (state.studyMode?.repeatFailures && !state.failuresRepeated) {
+      const failed = state.results.filter(r => r.status === 'wrong' || r.status === 'revealed').map(r => r.item);
+      const unique = [...new Map(failed.map(item => [item.uid, item])).values()];
+      if (unique.length) {
+        state.failuresRepeated = true;
+        const direction = state.studyMode.direction || getMode();
+        state.queue = shuffle(unique).map(item => ({
+          item,
+          direction: direction === 'MIX' ? (Math.random() < 0.5 ? 'EN-ES' : 'ES-EN') : direction,
+          claimed: false,
+          groupKey: ''
+        }));
+        state.groups = new Map();
+        state.queue.forEach(entry => {
+          entry.groupKey = makeGroupKey(entry.item, entry.direction);
+          if (!state.groups.has(entry.groupKey)) state.groups.set(entry.groupKey, []);
+          state.groups.get(entry.groupKey).push(entry);
+        });
+        state.index = 0;
+        toast(`Segunda vuelta: ${unique.length} tarjetas falladas`, 'info');
+        renderCurrent();
+        return;
+      }
+    }
+    finishSession();
+  }
+
+  function unresolvedFailedResults() {
+    const latestByUid = new Map();
+    state.results.forEach(result => latestByUid.set(result.item.uid, result));
+    return [...latestByUid.values()].filter(result => result.status === 'wrong' || result.status === 'revealed');
   }
 
   function finishSession() {
+    clearCardTimers();
     const total = state.results.length;
     const correct = state.results.filter(r => r.status === 'correct').length;
     const validOther = state.results.filter(r => r.status === 'valid-other').length;
@@ -3783,15 +4519,26 @@
     el.resAccuracy.textContent = total ? `${accuracy}%` : '—';
     el.resTime.textContent = formatDuration(Date.now() - state.startedAt);
 
-    const categoryName = categoryLabel(state.categoryMode).toLowerCase();
-    el.resSummary.textContent = validOther
-      ? `${total} preguntas de ${categoryName} · ${validOther} ${validOther === 1 ? 'respuesta válida' : 'respuestas válidas'} fuera de su tarjeta.`
-      : `${total} preguntas de ${categoryName}.`;
+    const categoryName = (state.studyMode?.name || categoryLabel(state.categoryMode)).toLowerCase();
+    let summary = validOther
+      ? `${total} respuestas registradas en ${categoryName} · ${validOther} ${validOther === 1 ? 'respuesta válida' : 'respuestas válidas'} fuera de su tarjeta.`
+      : `${total} respuestas registradas en ${categoryName}.`;
+    if (state.studyMode?.mastery) {
+      const passRate = total ? correct / total : 0;
+      const passed = passRate >= (state.studyMode.threshold || 0.85);
+      summary += ` ${passed ? 'APROBADO' : 'NO APROBADO'}: ${Math.round(passRate * 100)}% (mínimo ${Math.round((state.studyMode.threshold || 0.85) * 100)}%).`;
+    }
+    if (state.failuresRepeated) summary += ' La sesión incluyó una segunda vuelta de los errores.';
+    el.resSummary.textContent = summary;
 
-    const failed = state.results.filter(r => r.status === 'wrong' || r.status === 'revealed');
+    const failed = unresolvedFailedResults();
+    const blindReview = state.studyMode?.feedback === 'blind';
+    const reviewRows = blindReview ? state.results.slice() : failed;
+    const reviewHeading = el.resReview.querySelector('h3');
+    if (reviewHeading) reviewHeading.textContent = blindReview ? 'Revisión completa del examen' : 'Por reforzar';
     el.resReviewList.replaceChildren();
-    if (failed.length) {
-      failed.forEach(r => {
+    if (reviewRows.length) {
+      reviewRows.forEach(r => {
         const li = document.createElement('li');
         const en = document.createElement('span');
         en.className = 'rl-en';
@@ -3805,26 +4552,32 @@
 
         const meta = document.createElement('span');
         meta.className = 'rl-meta';
-        const blockName = BLOCKS.find(b => b.id === r.item.blockId)?.name || SPECIAL_BLOCKS.find(b => b.id === r.item.blockId)?.name || r.item.blockId || 'Bloque';
+        const blockNames = blockNamesForQuestion(r.item);
+        const blockName = blockNames.join(' · ') || r.item.blockId || 'Bloque';
         const position = state.results.indexOf(r) + 1;
-        const answerText = r.userAnswer?.trim()
-          ? `Tu respuesta: ${r.userAnswer.trim()}`
-          : (r.status === 'revealed' ? 'Respuesta revelada' : 'Sin respuesta');
-        meta.textContent = `Pregunta ${position}/${total} · ${blockName} · ${r.item.section || 'General'} · ${difficultyLabel(r.item.difficulty)} · ${answerText}`;
+        if (blindReview) {
+          const statusLabel = r.status === 'correct' ? 'Correcta' : r.status === 'revealed' ? 'Respuesta revelada' : 'Incorrecta';
+          const userAnswer = r.userAnswer?.trim() || 'Sin respuesta';
+          const expected = r.expectedAnswer || (r.direction === 'EN-ES' ? r.item.spanish : r.item.english);
+          meta.textContent = `Pregunta ${position}/${total} · ${statusLabel} · ${blockName} · Tu respuesta: ${userAnswer} · Respuesta esperada: ${expected}`;
+        } else {
+          const answerText = r.userAnswer?.trim()
+            ? `Tu respuesta: ${r.userAnswer.trim()}`
+            : (r.status === 'revealed' ? 'Respuesta revelada' : 'Sin respuesta');
+          meta.textContent = `Pregunta ${position}/${total} · ${blockName} · ${r.item.section || 'General'} · ${difficultyLabel(r.item.difficulty)} · ${answerText}`;
+        }
 
         li.append(en, arrow, es, meta);
         el.resReviewList.appendChild(li);
       });
       el.resReview.classList.remove('hidden');
-      el.btnRetry.classList.remove('hidden');
-      el.btnCopyImage.classList.remove('hidden');
-      el.btnShareImage.classList.remove('hidden');
     } else {
       el.resReview.classList.add('hidden');
-      el.btnRetry.classList.add('hidden');
-      el.btnCopyImage.classList.add('hidden');
-      el.btnShareImage.classList.add('hidden');
     }
+    // Las acciones de recuperación/imagen solo aparecen si queda algún error sin resolver.
+    el.btnRetry.classList.toggle('hidden', failed.length === 0);
+    el.btnCopyImage.classList.toggle('hidden', failed.length === 0);
+    el.btnShareImage.classList.toggle('hidden', failed.length === 0);
 
     updateCounters();
     showView('results');
@@ -4446,6 +5199,9 @@
     addTitle('Por bloque');
     BLOCKS.forEach(block => addBlockChoice(block, false));
 
+    addTitle('Bloques normales · expresiones similares');
+    SIMILAR_BLOCKS.forEach(block => addBlockChoice(block, false));
+
     addTitle('Bloques especiales');
     SPECIAL_BLOCKS.forEach(block => addBlockChoice(block, true));
 
@@ -4569,9 +5325,19 @@
     BLOCKS.forEach(block => regularGrid.appendChild(renderBlockButton(block, false)));
     blocksSection.appendChild(regularGrid);
 
+    const similarTitle = document.createElement('h3');
+    similarTitle.textContent = 'Bloques normales · expresiones similares';
+    similarTitle.className = 'similar-blocks-title';
+    blocksSection.appendChild(similarTitle);
+
+    const similarGrid = document.createElement('div');
+    similarGrid.className = 'explore-block-grid';
+    SIMILAR_BLOCKS.forEach(block => similarGrid.appendChild(renderBlockButton(block, false)));
+    blocksSection.appendChild(similarGrid);
+
     const specialTitle = document.createElement('h3');
     specialTitle.textContent = 'Bloques especiales';
-    specialTitle.style.marginTop = '18px';
+    specialTitle.className = 'similar-blocks-title';
     blocksSection.appendChild(specialTitle);
 
     const specialGrid = document.createElement('div');
@@ -4693,6 +5459,335 @@
   if (versionBadge) versionBadge.textContent = `v${APP_VERSION}`;
 
   /* ======================================================================
+     VERSIÓN 2.0 · CATÁLOGO DE MODOS Y MOTOR ADAPTATIVO
+     ====================================================================== */
+  const ADVANCED_MODE_GROUPS = [
+    { id: 'exam', name: 'Exámenes', description: 'Evalúa el recuerdo sin ayuda.' },
+    { id: 'practice', name: 'Práctica activa', description: 'Entrena las dos direcciones y la escritura.' },
+    { id: 'reinforce', name: 'Refuerzo', description: 'Da prioridad a errores y expresiones parecidas.' },
+    { id: 'adaptive', name: 'Sesiones adaptativas', description: 'Distribuye mejor el tiempo y repite fallos.' }
+  ];
+
+  const ADVANCED_MODES = [
+    { id: 'blind', name: 'Examen a ciegas', icon: '🙈', group: 'exam', description: 'No muestra aciertos, fallos, colores, pistas ni respuestas hasta el final. Conserva el aviso de respuesta válida de otro bloque.', tags: ['Sin feedback', 'Sin pistas'], config: { feedback: 'blind', allowHints: false } },
+    { id: 'strict-spelling', name: 'Ortografía estricta', icon: '✍️', group: 'exam', description: 'Exige escribir la respuesta completa correctamente; ignora mayúsculas, pero no signos ni errores ortográficos.', tags: ['Escritura exacta'], config: { feedback: 'instant', strict: true, allowHints: false } },
+    { id: 'cumulative', name: 'Examen acumulativo', icon: '🎯', group: 'exam', description: 'Incluye todas las tarjetas del vocabulario principal y de los bloques especiales.', tags: ['Todo el vocabulario'], config: { feedback: 'blind', allowHints: false, scopeOverride: 'all', sizeOverride: 'all' } },
+    { id: 'mastery', name: 'Examen de dominio', icon: '🏆', group: 'exam', description: 'Examen a ciegas y con ortografía estricta. Al final indica si alcanzaste al menos el 85%.', tags: ['85% para aprobar'], config: { feedback: 'blind', strict: true, allowHints: false, scopeOverride: 'all', sizeOverride: 'all', mastery: true, threshold: .85 } },
+    { id: 'speed', name: 'Velocidad controlada', icon: '⏱️', group: 'exam', description: 'Dispones de ocho segundos por tarjeta. Si se termina el tiempo, se registra como error.', tags: ['8 segundos'], config: { feedback: 'instant', allowHints: false, timeLimit: 8 } },
+    { id: 'direct', name: 'Inglés → español', icon: '➡️', group: 'practice', description: 'Presenta el término inglés y exige escribir su traducción al español.', tags: ['EN → ES'], config: { feedback: 'instant', direction: 'EN-ES', allowHints: true } },
+    { id: 'inverse', name: 'Español → inglés', icon: '⬅️', group: 'practice', description: 'Parte de la traducción en español para obligarte a recuperar la expresión inglesa.', tags: ['ES → EN'], config: { feedback: 'instant', direction: 'ES-EN', allowHints: true } },
+    { id: 'bidirectional', name: 'Bidireccional aleatorio', icon: '🔄', group: 'practice', description: 'Alterna al azar entre inglés → español y español → inglés.', tags: ['Dirección aleatoria'], config: { feedback: 'instant', direction: 'MIX', allowHints: true } },
+    { id: 'active-recall', name: 'Recuperación activa', icon: '🧠', group: 'practice', description: 'Responde sin pistas y recibe feedback al enviar. Al final vuelve a probar, una vez, las tarjetas que fallaste.', tags: ['Recuerdo libre', 'Segunda vuelta'], config: { feedback: 'instant', allowHints: false, repeatFailures: true } },
+    { id: 'exact-recall', name: 'Escritura exacta a ciegas', icon: '⌨️', group: 'practice', description: 'Combina recuperación sin feedback con tolerancia estricta a la ortografía.', tags: ['Sin feedback', 'Exactitud'], config: { feedback: 'blind', strict: true, allowHints: false } },
+    { id: 'mistakes', name: 'Repaso de errores', icon: '🔁', group: 'reinforce', description: 'Practica únicamente tarjetas que tengas guardadas como errores.', tags: ['Solo errores'], config: { feedback: 'instant', allowHints: true, scopeOverride: 'mistakes' } },
+    { id: 'review', name: 'Repasar guardadas', icon: '📌', group: 'reinforce', description: 'Practica las tarjetas que mandaste a Revisar con pista o respuesta revelada.', tags: ['Revisar'], config: { feedback: 'instant', allowHints: false, scopeOverride: 'review' } },
+    { id: 'spaced', name: 'Repaso espaciado', icon: '📅', group: 'reinforce', description: 'Ordena primero las tarjetas menos practicadas recientemente.', tags: ['Más antiguas primero'], config: { feedback: 'instant', allowHints: true, weighting: 'spaced', preserveOrder: true } },
+    { id: 'confusion', name: 'Diferenciar expresiones similares', icon: '🎭', group: 'reinforce', description: 'Practica solo las tarjetas agrupadas por expresiones parecidas que suelen confundirse.', tags: ['Bloques normales'], config: { feedback: 'instant', allowHints: false, scopeOverride: 'confusion', strict: true } },
+    { id: 'weak', name: 'Puntos débiles', icon: '🎯', group: 'reinforce', description: 'Prioriza tarjetas con muchos errores, baja precisión o dominio insuficiente.', tags: ['Por desempeño'], config: { feedback: 'instant', allowHints: true, weighting: 'weak', preserveOrder: true } },
+    { id: 'adaptive', name: 'Sesión adaptativa', icon: '🧩', group: 'adaptive', description: 'Combina errores, baja precisión y tarjetas nunca practicadas; ordena primero las que conviene reforzar.', tags: ['Selección adaptativa'], config: { feedback: 'instant', allowHints: true, weighting: 'adaptive', preserveOrder: true } },
+    { id: 'repeat-failures', name: 'Repetir errores al final', icon: '🌀', group: 'adaptive', description: 'Al terminar la primera vuelta, repite una vez las tarjetas incorrectas.', tags: ['Segunda vuelta'], config: { feedback: 'instant', allowHints: true, repeatFailures: true } },
+    { id: 'full-unseen', name: 'Tarjetas menos practicadas', icon: '🌱', group: 'adaptive', description: 'Prioriza las tarjetas que nunca has contestado o que llevas más tiempo sin practicar.', tags: ['Cobertura'], config: { feedback: 'instant', allowHints: false, weighting: 'spaced', preserveOrder: true } }
+  ];
+  const advancedModeById = new Map(ADVANCED_MODES.map(mode => [mode.id, mode]));
+
+  function itemPerformance(item) {
+    const stats = db.itemStats?.[item.uid] || {};
+    const attempts = Number(stats.attempts) || 0;
+    const correct = Number(stats.correct) || 0;
+    const wrong = Number(stats.wrong) || 0;
+    const accuracy = attempts ? correct / attempts : 0;
+    const lastSeen = stats.lastSeenAt ? Date.parse(stats.lastSeenAt) : 0;
+    const ageDays = lastSeen ? Math.max(0, (Date.now() - lastSeen) / 86400000) : 3650;
+    const errorRecord = db.mistakes[item.uid] ? 1 : 0;
+    return { attempts, correct, wrong, accuracy, ageDays, errorRecord, mastery: Number(stats.mastery) || 0 };
+  }
+
+  function prioritizeItems(items, weighting) {
+    const copy = items.slice();
+    const score = item => {
+      const p = itemPerformance(item);
+      if (weighting === 'spaced') return p.ageDays + (p.attempts === 0 ? 5000 : 0);
+      if (weighting === 'weak') return (1 - p.accuracy) * 100 + p.errorRecord * 80 + (p.attempts === 0 ? 25 : 0) + (5 - p.mastery) * 2;
+      if (weighting === 'adaptive') return p.errorRecord * 100 + (1 - p.accuracy) * 45 + Math.min(p.ageDays, 180) * .25 + (p.attempts === 0 ? 35 : 0) + (5 - p.mastery) * 3;
+      return 0;
+    };
+    if (weighting === 'spaced') copy.sort((a,b) => score(b)-score(a));
+    else copy.sort((a,b) => score(b)-score(a));
+    return copy;
+  }
+
+  function resolveAdvancedScope(value) {
+    if (value === 'main') return QUESTIONS.slice();
+    if (value === 'all') return ALL_QUESTIONS.slice();
+    if (value === 'mistakes') return mistakeItems();
+    if (value === 'review') return reviewItems();
+    if (value === 'confusion') return [...new Map(SIMILAR_BLOCKS.flatMap(block => block.items).map(item => [item.uid, item])).values()];
+    if (['easy','medium','hard'].includes(value)) return QUESTIONS.filter(item => item.difficulty === value);
+    if (value === 'block') {
+      const block = selectedStudyBlock();
+      return block?.items?.slice() || [];
+    }
+    return QUESTIONS.slice();
+  }
+
+  function startAdvancedMode(modeId, settings = {}) {
+    const mode = advancedModeById.get(modeId);
+    if (!mode) return;
+    let items = mode.config.scopeOverride
+      ? resolveAdvancedScope(mode.config.scopeOverride)
+      : resolveAdvancedScope(settings.scope || 'block');
+    if (mode.config.scopeOverride === 'all') items = ALL_QUESTIONS.slice();
+    if (mode.config.scopeOverride === 'confusion') items = resolveAdvancedScope('confusion');
+    if (!items.length) {
+      toast(mode.config.scopeOverride === 'mistakes' ? 'Todavía no tienes errores guardados.' : mode.config.scopeOverride === 'review' ? 'No hay tarjetas guardadas en Revisar.' : 'Ese conjunto no tiene tarjetas disponibles.', 'info');
+      return;
+    }
+    const weighting = mode.config.weighting || null;
+    if (weighting) items = prioritizeItems(items, weighting);
+    else items = shuffle(items);
+
+    let sizeChoice = mode.config.sizeOverride || settings.size || '30';
+    if (sizeChoice === 'all' || sizeChoice === 'Todo el conjunto') sizeChoice = items.length;
+    const size = Math.max(1, Number(sizeChoice) || 30);
+    if (items.length > size) items = items.slice(0, size);
+
+    const selectedDirection = settings.direction || getMode();
+    const config = {
+      ...mode.config,
+      name: mode.name,
+      direction: mode.config.direction || selectedDirection,
+      preserveOrder: true,
+      allowHints: mode.config.allowHints !== false,
+      feedback: mode.config.feedback || 'instant'
+    };
+    closeModal();
+    startSession(items, `mode:${modeId}`, config);
+  }
+
+  function buildAdvancedModesModal() {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'mode-picker';
+
+    const top = document.createElement('div');
+    top.className = 'mode-picker-top';
+    const intro = document.createElement('div');
+    intro.className = 'mode-picker-intro';
+    intro.innerHTML = '<p class="picker-eyebrow">ELIGE CÓMO ESTUDIAR</p><h3>Encuentra el modo adecuado</h3><p>Empieza con una recomendación o filtra por objetivo.</p>';
+    const searchWrap = document.createElement('label');
+    searchWrap.className = 'mode-search-wrap';
+    searchWrap.innerHTML = '<span aria-hidden="true">⌕</span>';
+    const search = document.createElement('input');
+    search.type = 'search';
+    search.id = 'v2-mode-search';
+    search.placeholder = 'Buscar un modo…';
+    search.setAttribute('aria-label', 'Buscar modo de estudio');
+    searchWrap.appendChild(search);
+    top.append(intro, searchWrap);
+    wrapper.appendChild(top);
+
+    const settings = document.createElement('details');
+    settings.className = 'mode-settings';
+    const summary = document.createElement('summary');
+    summary.innerHTML = '<span><strong>Configurar sesión</strong><small>Contenido, cantidad y dirección</small></span><span class="settings-chevron" aria-hidden="true">⌄</span>';
+    settings.appendChild(summary);
+
+    const controls = document.createElement('div');
+    controls.className = 'advanced-controls';
+    const makeSelect = (label, id, options, initial) => {
+      const wrap = document.createElement('label');
+      const text = document.createElement('span'); text.textContent = label;
+      const select = document.createElement('select'); select.id = id;
+      options.forEach(({value, text: optionText}) => {
+        const option = document.createElement('option'); option.value = value; option.textContent = optionText; select.appendChild(option);
+      });
+      select.value = initial;
+      wrap.append(text, select); return wrap;
+    };
+    const initialBlock = el.blockSelect.value === 'random' ? 'main' : 'block';
+    controls.append(
+      makeSelect('Contenido', 'v2-scope', [
+        {value:'block',text:'Bloque seleccionado'}, {value:'main',text:'Vocabulario principal'},
+        {value:'all',text:'Todo, incluidos especiales'}, {value:'easy',text:'Dificultad regalada'},
+        {value:'medium',text:'Dificultad intermedia'}, {value:'hard',text:'Dificultad difícil'},
+        {value:'confusion',text:'Expresiones similares'}, {value:'mistakes',text:'Solo errores guardados'},
+        {value:'review',text:'Solo Revisar'}
+      ], initialBlock),
+      makeSelect('Cantidad', 'v2-size', [
+        {value:'10',text:'10 tarjetas'}, {value:'20',text:'20 tarjetas'}, {value:'30',text:'30 tarjetas'},
+        {value:'60',text:'60 tarjetas'}, {value:'all',text:'Todas las disponibles'}
+      ], '30'),
+      makeSelect('Dirección', 'v2-direction', [
+        {value:'EN-ES',text:'Inglés → español'}, {value:'ES-EN',text:'Español → inglés'}, {value:'MIX',text:'Mezcla aleatoria'}
+      ], getMode())
+    );
+    settings.appendChild(controls);
+    wrapper.appendChild(settings);
+
+    const categories = [
+      {id:'recommended', label:'Recomendados'},
+      ...ADVANCED_MODE_GROUPS.map(g => ({id:g.id, label:g.name})),
+      {id:'all', label:'Todos'}
+    ];
+    let activeCategory = 'recommended';
+    const filterBar = document.createElement('div');
+    filterBar.className = 'mode-filter-bar';
+    filterBar.setAttribute('role', 'group');
+    filterBar.setAttribute('aria-label', 'Filtrar modos por objetivo');
+    const list = document.createElement('div');
+    list.className = 'mode-list';
+    const empty = document.createElement('div');
+    empty.className = 'mode-empty hidden';
+    empty.textContent = 'No encontré modos con ese nombre. Prueba otra búsqueda.';
+
+    function visibleModes() {
+      const query = search.value.trim().toLocaleLowerCase('es');
+      const recommended = new Set(['blind','active-recall','mistakes','adaptive']);
+      return ADVANCED_MODES.filter(mode => {
+        const matchesCategory = query ? true : (activeCategory === 'all' ||
+          (activeCategory === 'recommended' ? recommended.has(mode.id) : mode.group === activeCategory));
+        const haystack = `${mode.name} ${mode.description} ${mode.tags.join(' ')} ${mode.group}`.toLocaleLowerCase('es');
+        return matchesCategory && (!query || haystack.includes(query));
+      });
+    }
+
+    function renderModeList() {
+      list.replaceChildren();
+      const modes = visibleModes();
+      empty.classList.toggle('hidden', modes.length !== 0);
+      modes.forEach(mode => {
+        const row = document.createElement('article');
+        row.className = 'mode-row';
+        const icon = document.createElement('span'); icon.className = 'mode-row-icon'; icon.textContent = mode.icon; icon.setAttribute('aria-hidden','true');
+        const body = document.createElement('div'); body.className = 'mode-row-body';
+        const title = document.createElement('h4'); title.textContent = mode.name;
+        const desc = document.createElement('p'); desc.textContent = mode.description;
+        const meta = document.createElement('span'); meta.className = 'mode-row-tag'; meta.textContent = mode.tags[0] || 'Práctica';
+        body.append(title, desc, meta);
+        const start = document.createElement('button'); start.type = 'button'; start.className = 'btn btn-primary btn-sm mode-row-start'; start.textContent = 'Empezar';
+        start.setAttribute('aria-label', `Empezar modo: ${mode.name}`);
+        start.addEventListener('click', () => startAdvancedMode(mode.id, {
+          scope: $('#v2-scope').value, size: $('#v2-size').value, direction: $('#v2-direction').value
+        }));
+        row.append(icon, body, start);
+        list.appendChild(row);
+      });
+    }
+
+    categories.forEach(category => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'mode-filter' + (category.id === activeCategory ? ' is-active' : '');
+      button.dataset.category = category.id;
+      button.textContent = category.label;
+      button.setAttribute('aria-pressed', category.id === activeCategory ? 'true' : 'false');
+      button.addEventListener('click', () => {
+        activeCategory = category.id;
+        search.value = '';
+        $$('.mode-filter', filterBar).forEach(node => {
+          const active = node === button;
+          node.classList.toggle('is-active', active);
+          node.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+        renderModeList();
+      });
+      filterBar.appendChild(button);
+    });
+    search.addEventListener('input', () => {
+      if (search.value.trim()) activeCategory = 'all';
+      $$('.mode-filter', filterBar).forEach(node => {
+        const active = node.dataset.category === activeCategory;
+        node.classList.toggle('is-active', active);
+        node.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+      renderModeList();
+    });
+    wrapper.append(filterBar, list, empty);
+
+    const note = document.createElement('p');
+    note.className = 'advanced-footnote';
+    note.textContent = 'El examen a ciegas oculta los resultados hasta el final. El progreso y los errores se guardan en este dispositivo.';
+    wrapper.appendChild(note);
+    renderModeList();
+    openModal({ title: 'Modos de estudio · Versión 2.0', body: [wrapper] });
+  }
+
+  function syncBlockPickerLabel() {
+    const select = $('#block-select');
+    const label = $('#selected-block-name');
+    if (!select || !label) return;
+    const selected = select.options[select.selectedIndex];
+    label.textContent = selected?.textContent || 'Selecciona un bloque';
+  }
+
+  function buildBlockChooserModal() {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'block-picker-modal';
+    const intro = document.createElement('p');
+    intro.className = 'block-picker-modal-intro';
+    intro.textContent = 'Busca por nombre o explora los bloques agrupados por tipo. Puedes elegir otro bloque en cualquier momento.';
+    const searchWrap = document.createElement('label');
+    searchWrap.className = 'block-search-wrap';
+    searchWrap.innerHTML = '<span aria-hidden="true">⌕</span>';
+    const search = document.createElement('input');
+    search.type = 'search'; search.id = 'block-chooser-search';
+    search.placeholder = 'Buscar por palabra o bloque…';
+    search.setAttribute('aria-label', 'Buscar bloque de vocabulario');
+    searchWrap.appendChild(search);
+    const results = document.createElement('div');
+    results.className = 'block-chooser-results';
+    const empty = document.createElement('p');
+    empty.className = 'block-chooser-empty hidden';
+    empty.textContent = 'No encontré bloques que coincidan con la búsqueda.';
+    wrapper.append(intro, searchWrap, results, empty);
+
+    const groups = [
+      { title: 'Selección rápida', items: [{ id: 'random', name: `Aleatoria · ${SESSION_SIZE} preguntas`, items: QUESTIONS }] },
+      { title: 'Bloques de práctica', items: BLOCKS },
+      { title: 'Expresiones similares', items: SIMILAR_BLOCKS },
+      { title: 'Bloques especiales', items: SPECIAL_BLOCKS }
+    ];
+
+    function render() {
+      const q = normalize(search.value);
+      results.replaceChildren();
+      let matches = 0;
+      groups.forEach(group => {
+        const items = group.items.filter(block => {
+          const vocabulary = (block.items || []).map(item => Array.isArray(item)
+            ? item.join(' ')
+            : [item.english, item.spanish, item.section].filter(Boolean).join(' ')).join(' ');
+          return normalize(`${block.name} ${group.title} ${block.items?.length || 0} ${vocabulary}`).includes(q);
+        });
+        if (!items.length) return;
+        matches += items.length;
+        const section = document.createElement('section'); section.className = 'block-chooser-group';
+        const heading = document.createElement('h3'); heading.textContent = group.title;
+        const list = document.createElement('div'); list.className = 'block-chooser-list';
+        items.forEach(block => {
+          const option = document.createElement('button'); option.type = 'button'; option.className = 'block-choice';
+          const name = document.createElement('span'); name.className = 'block-choice-name'; name.textContent = block.name;
+          const count = document.createElement('span'); count.className = 'block-choice-count';
+          count.textContent = block.id === 'random' ? `${SESSION_SIZE} preguntas aleatorias` : `${block.items?.length || 0} tarjetas`;
+          const arrow = document.createElement('span'); arrow.className = 'block-choice-arrow'; arrow.textContent = '→'; arrow.setAttribute('aria-hidden','true');
+          option.append(name, count, arrow);
+          if ($('#block-select').value === block.id) option.classList.add('is-selected');
+          option.addEventListener('click', () => {
+            $('#block-select').value = block.id;
+            syncBlockPickerLabel();
+            closeModal();
+          });
+          list.appendChild(option);
+        });
+        section.append(heading, list); results.appendChild(section);
+      });
+      empty.classList.toggle('hidden', matches > 0);
+    }
+    search.addEventListener('input', render);
+    render();
+    openModal({ title: 'Elegir vocabulario', body: [wrapper] });
+  }
+
+  /* ======================================================================
      EVENTOS
      ====================================================================== */
   function selectedStudyBlock() {
@@ -4705,8 +5800,10 @@
         accent: 'var(--primary)'
       };
     }
-    return BLOCKS.find(b => b.id === value) || SPECIAL_BLOCKS.find(b => b.id === value) || null;
+    return findStudyBlock(value);
   }
+
+  $('#btn-choose-block').addEventListener('click', buildBlockChooserModal);
 
   $('#btn-start').addEventListener('click', () => {
     const block = selectedStudyBlock();
@@ -4729,6 +5826,7 @@
   });
 
   $('#btn-back').addEventListener('click', () => {
+    clearCardTimers();
     if (state.index > 0 && !state.answered) {
       if (!confirm('¿Salir de la práctica? Se perderá el progreso de esta sesión.')) return;
     }
@@ -4742,18 +5840,16 @@
   });
 
   $('#btn-retry').addEventListener('click', () => {
-    const failed = state.results
-      .filter(r => r.status === 'wrong' || r.status === 'revealed')
-      .map(r => r.item);
+    const failed = unresolvedFailedResults().map(r => r.item);
     const unique = [...new Map(failed.map(i => [i.uid, i])).values()];
-    if (unique.length) startSession(unique, state.categoryMode);
+    if (unique.length) startSession(unique, state.categoryMode, state.studyMode);
   });
 
   // Repite exactamente el conjunto de tarjetas de la sesión recién terminada.
   el.btnRepeat.addEventListener('click', () => {
     const items = state.queue.map(entry => entry.item);
     if (items.length) {
-      startSession(items, state.categoryMode);
+      startSession(items, state.categoryMode, state.studyMode);
     } else {
       showView('setup');
     }
@@ -4768,6 +5864,7 @@
   el.btnCopyImage.addEventListener('click', () => copyMistakesImage('copy'));
   el.btnShareImage.addEventListener('click', () => copyMistakesImage('share'));
   $('#btn-manage').addEventListener('click', buildManageModal);
+  $('#btn-advanced-modes').addEventListener('click', buildAdvancedModesModal);
   el.btnManagePinned.addEventListener('click', buildPinnedBlocksModal);
   $('#btn-explore').addEventListener('click', buildExploreModal);
 
@@ -4776,6 +5873,7 @@
     db.mistakes = {};
     db.review = {};
     db.stats = { answered: 0, correct: 0, bestStreak: 0, currentStreak: 0, sessions: 0 };
+    db.itemStats = {};
     db.history = [];
     saveDB();
     updateCounters();
@@ -4811,6 +5909,7 @@
     if (event.key === 'Escape') {
       if (!el.modal.hidden) { closeModal(); return; }
       if (views.practice.classList.contains('is-active')) {
+        clearCardTimers();
         if (state.index > 0 && !state.answered) {
           if (!confirm('¿Salir de la práctica? Se perderá el progreso de esta sesión.')) return;
         }
@@ -4850,6 +5949,7 @@
   function init() {
     initTheme();
     populateBlocks();
+    syncBlockPickerLabel();
     renderPinnedSpecialBlocks();
     setMode(db.settings.mode || 'EN-ES');
     updateCounters();
