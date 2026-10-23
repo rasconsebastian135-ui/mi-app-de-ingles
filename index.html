@@ -1301,7 +1301,8 @@
     main { padding: 22px 15px 24px; }
     .home-dashboard { gap: 16px; }
     .home-intro h2 { font-size: 1.72rem; }
-    .home-intro-copy > p:last-child { font-size: .82rem; }
+    .home-intro-copy > p:last-child { display: none; }
+    #data-info { display: none; }
     .home-metric { min-width: 0; padding: 0 10px; }
     .home-metric strong { font-size: 1.05rem; }
     .home-metric span { font-size: .58rem; }
@@ -1332,6 +1333,248 @@
     *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
   }
 
+
+
+  /* === Navegación por páginas: evita una pantalla principal interminable === */
+  .app { margin: 8px auto; min-height: calc(100vh - 24px); }
+  .main-nav {
+    display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px;
+    padding: 9px clamp(12px, 2.4vw, 26px); border-bottom: 1px solid var(--border);
+    background: var(--surface-solid); position: relative; z-index: 20;
+  }
+  .main-nav[hidden] { display: none !important; }
+  .main-nav-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 0;
+    padding: 10px 12px; border: 1px solid transparent; border-radius: 11px;
+    color: var(--muted); font-size: .78rem; font-weight: 850; background: transparent; white-space: nowrap;
+    transition: background .15s, color .15s, border-color .15s;
+  }
+  .main-nav-btn > span:first-child { font-size: 1rem; line-height: 1; }
+  .main-nav-btn:hover { background: var(--surface-2); color: var(--text); }
+  .main-nav-btn.is-active { color: var(--primary); background: var(--primary-soft); border-color: color-mix(in srgb, var(--primary), transparent 82%); }
+  main { padding: clamp(12px, 2vw, 20px) clamp(14px, 3vw, 35px) 16px; }
+  .home-grid { grid-template-columns: minmax(0,1fr) !important; }
+  .home-intro { align-items: center; }
+  .home-intro-copy { max-width: 650px; }
+  .home-dashboard { gap: 16px; }
+  .setup-panel { padding: clamp(16px, 2.4vw, 22px); }
+  .setup-panel .panel-heading { margin-bottom: 15px; }
+  .setup-panel .direction-heading { margin-top: 17px; }
+  .setup-reassurance { margin-bottom: 0; }
+  .page-frame { width: min(1030px, 100%); margin: 0 auto; }
+  .page-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; margin: 0 0 11px; }
+  .page-heading h2 { margin: 0; font-size: clamp(1.45rem, 2.6vw, 2rem); line-height: 1.13; letter-spacing: -.04em; }
+  .page-heading p:not(.page-eyebrow) { max-width: 650px; margin: 7px 0 0; color: var(--muted); font-size: .81rem; line-height: 1.5; }
+  .page-eyebrow { margin: 0 0 7px; color: var(--primary); font-size: .63rem; font-weight: 900; letter-spacing: .13em; }
+  .current-selection { width: min(275px, 36%); flex: 0 0 auto; display: grid; gap: 4px; padding: 12px 14px; border: 1px solid var(--border); border-radius: 13px; background: var(--surface-2); }
+  .current-selection span { font-size: .59rem; font-weight: 900; letter-spacing: .09em; color: var(--muted); }
+  .current-selection strong { font-size: .8rem; line-height: 1.3; overflow-wrap: anywhere; }
+  .current-selection small { font-size: .66rem; color: var(--muted); }
+  .vocab-search-wrap { display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 14px; border: 1px solid var(--border-2); border-radius: 13px; background: var(--surface-solid); color: var(--muted); }
+  .vocab-search-wrap:focus-within { border-color: var(--primary); box-shadow: var(--ring); }
+  .vocab-search-wrap > span { font-size: 1.3rem; flex: 0 0 auto; }
+  .vocab-search-wrap input { width: 100%; min-width: 0; border: 0; outline: 0; color: var(--text); background: transparent; font-size: .82rem; }
+  .vocab-search-wrap button { flex: 0 0 auto; display: grid; place-items: center; width: 27px; height: 27px; border-radius: 8px; color: var(--muted); font-size: 1.25rem; }
+  .vocab-search-wrap button:hover { background: var(--surface-3); color: var(--text); }
+  .vocab-category-tabs { display: grid; grid-template-columns: repeat(6, minmax(0,1fr)); gap: 7px; margin: 12px 0 8px; }
+  .vocab-category-btn { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-solid); color: var(--muted); font-size: .7rem; font-weight: 850; text-align: center; }
+  .vocab-category-btn:hover { border-color: var(--border-2); color: var(--text); }
+  .vocab-category-btn.is-active { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
+  .vocab-difficulty-filters { display: flex; flex-wrap: wrap; gap: 6px; padding: 1px 0 7px; }
+  .vocab-difficulty-filters[hidden] { display: none !important; }
+  .vocab-difficulty-btn { padding: 6px 10px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface-solid); color: var(--muted); font-size: .67rem; font-weight: 850; }
+  .vocab-difficulty-btn.is-active { color: var(--primary); border-color: var(--primary); background: var(--primary-soft); }
+  .vocab-results-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin: 9px 1px 9px; }
+  .vocab-results-heading strong { font-size: .79rem; font-weight: 900; }
+  .vocab-results-heading span { font-size: .67rem; color: var(--muted); white-space: nowrap; }
+  .vocab-card-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; min-height: 0; align-content: start; }
+  .vocab-card { position: relative; display: grid; grid-template-columns: 34px minmax(0,1fr) 20px; align-items: center; gap: 10px; min-width: 0; min-height: 70px; padding: 9px 10px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-solid); text-align: left; transition: border-color .14s, background .14s, transform .14s; }
+  .vocab-card:hover { border-color: var(--border-2); background: var(--surface-2); transform: translateY(-1px); }
+  .vocab-card.is-selected { border-color: var(--primary); background: var(--primary-soft); }
+  .vocab-card-icon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: var(--surface-3); font-size: 1rem; }
+  .vocab-card.is-selected .vocab-card-icon { background: var(--primary); color: var(--on-primary); }
+  .vocab-card-copy { min-width: 0; display: grid; gap: 4px; }
+  .vocab-card-copy strong { font-size: .75rem; line-height: 1.25; overflow-wrap: anywhere; }
+  .vocab-card-copy small { color: var(--muted); font-size: .64rem; line-height: 1.25; }
+  .vocab-card-state { display: grid; place-items: center; color: var(--muted); font-size: 1rem; font-weight: 950; }
+  .vocab-card.is-selected .vocab-card-state { color: var(--primary); }
+  .vocab-empty { grid-column: 1 / -1; min-height: 190px; display: grid; place-content: center; gap: 7px; padding: 22px; text-align: center; border: 1px dashed var(--border-2); border-radius: 13px; color: var(--muted); }
+  .vocab-empty strong { color: var(--text); font-size: .85rem; }
+  .vocab-empty span { font-size: .73rem; }
+  .vocab-pagination { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 12px 0 8px; }
+  .vocab-pagination > span { min-width: 85px; text-align: center; color: var(--muted); font-size: .7rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .vocab-pagination button:disabled { opacity: .35; cursor: default; }
+  .vocab-footer-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 13px; margin-top: 2px; border-top: 1px solid var(--border); }
+  .vocab-footer-actions > div { display: flex; gap: 8px; }
+  .vocab-footer-actions .btn { min-height: 42px; }
+  .mode-page-header { display: none; }
+  #view-modes .mode-picker { gap: 10px; }
+  #view-modes .mode-picker-top { grid-template-columns: minmax(0,1fr); }
+  #view-modes .mode-settings { margin-bottom: 2px; }
+  #view-modes .mode-list { max-height: none; overflow: visible; padding-right: 0; }
+  #view-modes .mode-row { min-height: 68px; padding: 8px 10px; }
+  .mode-pagination { margin-top: 8px; }
+  .mode-pagination[hidden] { display: none !important; }
+  .mode-pagination button { min-width: 105px; }
+  .mode-pagination button:disabled { opacity: .35; cursor: default; }
+  #view-review .quick-panel { margin: 0; display: block; background: var(--surface-solid); }
+  #view-review .quick-panel .quick-heading { margin-bottom: 14px; }
+  #view-review .quick-divider { margin: 16px 0; }
+  #view-tools .tools-panel { margin: 0; padding-top: 0; border-top: 0; }
+  #view-tools .pinned-details { margin-top: 14px; }
+  #view-tools .home-footer { margin-top: 16px; }
+  #view-tools .tools-actions { grid-template-columns: repeat(3, minmax(0,1fr)); }
+  #view-tools .mode-launch-card { grid-column: auto; }
+  #view-tools .tool-link, #view-tools .mode-launch-card { align-items: flex-start; }
+  #view-tools .mode-launch-copy small, #view-tools .tool-link small { line-height: 1.35; }
+
+  @media (max-width: 900px) {
+    .page-heading { flex-direction: column; }
+    .current-selection { width: 100%; }
+    .vocab-category-tabs { grid-template-columns: repeat(3, minmax(0,1fr)); }
+    #view-modes .mode-picker-top { grid-template-columns: 1fr; }
+    #view-tools .tools-actions { grid-template-columns: 1fr 1fr; }
+    #view-tools .mode-launch-card { grid-column: 1 / -1; }
+    .vocab-card-grid { min-height: 270px; }
+    .vocab-card { min-height: 82px; }
+  }
+  @media (max-width: 620px) {
+    .app { width: 100%; height: auto; min-height: 100dvh; margin: 0; border-radius: 0; border-left: 0; border-right: 0; overflow: visible; }
+    .main-nav { position: sticky; top: 0; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 3px; padding: 6px 6px; box-shadow: 0 3px 12px rgba(20,30,70,.045); }
+    .main-nav-btn { flex-direction: column; gap: 4px; min-height: 48px; padding: 5px 2px; border-radius: 9px; font-size: .59rem; white-space: normal; line-height: 1.1; }
+    .main-nav-btn > span:first-child { font-size: 1.03rem; }
+    main { padding: 16px 12px 20px; }
+    .home-intro { gap: 12px; }
+    .home-intro h2 { font-size: 1.62rem; }
+    .home-intro-copy > p:last-child { margin-top: 6px; }
+    .home-metrics { padding: 9px 0; }
+    .home-metric { padding: 0 8px; }
+    .home-metric strong { font-size: .98rem; }
+    .setup-panel { padding: 14px; }
+    .page-heading { gap: 8px; margin-bottom: 10px; }
+    .page-heading h2 { font-size: 1.48rem; }
+    .page-heading p:not(.page-eyebrow) { font-size: .75rem; }
+    #view-vocabulary .page-heading p:not(.page-eyebrow) { display: none; }
+    #view-vocabulary .current-selection { display: none; }
+    .vocab-search-wrap { height: 44px; padding: 0 10px; }
+    .vocab-search-wrap input { font-size: .75rem; }
+    .vocab-category-tabs { gap: 5px; margin: 9px 0 6px; }
+    .vocab-category-btn { min-height: 37px; padding: 6px 3px; font-size: .61rem; }
+    .vocab-difficulty-filters { gap: 5px; }
+    .vocab-difficulty-btn { padding: 6px 8px; font-size: .63rem; }
+    .vocab-card-grid { gap: 6px; min-height: 0; }
+    .vocab-card { grid-template-columns: 27px minmax(0,1fr) 12px; gap: 7px; min-height: 59px; padding: 7px; border-radius: 10px; }
+    .vocab-card-icon { width: 27px; height: 27px; border-radius: 8px; font-size: .82rem; }
+    .vocab-card-copy strong { font-size: .66rem; }
+    .vocab-card-copy small { font-size: .58rem; }
+    .vocab-footer-actions #vocab-back-home { display: none; }
+    .vocab-footer-actions { padding-top: 8px; margin-top: 0; }
+    .vocab-card-state { font-size: .8rem; }
+    .vocab-results-heading { margin: 7px 1px; }
+    .vocab-results-heading strong { font-size: .72rem; }
+    .vocab-results-heading span { font-size: .59rem; }
+    .vocab-pagination { gap: 8px; margin: 9px 0 7px; }
+    .vocab-pagination .btn { padding: 7px 9px; font-size: .66rem; }
+    .vocab-pagination > span { min-width: 50px; font-size: .65rem; }
+    .vocab-footer-actions { align-items: stretch; flex-direction: column-reverse; gap: 8px; padding-top: 10px; }
+    .vocab-footer-actions > div { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .vocab-footer-actions .btn { min-height: 40px; padding: 8px; font-size: .72rem; }
+    #view-modes .mode-picker-top { grid-template-columns: 1fr; }
+    #view-modes .page-heading p:not(.page-eyebrow) { display: none; }
+    #view-modes .mode-settings .advanced-controls { grid-template-columns: 1fr; }
+    #view-modes .mode-list { gap: 7px; }
+    #view-modes .mode-row { grid-template-columns: 29px minmax(0,1fr); min-height: 0; gap: 8px; padding: 9px; }
+    #view-modes .mode-row-icon { width: 29px; height: 29px; font-size: .9rem; }
+    #view-modes .mode-row-body h4 { font-size: .72rem; }
+    #view-modes .mode-row-body p { font-size: .63rem; margin: 2px 0 4px; }
+    #view-modes .mode-row-start { grid-column: 2; justify-self: start; padding: 6px 10px; }
+    .mode-pagination { margin-top: 8px; }
+    .mode-pagination .btn { min-width: 90px; }
+    #view-review .quick-panel { padding: 13px; }
+    #view-review .quick-panel .quick-heading { margin-bottom: 11px; }
+    #view-review .quick-section-title { gap: 6px; }
+    #view-tools .tools-actions { grid-template-columns: 1fr; }
+    #view-tools .mode-launch-card { grid-column: auto; }
+    #view-tools .pinned-details .pinned-block-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  }
+
+
+  /* En móviles bajos, el inicio debe mostrar ambas acciones sin desplazamiento. */
+  .vocab-category-btn { position: relative; }
+  .vocab-category-count { display: inline-grid; place-items: center; min-width: 19px; height: 19px; padding: 0 4px; border-radius: 6px; background: var(--surface-3); color: var(--muted); font-size: .59rem; font-weight: 900; line-height: 1; }
+  .vocab-category-btn.is-active .vocab-category-count { background: var(--primary); color: var(--on-primary); }
+  .vocab-card-copy small { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; }
+  .vocab-card-grid .vocab-card-copy { align-self: center; }
+  @media (max-height: 740px) and (max-width: 620px) {
+    main { padding-top: 8px; padding-bottom: 8px; }
+    .home-dashboard { gap: 8px; }
+    .home-intro { flex-direction: row; align-items: center; gap: 8px; }
+    .home-intro-copy { min-width: 0; }
+    .home-intro h2 { font-size: 1.26rem; line-height: 1.08; }
+    .home-eyebrow { font-size: .53rem; margin-bottom: 5px; letter-spacing: .08em; }
+    .home-metrics { display: none; }
+    .setup-panel { padding: 11px; }
+    .setup-panel .panel-heading { gap: 8px; margin-bottom: 8px; }
+    .setup-panel .panel-heading p, .setup-panel .direction-heading p { display: none; }
+    .panel-step { width: 25px; height: 25px; border-radius: 8px; font-size: .63rem; }
+    .panel-heading h3, .direction-heading h3 { font-size: .82rem; }
+    .field-label { margin-bottom: 5px; font-size: .67rem; }
+    .block-picker-button { gap: 8px; padding: 9px; }
+    .block-picker-icon { width: 30px; height: 30px; }
+    .block-picker-copy small { font-size: .55rem; }
+    .block-picker-copy strong { font-size: .72rem; }
+    .block-picker-action { font-size: .68rem; }
+    .direction-heading { margin: 10px 0 6px !important; gap: 8px; }
+    .m-dir.seg { gap: 3px; padding: 3px; }
+    .m-dir.seg span { padding: 7px 3px; font-size: .65rem; }
+    .setup-actions { grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 11px; }
+    .setup-actions .btn { min-height: 43px; padding: 7px; font-size: .69rem; line-height: 1.15; justify-content: center; }
+    #btn-start { justify-content: center; }
+    #btn-start .arrow { display: none; }
+    .setup-reassurance { margin-top: 7px; font-size: .59rem; line-height: 1.3; }
+    .setup-reassurance span { width: 14px; height: 14px; }
+    .page-heading { margin-bottom: 7px; }
+    .vocab-search-wrap { height: 40px; }
+    .vocab-category-tabs { margin-top: 6px; margin-bottom: 4px; }
+    .vocab-category-btn { min-height: 32px; }
+    .vocab-results-heading { margin: 5px 1px; }
+    .vocab-card-grid { gap: 5px; }
+    .vocab-card { min-height: 54px; }
+    .vocab-pagination { margin: 6px 0 4px; }
+    .vocab-footer-actions .btn { min-height: 36px; }
+    #view-modes .advanced-footnote { display: none; }
+    #view-modes .mode-filter-bar { padding-bottom: 5px; }
+    #view-modes .mode-settings summary { padding: 8px 10px; }
+    #view-modes .mode-row { padding: 7px; }
+  }
+  @media (min-width: 621px) and (max-height: 820px) {
+    .app { margin-top: 4px; margin-bottom: 4px; }
+    main { padding-top: 8px; padding-bottom: 8px; }
+    .home-dashboard { gap: 10px; }
+    .setup-panel { padding: 15px; }
+    .setup-panel .panel-heading { margin-bottom: 9px; }
+    .setup-panel .direction-heading { margin: 12px 0 7px; }
+    .m-dir.seg span { padding-top: 7px; padding-bottom: 7px; }
+    .setup-actions { margin-top: 12px; }
+    .setup-reassurance { margin-top: 7px; }
+    #view-vocabulary .page-heading p:not(.page-eyebrow), #view-modes .page-heading p:not(.page-eyebrow) { display: none; }
+    #view-modes .mode-picker { gap: 6px; }
+    #view-modes .mode-picker-top { gap: 6px; }
+    #view-modes .mode-settings summary { padding-top: 7px; padding-bottom: 7px; }
+    #view-modes .mode-row { min-height: 55px; padding: 6px 9px; }
+    #view-modes .mode-row-body p { display: none; }
+    #view-modes .mode-filter-bar { padding-bottom: 6px; }
+    .mode-pagination { margin-top: 4px; }
+  }
+
+
+  /* Ajuste final: las páginas principales ocupan el viewport sin añadir un margen inferior que cree scroll. */
+  @media (min-width: 621px) {
+    .app.app { margin: 0 auto; }
+  }
+  @media (max-width: 620px) {
+    .app { margin: 0; }
+  }
 </style>
 </head>
 <body>
@@ -1361,6 +1604,14 @@
       </button>
     </div>
   </header>
+
+  <nav id="main-navigation" class="main-nav" aria-label="Navegación principal">
+    <button class="main-nav-btn is-active" type="button" data-page="setup"><span aria-hidden="true">⌂</span><span>Inicio</span></button>
+    <button class="main-nav-btn" type="button" data-page="vocabulary"><span aria-hidden="true">▦</span><span>Vocabulario</span></button>
+    <button class="main-nav-btn" type="button" data-page="modes"><span aria-hidden="true">✦</span><span>Modos</span></button>
+    <button class="main-nav-btn" type="button" data-page="review"><span aria-hidden="true">↻</span><span>Repaso</span></button>
+    <button class="main-nav-btn" type="button" data-page="tools"><span aria-hidden="true">⚙</span><span>Herramientas</span></button>
+  </nav>
 
   <main>
     <!-- ============================ SETUP ============================ -->
@@ -1456,6 +1707,56 @@
         </details>
 
         <div class="home-footer"><span>Practicador de Vocabulario <strong>v2.0</strong></span><span>El avance se guarda localmente.</span><button id="btn-reset" class="link-danger hidden" type="button" title="Borrar todo el progreso guardado">Borrar progreso</button><span id="total-progress" class="hidden"></span></div>
+      </div>
+    </section>
+
+    <!-- ======================= SELECTOR DE VOCABULARIO ======================= -->
+    <section id="view-vocabulary" class="view" aria-labelledby="vocabulary-page-title">
+      <div class="page-frame vocabulary-page">
+        <header class="page-heading">
+          <div><p class="page-eyebrow">CONTENIDO DE ESTUDIO</p><h2 id="vocabulary-page-title">Elige exactamente qué practicar</h2><p>Busca una expresión o entra por categoría. Los resultados están paginados para que no tengas que recorrer listas interminables.</p></div>
+          <div class="current-selection"><span>SELECCIÓN ACTUAL</span><strong id="vocab-current-name">Aleatoria</strong><small id="vocab-current-count">30 preguntas por sesión</small></div>
+        </header>
+        <div class="vocab-search-wrap"><span aria-hidden="true">⌕</span><input id="vocab-search" type="search" placeholder="Busca una palabra, traducción o nombre de bloque…" autocomplete="off" aria-label="Buscar vocabulario o bloques"><button id="vocab-clear-search" type="button" aria-label="Limpiar búsqueda" title="Limpiar búsqueda">×</button></div>
+        <div id="vocab-category-tabs" class="vocab-category-tabs" role="tablist" aria-label="Categorías de vocabulario"></div>
+        <div id="vocab-difficulty-filters" class="vocab-difficulty-filters" aria-label="Filtrar por dificultad" hidden></div>
+        <div class="vocab-results-heading"><strong id="vocab-results-label">Selección rápida</strong><span id="vocab-results-count"></span></div>
+        <div id="vocab-card-grid" class="vocab-card-grid" aria-live="polite"></div>
+        <div class="vocab-pagination" id="vocab-pagination">
+          <button id="vocab-prev" class="btn btn-secondary btn-sm" type="button">← Anterior</button>
+          <span id="vocab-page-status" aria-live="polite">1 / 1</span>
+          <button id="vocab-next" class="btn btn-secondary btn-sm" type="button">Siguiente →</button>
+        </div>
+        <div class="vocab-footer-actions">
+          <button id="vocab-back-home" class="btn btn-secondary" type="button">Volver al inicio</button>
+          <div><button id="vocab-start" class="btn btn-primary btn-lg" type="button">Practicar selección <span aria-hidden="true">→</span></button><button id="vocab-flashcards" class="btn btn-secondary btn-lg" type="button">Estudiar con tarjetas</button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================== MODOS =========================== -->
+    <section id="view-modes" class="view" aria-labelledby="modes-page-title">
+      <div class="page-frame modes-page">
+        <header class="page-heading">
+          <div><p class="page-eyebrow">FORMAS DE APRENDER</p><h2 id="modes-page-title">Elige cómo estudiar</h2><p>Filtra los modos por objetivo. Solo aparecen unos cuantos por página; no necesitas recorrer una lista larga.</p></div>
+        </header>
+        <div id="mode-page-content"></div>
+      </div>
+    </section>
+
+    <!-- =========================== REPASO =========================== -->
+    <section id="view-review" class="view" aria-labelledby="review-page-title">
+      <div class="page-frame tools-page">
+        <header class="page-heading"><div><p class="page-eyebrow">REFUERZO</p><h2 id="review-page-title">Repasar y corregir</h2><p>Accede a las tarjetas que necesitan atención y a prácticas rápidas por dificultad.</p></div></header>
+        <div id="review-page-content"></div>
+      </div>
+    </section>
+
+    <!-- ========================= HERRAMIENTAS ========================= -->
+    <section id="view-tools" class="view" aria-labelledby="tools-page-title">
+      <div class="page-frame tools-page">
+        <header class="page-heading"><div><p class="page-eyebrow">ACCESOS SECUNDARIOS</p><h2 id="tools-page-title">Herramientas</h2><p>Exploración, guardados y accesos a tus bloques favoritos, separados de la pantalla de estudio.</p></div></header>
+        <div id="tools-page-content"></div>
       </div>
     </section>
 
@@ -3181,11 +3482,26 @@
      ====================================================================== */
   const views = {
     setup: $('#view-setup'),
+    vocabulary: $('#view-vocabulary'),
+    modes: $('#view-modes'),
+    review: $('#view-review'),
+    tools: $('#view-tools'),
     practice: $('#view-practice'),
     results: $('#view-results'),
     flashcards: $('#view-flashcards')
   };
   const main = document.querySelector('main');
+
+  // Divide la antigua pantalla larga en páginas independientes sin duplicar
+  // componentes ni alterar sus IDs/eventos originales.
+  const quickPanelForReview = document.querySelector('#view-setup .quick-panel');
+  const toolsPanelForTools = document.querySelector('#view-setup .tools-panel');
+  const pinnedForTools = document.querySelector('#view-setup .pinned-details');
+  const footerForTools = document.querySelector('#view-setup .home-footer');
+  if (quickPanelForReview) $('#review-page-content').appendChild(quickPanelForReview);
+  if (toolsPanelForTools) $('#tools-page-content').appendChild(toolsPanelForTools);
+  if (pinnedForTools) $('#tools-page-content').appendChild(pinnedForTools);
+  if (footerForTools) $('#tools-page-content').appendChild(footerForTools);
 
   const el = {
     blockSelect: $('#block-select'),
@@ -3277,13 +3593,22 @@
      ====================================================================== */
   function showView(name) {
     Object.entries(views).forEach(([key, node]) => {
-      node.classList.toggle('is-active', key === name);
+      if (node) node.classList.toggle('is-active', key === name);
     });
-    // El contador global de errores cambia al responder. Ocultarlo durante
-    // un examen a ciegas evita que revele fallos antes de los resultados.
+    const mainNav = $('#main-navigation');
+    const immersive = ['practice', 'results', 'flashcards'].includes(name);
+    if (mainNav) {
+      mainNav.hidden = immersive;
+      $$('.main-nav-btn', mainNav).forEach(button => {
+        const active = button.dataset.page === name;
+        button.classList.toggle('is-active', active);
+        button.setAttribute('aria-current', active ? 'page' : 'false');
+      });
+    }
+    // El contador global de errores puede revelar resultados en el examen a ciegas.
     const blindSessionActive = name === 'practice' && state.studyMode?.feedback === 'blind';
     el.headerStatus.classList.toggle('hidden', blindSessionActive);
-    main.scrollTo({ top: 0, behavior: 'smooth' });
+    main.scrollTo({ top: 0, behavior: 'auto' });
   }
 
   function toast(message, type = 'info', options = {}) {
@@ -3438,8 +3763,18 @@
 
     const randomOption = document.createElement('option');
     randomOption.value = 'random';
-    randomOption.textContent = `Aleatoria · ${SESSION_SIZE} preguntas de todo`;
+    randomOption.textContent = `Aleatoria · ${SESSION_SIZE} preguntas`;
     el.blockSelect.appendChild(randomOption);
+
+    const mainAllOption = document.createElement('option');
+    mainAllOption.value = 'all-main';
+    mainAllOption.textContent = `Todo el vocabulario principal (${QUESTIONS.length})`;
+    el.blockSelect.appendChild(mainAllOption);
+
+    const allOption = document.createElement('option');
+    allOption.value = 'all-vocab';
+    allOption.textContent = `Principal + bloques especiales (${ALL_QUESTIONS.length})`;
+    el.blockSelect.appendChild(allOption);
 
     DIFFICULTIES.forEach(diff => {
       const group = document.createElement('optgroup');
@@ -5582,7 +5917,7 @@
     search.placeholder = 'Buscar un modo…';
     search.setAttribute('aria-label', 'Buscar modo de estudio');
     searchWrap.appendChild(search);
-    top.append(intro, searchWrap);
+    top.append(searchWrap);
     wrapper.appendChild(top);
 
     const settings = document.createElement('details');
@@ -5635,6 +5970,13 @@
     filterBar.setAttribute('aria-label', 'Filtrar modos por objetivo');
     const list = document.createElement('div');
     list.className = 'mode-list';
+    const pager = document.createElement('div');
+    pager.className = 'vocab-pagination mode-pagination';
+    const prevPage = document.createElement('button'); prevPage.type = 'button'; prevPage.className = 'btn btn-secondary btn-sm'; prevPage.textContent = '← Anterior';
+    const pageStatus = document.createElement('span');
+    const nextPage = document.createElement('button'); nextPage.type = 'button'; nextPage.className = 'btn btn-secondary btn-sm'; nextPage.textContent = 'Siguiente →';
+    pager.append(prevPage, pageStatus, nextPage);
+    let modePage = 0;
     const empty = document.createElement('div');
     empty.className = 'mode-empty hidden';
     empty.textContent = 'No encontré modos con ese nombre. Prueba otra búsqueda.';
@@ -5652,8 +5994,13 @@
 
     function renderModeList() {
       list.replaceChildren();
-      const modes = visibleModes();
-      empty.classList.toggle('hidden', modes.length !== 0);
+      const allModes = visibleModes();
+      const isSmallScreen = window.matchMedia('(max-width: 620px)').matches;
+      const perPage = isSmallScreen ? (window.innerHeight <= 740 ? 1 : 2) : (window.innerHeight <= 820 ? 3 : 4);
+      const pageCount = Math.max(1, Math.ceil(allModes.length / perPage));
+      modePage = Math.min(modePage, pageCount - 1);
+      const modes = allModes.slice(modePage * perPage, modePage * perPage + perPage);
+      empty.classList.toggle('hidden', allModes.length !== 0);
       modes.forEach(mode => {
         const row = document.createElement('article');
         row.className = 'mode-row';
@@ -5671,8 +6018,13 @@
         row.append(icon, body, start);
         list.appendChild(row);
       });
+      pageStatus.textContent = `${allModes.length ? modePage + 1 : 0} / ${allModes.length ? pageCount : 0}`;
+      prevPage.disabled = modePage <= 0;
+      nextPage.disabled = modePage >= pageCount - 1 || allModes.length === 0;
+      pager.hidden = allModes.length <= perPage;
     }
-
+    prevPage.addEventListener('click', () => { modePage = Math.max(0, modePage - 1); renderModeList(); });
+    nextPage.addEventListener('click', () => { modePage += 1; renderModeList(); });
     categories.forEach(category => {
       const button = document.createElement('button');
       button.type = 'button';
@@ -5682,6 +6034,7 @@
       button.setAttribute('aria-pressed', category.id === activeCategory ? 'true' : 'false');
       button.addEventListener('click', () => {
         activeCategory = category.id;
+        modePage = 0;
         search.value = '';
         $$('.mode-filter', filterBar).forEach(node => {
           const active = node === button;
@@ -5693,6 +6046,7 @@
       filterBar.appendChild(button);
     });
     search.addEventListener('input', () => {
+      modePage = 0;
       if (search.value.trim()) activeCategory = 'all';
       $$('.mode-filter', filterBar).forEach(node => {
         const active = node.dataset.category === activeCategory;
@@ -5701,14 +6055,15 @@
       });
       renderModeList();
     });
-    wrapper.append(filterBar, list, empty);
+    wrapper.append(filterBar, list, pager, empty);
 
     const note = document.createElement('p');
     note.className = 'advanced-footnote';
     note.textContent = 'El examen a ciegas oculta los resultados hasta el final. El progreso y los errores se guardan en este dispositivo.';
     wrapper.appendChild(note);
     renderModeList();
-    openModal({ title: 'Modos de estudio · Versión 2.0', body: [wrapper] });
+    $('#mode-page-content').replaceChildren(wrapper);
+    showView('modes');
   }
 
   function syncBlockPickerLabel() {
@@ -5719,72 +6074,247 @@
     label.textContent = selected?.textContent || 'Selecciona un bloque';
   }
 
-  function buildBlockChooserModal() {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'block-picker-modal';
-    const intro = document.createElement('p');
-    intro.className = 'block-picker-modal-intro';
-    intro.textContent = 'Busca por nombre o explora los bloques agrupados por tipo. Puedes elegir otro bloque en cualquier momento.';
-    const searchWrap = document.createElement('label');
-    searchWrap.className = 'block-search-wrap';
-    searchWrap.innerHTML = '<span aria-hidden="true">⌕</span>';
-    const search = document.createElement('input');
-    search.type = 'search'; search.id = 'block-chooser-search';
-    search.placeholder = 'Buscar por palabra o bloque…';
-    search.setAttribute('aria-label', 'Buscar bloque de vocabulario');
-    searchWrap.appendChild(search);
-    const results = document.createElement('div');
-    results.className = 'block-chooser-results';
-    const empty = document.createElement('p');
-    empty.className = 'block-chooser-empty hidden';
-    empty.textContent = 'No encontré bloques que coincidan con la búsqueda.';
-    wrapper.append(intro, searchWrap, results, empty);
+  const vocabPickerState = { category: 'quick', difficulty: 'all', page: 0, query: '' };
 
-    const groups = [
-      { title: 'Selección rápida', items: [{ id: 'random', name: `Aleatoria · ${SESSION_SIZE} preguntas`, items: QUESTIONS }] },
-      { title: 'Bloques de práctica', items: BLOCKS },
-      { title: 'Expresiones similares', items: SIMILAR_BLOCKS },
-      { title: 'Bloques especiales', items: SPECIAL_BLOCKS }
+  const VOCAB_CATEGORY_DEFS = [
+    { id: 'quick', label: 'Selección rápida', icon: '⚡' },
+    { id: 'main', label: 'Bloques normales', icon: '▦' },
+    { id: 'difficulty', label: 'Por dificultad', icon: '◈' },
+    { id: 'similar', label: 'Expresiones similares', icon: '⇄' },
+    { id: 'special', label: 'Bloques especiales', icon: '✦' },
+    { id: 'all', label: 'Todos', icon: '☷' }
+  ];
+
+  function getVocabularyCandidates() {
+    const quick = [
+      { id: 'random', name: `Aleatoria · ${SESSION_SIZE} preguntas`, description: 'Una selección distinta cada sesión', group: 'quick', items: QUESTIONS, countLabel: `${SESSION_SIZE} preguntas al azar`, icon: '🎲', searchableItems: false },
+      { id: 'all-main', name: 'Todo el vocabulario principal', description: 'Practica la colección principal completa', group: 'quick', items: QUESTIONS, countLabel: `${QUESTIONS.length} preguntas`, icon: '📚', searchableItems: false },
+      { id: 'all-vocab', name: 'Principal + bloques especiales', description: 'Incluye la colección y los bloques especiales', group: 'quick', items: ALL_QUESTIONS, countLabel: `${ALL_QUESTIONS.length} preguntas`, icon: '🗂️', searchableItems: false }
     ];
+    const normal = BLOCKS.map(block => ({ ...block, group: 'main', icon: '▦', description: `Dificultad ${DIFF_LABEL[block.difficulty]?.toLowerCase() || 'intermedia'}`, countLabel: `${block.items.length} tarjetas`, searchableItems: true }));
+    const similar = SIMILAR_BLOCKS.map(block => ({ ...block, group: 'similar', icon: '⇄', description: 'Bloque normal para distinguir expresiones cercanas', countLabel: `${block.items.length} tarjetas`, searchableItems: true }));
+    const special = SPECIAL_BLOCKS.map(block => ({ ...block, group: 'special', icon: '✦', description: 'Colección especial independiente', countLabel: `${block.items.length} tarjetas`, searchableItems: true }));
+    return [...quick, ...normal, ...similar, ...special];
+  }
 
-    function render() {
-      const q = normalize(search.value);
-      results.replaceChildren();
-      let matches = 0;
-      groups.forEach(group => {
-        const items = group.items.filter(block => {
-          const vocabulary = (block.items || []).map(item => Array.isArray(item)
-            ? item.join(' ')
-            : [item.english, item.spanish, item.section].filter(Boolean).join(' ')).join(' ');
-          return normalize(`${block.name} ${group.title} ${block.items?.length || 0} ${vocabulary}`).includes(q);
-        });
-        if (!items.length) return;
-        matches += items.length;
-        const section = document.createElement('section'); section.className = 'block-chooser-group';
-        const heading = document.createElement('h3'); heading.textContent = group.title;
-        const list = document.createElement('div'); list.className = 'block-chooser-list';
-        items.forEach(block => {
-          const option = document.createElement('button'); option.type = 'button'; option.className = 'block-choice';
-          const name = document.createElement('span'); name.className = 'block-choice-name'; name.textContent = block.name;
-          const count = document.createElement('span'); count.className = 'block-choice-count';
-          count.textContent = block.id === 'random' ? `${SESSION_SIZE} preguntas aleatorias` : `${block.items?.length || 0} tarjetas`;
-          const arrow = document.createElement('span'); arrow.className = 'block-choice-arrow'; arrow.textContent = '→'; arrow.setAttribute('aria-hidden','true');
-          option.append(name, count, arrow);
-          if ($('#block-select').value === block.id) option.classList.add('is-selected');
-          option.addEventListener('click', () => {
-            $('#block-select').value = block.id;
-            syncBlockPickerLabel();
-            closeModal();
-          });
-          list.appendChild(option);
-        });
-        section.append(heading, list); results.appendChild(section);
-      });
-      empty.classList.toggle('hidden', matches > 0);
+  function getCandidateSearchText(candidate) {
+    const base = `${candidate.name} ${candidate.description || ''} ${candidate.group || ''} ${candidate.difficulty || ''}`;
+    if (!candidate.searchableItems) return normalize(base);
+    const words = (candidate.items || []).map(item => {
+      if (Array.isArray(item)) return item.join(' ');
+      return [item.english, item.spanish, item.section, item.note,
+        ...(item.englishVariants || []), ...(item.spanishVariants || [])].filter(Boolean).join(' ');
+    }).join(' ');
+    return normalize(`${base} ${words}`);
+  }
+
+  function selectedCandidateLabel(candidate) {
+    const select = el.blockSelect;
+    const option = select?.querySelector(`option[value="${candidate.id}"]`);
+    return option?.textContent || candidate.name;
+  }
+
+  function updateVocabSelectionSummary() {
+    const select = el.blockSelect;
+    const option = select?.options[select.selectedIndex];
+    const currentName = $('#vocab-current-name');
+    const currentCount = $('#vocab-current-count');
+    if (currentName) currentName.textContent = option?.textContent || 'Aleatoria';
+    if (currentCount) {
+      const value = select?.value || 'random';
+      if (value === 'random') currentCount.textContent = `${SESSION_SIZE} preguntas aleatorias por sesión`;
+      else if (value === 'all-main') currentCount.textContent = `${QUESTIONS.length} preguntas del vocabulario principal`;
+      else if (value === 'all-vocab') currentCount.textContent = `${ALL_QUESTIONS.length} tarjetas contando bloques especiales`;
+      else {
+        const block = findStudyBlock(value);
+        currentCount.textContent = block ? `${block.items.length} tarjetas · ${block.isConfusion ? 'expresiones similares' : block.isSpecial ? 'bloque especial' : DIFF_LABEL[block.difficulty] || 'bloque de vocabulario'}` : 'Contenido de estudio';
+      }
     }
-    search.addEventListener('input', render);
-    render();
-    openModal({ title: 'Elegir vocabulario', body: [wrapper] });
+  }
+
+  function vocabularyCandidateDetails(candidate) {
+    const count = candidate.countLabel || `${(candidate.items || []).length} tarjetas`;
+    if (candidate.group === 'quick') {
+      const descriptions = {
+        random: 'Selección nueva en cada sesión',
+        'all-main': 'Todo el vocabulario principal',
+        'all-vocab': 'Principal y bloques especiales juntos'
+      };
+      return `${count} · ${descriptions[candidate.id] || candidate.description || ''}`.trim();
+    }
+    const examples = (candidate.items || []).slice(0, 2).map(item => {
+      if (Array.isArray(item)) return item.slice(0, 2).filter(Boolean).join(' ↔ ');
+      const english = item?.english || item?.en || item?.term || '';
+      const spanish = item?.spanish || item?.es || item?.translation || '';
+      if (english && spanish) return `${english} ↔ ${spanish}`;
+      return english || spanish || item?.section || '';
+    }).filter(Boolean);
+    return examples.length ? `${count} · ${examples.join(' · ')}` : count;
+  }
+
+  function renderVocabularyPicker() {
+    const search = $('#vocab-search');
+    const grid = $('#vocab-card-grid');
+    const tabs = $('#vocab-category-tabs');
+    const diffFilters = $('#vocab-difficulty-filters');
+    const pager = $('#vocab-pagination');
+    if (!search || !grid || !tabs || !diffFilters || !pager) return;
+    const candidates = getVocabularyCandidates();
+
+    // Construye los controles de categoría una sola vez; sus estados son persistentes.
+    if (!tabs.dataset.ready) {
+      tabs.replaceChildren();
+      VOCAB_CATEGORY_DEFS.forEach(category => {
+        const button = document.createElement('button');
+        button.type = 'button'; button.className = 'vocab-category-btn';
+        button.dataset.category = category.id;
+        button.setAttribute('role', 'tab');
+        button.setAttribute('aria-selected', 'false');
+        const countMap = {
+          quick: candidates.filter(candidate => candidate.group === 'quick').length,
+          main: candidates.filter(candidate => candidate.group === 'main').length,
+          difficulty: 3,
+          similar: candidates.filter(candidate => candidate.group === 'similar').length,
+          special: candidates.filter(candidate => candidate.group === 'special').length,
+          all: candidates.length
+        };
+        const labelText = document.createElement('span');
+        labelText.className = 'vocab-category-label';
+        labelText.textContent = category.label;
+        const countText = document.createElement('small');
+        countText.className = 'vocab-category-count';
+        countText.textContent = String(countMap[category.id] ?? 0);
+        const iconText = document.createElement('span');
+        iconText.className = 'vocab-category-icon';
+        iconText.setAttribute('aria-hidden', 'true');
+        iconText.textContent = category.icon;
+        button.append(iconText, labelText, countText);
+        button.title = category.id === 'difficulty' ? 'Tres niveles de dificultad' : `${countMap[category.id] ?? 0} opciones`;
+        button.setAttribute('aria-label', `${category.label}: ${category.id === 'difficulty' ? 'tres niveles' : `${countMap[category.id] ?? 0} opciones`}`);
+        button.addEventListener('click', () => {
+          vocabPickerState.category = category.id;
+          vocabPickerState.page = 0;
+          vocabPickerState.difficulty = 'all';
+          search.value = '';
+          vocabPickerState.query = '';
+          $$('.vocab-category-btn', tabs).forEach(tab => {
+            const active = tab.dataset.category === category.id;
+            tab.classList.toggle('is-active', active);
+            tab.setAttribute('aria-selected', String(active));
+          });
+          renderVocabularyPicker();
+        });
+        tabs.appendChild(button);
+      });
+      tabs.dataset.ready = 'true';
+    }
+
+    if (!diffFilters.dataset.ready) {
+      const options = [
+        { id: 'all', label: 'Todas las dificultades' },
+        { id: 'easy', label: 'Regalada' },
+        { id: 'medium', label: 'Intermedia' },
+        { id: 'hard', label: 'Difícil' }
+      ];
+      diffFilters.replaceChildren();
+      options.forEach(opt => {
+        const button = document.createElement('button');
+        button.type = 'button'; button.className = 'vocab-difficulty-btn';
+        button.dataset.difficulty = opt.id; button.textContent = opt.label;
+        button.addEventListener('click', () => {
+          vocabPickerState.difficulty = opt.id;
+          vocabPickerState.page = 0;
+          renderVocabularyPicker();
+        });
+        diffFilters.appendChild(button);
+      });
+      diffFilters.dataset.ready = 'true';
+    }
+
+    vocabPickerState.query = search.value.trim();
+    const query = normalize(vocabPickerState.query);
+    let filtered;
+    const searching = Boolean(query);
+    if (searching) {
+      // Buscar palabras también encuentra los bloques que contienen esa tarjeta;
+      // las colecciones completas no aparecen como coincidencias engañosas.
+      filtered = candidates.filter(candidate => getCandidateSearchText(candidate).includes(query));
+    } else {
+      switch (vocabPickerState.category) {
+        case 'quick': filtered = candidates.filter(candidate => candidate.group === 'quick'); break;
+        case 'main': filtered = candidates.filter(candidate => candidate.group === 'main'); break;
+        case 'difficulty':
+          filtered = candidates.filter(candidate => candidate.group === 'main' && (vocabPickerState.difficulty === 'all' || candidate.difficulty === vocabPickerState.difficulty));
+          break;
+        case 'similar': filtered = candidates.filter(candidate => candidate.group === 'similar'); break;
+        case 'special': filtered = candidates.filter(candidate => candidate.group === 'special'); break;
+        default: filtered = candidates;
+      }
+    }
+
+    $$('.vocab-category-btn', tabs).forEach(tab => {
+      const active = searching ? tab.dataset.category === 'all' : tab.dataset.category === vocabPickerState.category;
+      tab.classList.toggle('is-active', active);
+      tab.setAttribute('aria-selected', String(active));
+    });
+    diffFilters.hidden = vocabPickerState.category !== 'difficulty' || searching;
+    $$('.vocab-difficulty-btn', diffFilters).forEach(button => button.classList.toggle('is-active', button.dataset.difficulty === vocabPickerState.difficulty));
+
+    const categoryTitle = searching ? `Resultados para «${vocabPickerState.query}»` : (VOCAB_CATEGORY_DEFS.find(x => x.id === vocabPickerState.category)?.label || 'Vocabulario');
+    $('#vocab-results-label').textContent = categoryTitle;
+    $('#vocab-results-count').textContent = `${filtered.length} ${filtered.length === 1 ? 'opción' : 'opciones'}`;
+
+    const isSmallScreen = window.matchMedia('(max-width: 620px)').matches;
+    const pageSize = isSmallScreen ? (window.innerHeight <= 740 ? 4 : 6) : (window.innerHeight <= 820 ? 6 : 8);
+    const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
+    vocabPickerState.page = Math.min(vocabPickerState.page, pageCount - 1);
+    const start = vocabPickerState.page * pageSize;
+    const pageItems = filtered.slice(start, start + pageSize);
+    grid.replaceChildren();
+
+    if (!pageItems.length) {
+      const empty = document.createElement('div'); empty.className = 'vocab-empty';
+      const title = document.createElement('strong'); title.textContent = 'No encontré coincidencias';
+      const detail = document.createElement('span'); detail.textContent = 'Prueba otra palabra, una parte de la expresión o cambia de categoría.';
+      empty.append(title, detail); grid.appendChild(empty);
+    } else {
+      const activeValue = el.blockSelect.value;
+      pageItems.forEach(candidate => {
+        const option = document.createElement('button');
+        option.type = 'button'; option.className = 'vocab-card';
+        option.classList.toggle('is-selected', activeValue === candidate.id);
+        option.setAttribute('aria-pressed', String(activeValue === candidate.id));
+        const icon = document.createElement('span'); icon.className = 'vocab-card-icon'; icon.textContent = candidate.icon || '▦'; icon.setAttribute('aria-hidden', 'true');
+        const copy = document.createElement('span'); copy.className = 'vocab-card-copy';
+        const name = document.createElement('strong'); name.textContent = candidate.name;
+        const detail = document.createElement('small');
+        detail.textContent = vocabularyCandidateDetails(candidate);
+        option.title = `${candidate.name}. ${candidate.description || ''} ${vocabularyCandidateDetails(candidate)}`.trim();
+        copy.append(name, detail);
+        const stateIcon = document.createElement('span'); stateIcon.className = 'vocab-card-state'; stateIcon.textContent = activeValue === candidate.id ? '✓' : '→'; stateIcon.setAttribute('aria-hidden', 'true');
+        option.append(icon, copy, stateIcon);
+        option.addEventListener('click', () => {
+          el.blockSelect.value = candidate.id;
+          syncBlockPickerLabel();
+          updateVocabSelectionSummary();
+          renderVocabularyPicker();
+        });
+        grid.appendChild(option);
+      });
+    }
+
+    $('#vocab-page-status').textContent = `${vocabPickerState.page + 1} / ${pageCount}`;
+    $('#vocab-prev').disabled = vocabPickerState.page <= 0;
+    $('#vocab-next').disabled = vocabPickerState.page >= pageCount - 1;
+    pager.hidden = filtered.length === 0;
+    updateVocabSelectionSummary();
+  }
+
+  function buildBlockChooserModal() {
+    // La elección ya no usa una lista modal larga: abre una página dedicada,
+    // con búsqueda global, filtros por tipo y paginación.
+    renderVocabularyPicker();
+    showView('vocabulary');
   }
 
   /* ======================================================================
@@ -5793,17 +6323,57 @@
   function selectedStudyBlock() {
     const value = el.blockSelect.value;
     if (value === 'random') {
-      return {
-        id: 'random',
-        name: 'Aleatoria',
-        items: shuffle(QUESTIONS).slice(0, SESSION_SIZE),
-        accent: 'var(--primary)'
-      };
+      return { id: 'random', name: `Aleatoria · ${SESSION_SIZE} preguntas`, items: shuffle(QUESTIONS).slice(0, SESSION_SIZE), accent: 'var(--primary)' };
+    }
+    if (value === 'all-main') {
+      return { id: 'all-main', name: 'Todo el vocabulario principal', items: QUESTIONS.slice(), accent: 'var(--primary)' };
+    }
+    if (value === 'all-vocab') {
+      return { id: 'all-vocab', name: 'Vocabulario principal + bloques especiales', items: ALL_QUESTIONS.slice(), accent: 'var(--primary)' };
     }
     return findStudyBlock(value);
   }
 
   $('#btn-choose-block').addEventListener('click', buildBlockChooserModal);
+
+  // Navegación principal entre páginas; cada área tiene su propio espacio.
+  $('#main-navigation').addEventListener('click', event => {
+    const button = event.target.closest('[data-page]');
+    if (!button) return;
+    const page = button.dataset.page;
+    if (page === 'vocabulary') { renderVocabularyPicker(); showView('vocabulary'); }
+    else if (page === 'modes') buildAdvancedModesModal();
+    else showView(page);
+  });
+
+  $('#vocab-search').addEventListener('input', () => {
+    vocabPickerState.page = 0;
+    renderVocabularyPicker();
+  });
+  $('#vocab-clear-search').addEventListener('click', () => {
+    $('#vocab-search').value = '';
+    vocabPickerState.query = '';
+    vocabPickerState.page = 0;
+    $('#vocab-search').focus();
+    renderVocabularyPicker();
+  });
+  $('#vocab-prev').addEventListener('click', () => {
+    vocabPickerState.page = Math.max(0, vocabPickerState.page - 1);
+    renderVocabularyPicker();
+  });
+  $('#vocab-next').addEventListener('click', () => {
+    vocabPickerState.page += 1;
+    renderVocabularyPicker();
+  });
+  $('#vocab-back-home').addEventListener('click', () => showView('setup'));
+  $('#vocab-start').addEventListener('click', () => {
+    const block = selectedStudyBlock();
+    if (block) startSession(block.items, 'practice');
+  });
+  $('#vocab-flashcards').addEventListener('click', () => {
+    const block = selectedStudyBlock();
+    if (block) startFlashcards(block.items, block.name);
+  });
 
   $('#btn-start').addEventListener('click', () => {
     const block = selectedStudyBlock();
@@ -5866,7 +6436,7 @@
   $('#btn-manage').addEventListener('click', buildManageModal);
   $('#btn-advanced-modes').addEventListener('click', buildAdvancedModesModal);
   el.btnManagePinned.addEventListener('click', buildPinnedBlocksModal);
-  $('#btn-explore').addEventListener('click', buildExploreModal);
+  $('#btn-explore').addEventListener('click', () => { renderVocabularyPicker(); showView('vocabulary'); $('#vocab-search').focus(); });
 
   el.resetBtn.addEventListener('click', () => {
     if (!confirm('¿Borrar TODO el progreso guardado? Esto incluye errores, revisar y estadísticas.')) return;
@@ -5950,6 +6520,9 @@
     initTheme();
     populateBlocks();
     syncBlockPickerLabel();
+    updateVocabSelectionSummary();
+    renderVocabularyPicker();
+    showView('setup');
     renderPinnedSpecialBlocks();
     setMode(db.settings.mode || 'EN-ES');
     updateCounters();
