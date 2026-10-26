@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Practicador de vocabulario inglés-español con categorías de dificultad, errores, repaso y estadísticas.">
 <meta name="theme-color" content="#4f46e5">
-<title>Practicador de Vocabulario · Versión 2.1</title>
+<title>Practicador de Vocabulario · Versión 2.1.1</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 
@@ -2334,13 +2334,13 @@
   }
 
 /* ================================================================
-   EFECTOS VISTOSOS · v2.1
+   EFECTOS VISTOSOS · v2.1.1
    ================================================================ */
 @keyframes fxRipple {
   to { transform: scale(4); opacity: 0; }
 }
 @keyframes fxWordReveal {
-  from { opacity: 0; transform: translateY(8px) rotateX(-30deg) scale(.92); filter: blur(6px); }
+  from { opacity: 0; transform: translateY(6px) rotateX(-18deg) scale(.98); filter: blur(3px); }
   to   { opacity: 1; transform: translateY(0) rotateX(0) scale(1); filter: blur(0); }
 }
 @keyframes fxNumberPop {
@@ -2385,7 +2385,8 @@
 /* Reveal del prompt por palabras */
 .prompt .prompt-word {
   display: inline-block;
-  animation: fxWordReveal .45s cubic-bezier(.2,.8,.2,1) both;
+  /* El reveal debe durar poco; el retraso escalonado también está limitado en JS. */
+  animation: fxWordReveal .30s cubic-bezier(.2,.8,.2,1) both;
   will-change: transform, opacity, filter;
 }
 
@@ -2435,7 +2436,7 @@
 <div class="app">
   <header class="topbar">
     <div class="topbar-left">
-      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v2.1</span>
+      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v2.1.1</span>
       <div class="brand">
         <div class="brand-mark">V</div>
         <div>
@@ -2559,7 +2560,7 @@
           </section>
         </details>
 
-        <div class="home-footer"><span>Practicador de Vocabulario <strong>v2.1</strong></span><span>El avance se guarda localmente.</span><button id="btn-reset" class="link-danger hidden" type="button" title="Borrar todo el progreso guardado">Borrar progreso</button><span id="total-progress" class="hidden"></span></div>
+        <div class="home-footer"><span>Practicador de Vocabulario <strong>v2.1.1</strong></span><span>El avance se guarda localmente.</span><button id="btn-reset" class="link-danger hidden" type="button" title="Borrar todo el progreso guardado">Borrar progreso</button><span id="total-progress" class="hidden"></span></div>
       </div>
     </section>
 
@@ -4489,6 +4490,27 @@ window.VOCAB_PRACTICE_CATALOG = {
   /* ======================================================================
      UI HELPERS
      ====================================================================== */
+  function restartCardShake() {
+    const card = el.wordCard;
+    if (!card) return;
+    // Las animaciones de entrada y error comparten la propiedad CSS animation.
+    // Quitamos la clase de entrada y reiniciamos shake sin temporizadores obsoletos.
+    card.classList.remove('session-card-enter', 'shake');
+    void card.offsetWidth;
+    card.classList.add('shake');
+  }
+
+  if (el.wordCard) {
+    el.wordCard.addEventListener('animationend', event => {
+      if (event.target !== el.wordCard) return;
+      if (event.animationName === 'sessionCardEnter') {
+        el.wordCard.classList.remove('session-card-enter');
+      } else if (event.animationName === 'shake') {
+        el.wordCard.classList.remove('shake');
+      }
+    });
+  }
+
   function showView(name) {
     Object.entries(views).forEach(([key, node]) => {
       if (!node) return;
@@ -5651,8 +5673,7 @@ window.VOCAB_PRACTICE_CATALOG = {
 
     if (!normalize(userAnswer) && !isTimeout) {
       el.input.focus();
-      el.wordCard.classList.add('shake');
-      setTimeout(() => el.wordCard.classList.remove('shake'), 400);
+      restartCardShake();
       return;
     }
 
@@ -5742,8 +5763,7 @@ window.VOCAB_PRACTICE_CATALOG = {
         el.feedback.replaceChildren();
       } else {
         el.input.classList.add('wrong');
-        el.wordCard.classList.add('shake');
-        setTimeout(() => el.wordCard.classList.remove('shake'), 420);
+        restartCardShake();
       }
 
       const slot = claimSlot(entry);
@@ -7570,7 +7590,7 @@ window.VOCAB_PRACTICE_CATALOG = {
 })();
 
 /* ================================================================
-   SISTEMA DE EFECTOS VISTOSOS · v2.1
+   SISTEMA DE EFECTOS VISTOSOS · v2.1.1
    Confetti en canvas, ripple, tilt 3D, reveal, count-up, racha
    ================================================================ */
 (function initFx(){
@@ -7705,7 +7725,6 @@ window.VOCAB_PRACTICE_CATALOG = {
   /* ---------- Reveal del prompt por letras ---------- */
   const prompt = document.getElementById('word-prompt');
   if (prompt){
-    let lastRevealed = '';
     const reveal = () => {
       const text = prompt.textContent;
       if (!text) return;
@@ -7717,7 +7736,8 @@ window.VOCAB_PRACTICE_CATALOG = {
         if (/^\s+$/.test(chunk)){ prompt.appendChild(document.createTextNode(chunk)); continue; }
         const span = document.createElement('span');
         span.className = 'prompt-word';
-        span.style.animationDelay = (i++ * 35) + 'ms';
+        /* Evita que las frases largas acumulen varios segundos de desenfoque. */
+        span.style.animationDelay = (Math.min(i++, 8) * 12) + 'ms';
         span.textContent = chunk;
         prompt.appendChild(span);
       }
@@ -7725,8 +7745,8 @@ window.VOCAB_PRACTICE_CATALOG = {
     new MutationObserver(() => {
       if (prompt.querySelector('.prompt-word')) return;
       const txt = prompt.textContent;
-      if (!txt || txt === lastRevealed) return;
-      lastRevealed = txt;
+      if (!txt) return;
+      // También anima de nuevo si una tarjeta repite exactamente el mismo término.
       reveal();
     }).observe(prompt, { childList: true, characterData: true, subtree: false });
   }
