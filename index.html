@@ -2333,6 +2333,88 @@
     #view-vocabulary .vocab-card-grid { min-height:0 !important; }
   }
 
+/* ================================================================
+   EFECTOS VISTOSOS · v2.1
+   ================================================================ */
+@keyframes fxRipple {
+  to { transform: scale(4); opacity: 0; }
+}
+@keyframes fxWordReveal {
+  from { opacity: 0; transform: translateY(8px) rotateX(-30deg) scale(.92); filter: blur(6px); }
+  to   { opacity: 1; transform: translateY(0) rotateX(0) scale(1); filter: blur(0); }
+}
+@keyframes fxNumberPop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.22); color: var(--primary); }
+  100% { transform: scale(1); }
+}
+@keyframes fxStreakFire {
+  0%,100% { transform: scale(1) rotate(-2deg);
+            filter: drop-shadow(0 0 5px rgba(245,158,11,.55)); }
+  50%     { transform: scale(1.12) rotate(2deg);
+            filter: drop-shadow(0 0 12px rgba(245,158,11,.9))
+                    drop-shadow(0 0 22px rgba(244,63,112,.4)); }
+}
+@keyframes fxCorrectBurst {
+  0%   { box-shadow: 0 0 0 0 rgba(16,185,129,.55); transform: scale(1); }
+  40%  { transform: scale(1.02); }
+  100% { box-shadow: 0 0 0 22px rgba(16,185,129,0); transform: scale(1); }
+}
+
+/* Canvas para partículas: encima de todo, sin bloquear clicks */
+#fx-canvas {
+  position: fixed; inset: 0; z-index: 9998;
+  width: 100%; height: 100%;
+  pointer-events: none;
+}
+
+/* Ripple: contenedor del efecto */
+.btn, .cat-btn, .vocab-card, .main-nav-btn,
+.session-nav-btn, .mode-row-start, .icon-btn,
+.pinned-block-open, .pinned-block-flash,
+.vocab-category-btn, .mode-filter { position: relative; overflow: hidden; }
+
+.fx-ripple {
+  position: absolute; border-radius: 50%;
+  transform: scale(0); pointer-events: none;
+  background: rgba(255,255,255,.55);
+  mix-blend-mode: overlay;
+  animation: fxRipple .55s ease-out forwards;
+}
+
+/* Reveal del prompt por palabras */
+.prompt .prompt-word {
+  display: inline-block;
+  animation: fxWordReveal .45s cubic-bezier(.2,.8,.2,1) both;
+  will-change: transform, opacity, filter;
+}
+
+/* Count-up en stats */
+.home-metric strong.fx-pop,
+.result-stats .stat strong.fx-pop { animation: fxNumberPop .55s cubic-bezier(.2,.8,.2,1); }
+
+/* Racha en llamas */
+.chip.streak.fx-fire { animation: fxStreakFire 1.25s ease-in-out infinite; }
+
+/* Pulso reforzado al acertar */
+.answer-input.correct { animation: fxCorrectBurst .65s cubic-bezier(.2,.8,.2,1); }
+
+/* Tilt 3D — pausar animación continua mientras el cursor está encima */
+.word-card:hover { animation-play-state: paused; }
+.word-card, .flashcard {
+  will-change: transform;
+  transform-style: preserve-3d;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #fx-canvas { display: none !important; }
+  .prompt .prompt-word,
+  .answer-input.correct,
+  .home-metric strong.fx-pop,
+  .chip.streak.fx-fire,
+  .fx-ripple { animation: none !important; }
+}
+ 
 </style>
 </head>
 <body>
@@ -7440,6 +7522,285 @@
   }
 
   init();
+})();
+
+ /* ================================================================
+   SISTEMA DE EFECTOS VISTOSOS · v2.1
+   Confetti en canvas, ripple, tilt 3D, reveal, count-up, racha
+   ================================================================ */
+(function initFx(){
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (window.__fxReady) return;
+  window.__fxReady = true;
+
+  /* ---------- Canvas + partículas ---------- */
+  const canvas = document.createElement('canvas');
+  canvas.id = 'fx-canvas';
+  canvas.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let rafId = null;
+
+  function resize(){
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width  = window.innerWidth  * dpr;
+    canvas.height = window.innerHeight * dpr;
+    canvas.style.width  = window.innerWidth  + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function tick(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const gravity = 0.18;
+    for (let i = particles.length - 1; i >= 0; i--){
+      const p = particles[i];
+      p.vy += gravity;
+      p.vx *= 0.994;
+      p.x  += p.vx;
+      p.y  += p.vy;
+      p.rot += p.vr;
+      p.life--;
+      if (p.life <= 0 || p.y > window.innerHeight + 40){ particles.splice(i,1); continue; }
+
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.globalAlpha = Math.max(0, p.life / p.maxLife);
+      ctx.fillStyle = p.color;
+
+      if (p.shape === 'circle'){
+        ctx.beginPath();
+        ctx.arc(0, 0, p.size * .5, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (p.shape === 'ribbon'){
+        ctx.fillRect(-p.size * .5, -p.size * .14, p.size, p.size * .28);
+      } else {
+        ctx.fillRect(-p.size * .4, -p.size * .4, p.size * .8, p.size * .8);
+      }
+      ctx.restore();
+    }
+    if (particles.length){ rafId = requestAnimationFrame(tick); }
+    else { rafId = null; ctx.clearRect(0, 0, canvas.width, canvas.height); }
+  }
+
+  function spawn(x, y, opts = {}){
+    const palette = opts.colors || ['#6858ff','#8f6bff','#38bdf8','#10b981','#fbbf24','#f43f70','#a855f7'];
+    const count = opts.count || 26;
+    const spread = opts.spread || 9;
+    const lift  = opts.lift || 5;
+    for (let i = 0; i < count; i++){
+      const ang = Math.random() * Math.PI * 2;
+      const spd = 2.5 + Math.random() * spread;
+      particles.push({
+        x, y,
+        vx: Math.cos(ang) * spd,
+        vy: Math.sin(ang) * spd - lift,
+        rot: Math.random() * Math.PI,
+        vr: (Math.random() - .5) * .32,
+        size: 5 + Math.random() * 7,
+        color: palette[(Math.random() * palette.length) | 0],
+        shape: Math.random() < .4 ? 'ribbon' : (Math.random() < .5 ? 'circle' : 'square'),
+        life: 70 + Math.random() * 50,
+        maxLife: 110
+      });
+    }
+    if (!rafId) rafId = requestAnimationFrame(tick);
+  }
+
+  function rain(opts = {}){
+    const palette = ['#6858ff','#8f6bff','#38bdf8','#10b981','#fbbf24','#f43f70','#a855f7','#22d3ee'];
+    const count = opts.count || 120;
+    for (let i = 0; i < count; i++){
+      particles.push({
+        x: Math.random() * window.innerWidth,
+        y: -20 - Math.random() * 220,
+        vx: (Math.random() - .5) * 3,
+        vy: 1.5 + Math.random() * 3.2,
+        rot: Math.random() * Math.PI,
+        vr: (Math.random() - .5) * .28,
+        size: 6 + Math.random() * 9,
+        color: palette[(Math.random() * palette.length) | 0],
+        shape: Math.random() < .5 ? 'ribbon' : 'square',
+        life: 220 + Math.random() * 90,
+        maxLife: 300
+      });
+    }
+    if (!rafId) rafId = requestAnimationFrame(tick);
+  }
+
+  window.__fx = { spawn, rain };
+
+  /* ---------- Ripple en botones ---------- */
+  document.addEventListener('pointerdown', ev => {
+    const el = ev.target.closest(
+      '.btn, .cat-btn, .vocab-card, .main-nav-btn, .session-nav-btn, ' +
+      '.mode-row-start, .icon-btn, .pinned-block-open, .pinned-block-flash, ' +
+      '.vocab-category-btn, .mode-filter'
+    );
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const size = Math.max(r.width, r.height) * 1.4;
+    const dot = document.createElement('span');
+    dot.className = 'fx-ripple';
+    dot.style.width = dot.style.height = size + 'px';
+    dot.style.left = (ev.clientX - r.left - size / 2) + 'px';
+    dot.style.top  = (ev.clientY - r.top  - size / 2) + 'px';
+    el.appendChild(dot);
+    setTimeout(() => dot.remove(), 620);
+  }, { passive: true });
+
+  /* ---------- Reveal del prompt por letras ---------- */
+  const prompt = document.getElementById('word-prompt');
+  if (prompt){
+    let lastRevealed = '';
+    const reveal = () => {
+      const text = prompt.textContent;
+      if (!text) return;
+      prompt.textContent = '';
+      const parts = text.split(/(\s+)/);
+      let i = 0;
+      for (const chunk of parts){
+        if (!chunk) continue;
+        if (/^\s+$/.test(chunk)){ prompt.appendChild(document.createTextNode(chunk)); continue; }
+        const span = document.createElement('span');
+        span.className = 'prompt-word';
+        span.style.animationDelay = (i++ * 35) + 'ms';
+        span.textContent = chunk;
+        prompt.appendChild(span);
+      }
+    };
+    new MutationObserver(() => {
+      if (prompt.querySelector('.prompt-word')) return;
+      const txt = prompt.textContent;
+      if (!txt || txt === lastRevealed) return;
+      lastRevealed = txt;
+      reveal();
+    }).observe(prompt, { childList: true, characterData: true, subtree: false });
+  }
+
+  /* ---------- Count-up en números de stats ---------- */
+  function animateNumber(node, target){
+    if (node.dataset.fxAnimating === '1') return;
+    if (node.dataset.fxTarget === String(target)) return;
+    node.dataset.fxTarget = String(target);
+    node.dataset.fxAnimating = '1';
+
+    const t0 = performance.now();
+    const dur = 550;
+    const step = t => {
+      const p = Math.min(1, (t - t0) / dur);
+      const eased = 1 - Math.pow(1 - p, 3);
+      node.textContent = Math.round(target * eased);
+      if (p < 1) requestAnimationFrame(step);
+      else {
+        node.textContent = target;
+        node.dataset.fxAnimating = '0';
+      }
+    };
+    node.classList.add('fx-pop');
+    setTimeout(() => node.classList.remove('fx-pop'), 580);
+    requestAnimationFrame(step);
+  }
+
+  ['stat-total','stat-streak','res-correct','res-wrong','res-valid'].forEach(id => {
+    const node = document.getElementById(id);
+    if (!node) return;
+    node.dataset.fxTarget = node.textContent.trim();
+    new MutationObserver(() => {
+      if (node.dataset.fxAnimating === '1') return;
+      const v = parseInt(node.textContent, 10);
+      if (!isNaN(v) && node.dataset.fxTarget !== String(v)) animateNumber(node, v);
+    }).observe(node, { childList: true, characterData: true, subtree: true });
+  });
+
+  /* ---------- Fuego en el chip de racha ---------- */
+  const streakChip = document.getElementById('chip-streak');
+  if (streakChip){
+    new MutationObserver(() => {
+      if (!streakChip.classList.contains('hidden')) streakChip.classList.add('fx-fire');
+      else streakChip.classList.remove('fx-fire');
+    }).observe(streakChip, { attributes: true, attributeFilter: ['class'] });
+  }
+
+  /* ---------- Confetti al acertar ---------- */
+  const form  = document.getElementById('answer-form');
+  const input = document.getElementById('answer-input');
+  if (form && input){
+    form.addEventListener('submit', () => {
+      setTimeout(() => {
+        const fb = document.getElementById('feedback');
+        if (!fb || fb.hidden || !fb.classList.contains('success')) return;
+        const r = input.getBoundingClientRect();
+        spawn(r.left + r.width / 2, r.top + r.height / 2, {
+          count: 30, spread: 10, lift: 7,
+          colors: ['#10b981','#34d399','#6ee7b7','#fbbf24','#38bdf8','#6858ff']
+        });
+        // Spark extra en el chip de racha si está visible
+        if (streakChip && !streakChip.classList.contains('hidden')){
+          const sr = streakChip.getBoundingClientRect();
+          spawn(sr.left + sr.width / 2, sr.top + sr.height / 2, {
+            count: 14, spread: 5, lift: 3,
+            colors: ['#fbbf24','#f97316','#f43f5e']
+          });
+        }
+      }, 60);
+    });
+  }
+
+  /* ---------- Confetti al terminar con buena nota ---------- */
+  const resultsView = document.getElementById('view-results');
+  if (resultsView){
+    new MutationObserver(() => {
+      if (!resultsView.classList.contains('is-active')) return;
+      const acc = (document.getElementById('res-accuracy')?.textContent || '').trim();
+      const pct = parseInt(acc, 10);
+      if (isNaN(pct)) return;
+      if (pct >= 90)      setTimeout(() => rain({ count: 180 }), 280);
+      else if (pct >= 70) setTimeout(() => rain({ count: 120 }), 280);
+      else if (pct >= 50) setTimeout(() => rain({ count: 60  }), 280);
+    }).observe(resultsView, { attributes: true, attributeFilter: ['class'] });
+  }
+
+  /* ---------- Tilt 3D en tarjeta de práctica y flashcard ---------- */
+  function addTilt(el, max = 5){
+    if (!el) return;
+    let frame = null;
+    el.addEventListener('pointermove', ev => {
+      if (window.matchMedia('(hover: none)').matches) return;
+      const r = el.getBoundingClientRect();
+      const px = (ev.clientX - r.left) / r.width  - .5;
+      const py = (ev.clientY - r.top ) / r.height - .5;
+      if (frame) cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        el.style.transform =
+          `perspective(900px) rotateX(${-py * max}deg) rotateY(${px * max}deg)`;
+      });
+    });
+    el.addEventListener('pointerleave', () => {
+      if (frame) cancelAnimationFrame(frame);
+      el.style.transform = '';
+    });
+  }
+  addTilt(document.getElementById('word-card'), 4);
+  addTilt(document.getElementById('flashcard'), 6);
+
+  /* ---------- Botón principal magnético ---------- */
+  const primaryBtn = document.getElementById('btn-start');
+  if (primaryBtn && !window.matchMedia('(hover: none)').matches){
+    primaryBtn.addEventListener('pointermove', ev => {
+      const r = primaryBtn.getBoundingClientRect();
+      const px = (ev.clientX - r.left) / r.width  - .5;
+      const py = (ev.clientY - r.top ) / r.height - .5;
+      primaryBtn.style.transform = `translate(${px * 6}px, ${py * 4}px)`;
+    });
+    primaryBtn.addEventListener('pointerleave', () => {
+      primaryBtn.style.transform = '';
+    });
+  }
 })();
 </script>
 </body>
