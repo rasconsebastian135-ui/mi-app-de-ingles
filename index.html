@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Practicador de vocabulario inglés-español con categorías de dificultad, errores, repaso y estadísticas.">
 <meta name="theme-color" content="#4f46e5">
-<title>Practicador de Vocabulario · Versión 2.1.1</title>
+<title>Practicador de Vocabulario · Versión 2.3</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 
@@ -2436,7 +2436,7 @@
 <div class="app">
   <header class="topbar">
     <div class="topbar-left">
-      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v2.1.1</span>
+      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v2.3</span>
       <div class="brand">
         <div class="brand-mark">V</div>
         <div>
@@ -2473,7 +2473,7 @@
       <div class="home-dashboard">
         <header class="home-intro">
           <div class="home-intro-copy">
-            <p class="home-eyebrow">TU ESPACIO DE ESTUDIO <span>·</span> VERSIÓN 2.1</p>
+            <p class="home-eyebrow">TU ESPACIO DE ESTUDIO <span>·</span> VERSIÓN 2.3</p>
             <h2 id="setup-title">¿Qué vas a practicar hoy?</h2>
             <p>Elige el vocabulario, selecciona la dirección y empieza. Las opciones avanzadas están aparte para que no estorben.</p>
           </div>
@@ -2560,7 +2560,7 @@
           </section>
         </details>
 
-        <div class="home-footer"><span>Practicador de Vocabulario <strong>v2.1.1</strong></span><span>El avance se guarda localmente.</span><button id="btn-reset" class="link-danger hidden" type="button" title="Borrar todo el progreso guardado">Borrar progreso</button><span id="total-progress" class="hidden"></span></div>
+        <div class="home-footer"><span>Practicador de Vocabulario <strong>v2.3</strong></span><span>El avance se guarda localmente.</span><button id="btn-reset" class="link-danger hidden" type="button" title="Borrar todo el progreso guardado">Borrar progreso</button><span id="total-progress" class="hidden"></span></div>
       </div>
     </section>
 
@@ -3803,7 +3803,153 @@ window.VOCAB_PRACTICE_CATALOG = {
         ['Neither... nor', 'Ni... ni'],
         ['Alternatively', 'Alternativamente']
       ]
-    }
+    },
+    {
+      id: 'confusion-false-friends',
+      name: 'FALSOS AMIGOS · Palabras que engañan por parecerse al español',
+      accent: '#ea580c',
+      items: [
+        ['Actually', 'En realidad / de hecho', 'ACTUALLY no significa normalmente “actualmente”. Para “actualmente”, usa CURRENTLY.'],
+        ['Currently', 'Actualmente / en este momento', 'CURRENTLY = ahora o en el presente. ACTUALLY = en realidad; corrige una idea o expectativa.'],
+        ['Attend', 'Asistir a una clase o evento', 'ATTEND = estar presente en una clase o evento. ATTEND TO alguien/algo también puede significar atender. ASSIST = ayudar.'],
+        ['Assist', 'Ayudar / prestar ayuda', 'ASSIST = ayudar. ATTEND a class/meeting = asistir a una clase o reunión.'],
+        ['Sensible', 'Sensato / razonable', 'SENSIBLE en inglés suele ser sensato. SENSITIVE significa sensible en lo emocional o físico.'],
+        ['Sensitive', 'Sensible / que reacciona fácilmente', 'SENSITIVE = sensible o susceptible. SENSIBLE = sensato, razonable.'],
+        ['Library', 'Biblioteca', 'LIBRARY = biblioteca. BOOKSTORE = tienda que vende libros; eso es una librería en español.'],
+        ['Bookstore', 'Librería / tienda de libros', 'BOOKSTORE vende libros. LIBRARY es una biblioteca donde lees o pides libros prestados.'],
+        ['Recipe', 'Receta de cocina', 'RECIPE = instrucciones para preparar comida. RECEIPT = recibo o comprobante de compra.'],
+        ['Receipt', 'Recibo / comprobante de compra', 'RECEIPT demuestra una compra o un pago. RECIPE explica cómo preparar comida.'],
+        ['Eventually', 'Finalmente / con el tiempo', 'EVENTUALLY = al final, después de un tiempo. No suele significar “eventualmente” en el sentido de “de vez en cuando”.'],
+        ['Occasionally', 'Ocasionalmente / de vez en cuando', 'OCCASIONALLY = algunas veces. “Eventualmente” en español a menudo se expresa así o con POSSIBLY, según el contexto.'],
+        ['Realize', 'Darse cuenta de algo', 'REALIZE suele significar “darse cuenta”. Para “realizar una tarea”, usa DO, CARRY OUT o PERFORM, según el contexto.'],
+        ['Perform', 'Ejecutar / realizar una acción', 'PERFORM = ejecutar una tarea o actuación. REALIZE = darse cuenta de algo.'],
+        ['Embarrassed', 'Avergonzado / con vergüenza', 'EMBARRASSED = sentir vergüenza. PREGNANT = embarazada.'],
+        ['Pregnant', 'Embarazada', 'PREGNANT = embarazada. EMBARRASSED = avergonzado o con vergüenza.'],
+        ['Deception', 'Engaño', 'DECEPTION = engaño. “Decepción” suele ser DISAPPOINTMENT.'],
+        ['Disappointment', 'Decepción / desilusión', 'DISAPPOINTMENT = decepción. DECEPTION = engaño.'],
+        ['Sympathetic', 'Comprensivo / compasivo', 'SYMPATHETIC suele describir a alguien que comprende tu problema. “Simpático” como agradable suele ser FRIENDLY o NICE.'],
+        ['Friendly', 'Amable / simpático', 'FRIENDLY = amable o sociable. SYMPATHETIC = comprensivo o compasivo ante un problema.'],
+        ['Constipated', 'Estreñido', 'CONSTIPATED = estreñido. Para “estar constipado” en el sentido de tener un resfriado, di HAVE A COLD.'],
+        ['Cold', 'Resfriado / frío', 'HAVE A COLD = estar resfriado. CONSTIPATED significa estreñido, no constipado.'],
+        ['Pretend', 'Fingir', 'PRETEND = fingir. “Pretender” en el sentido de tener intención de hacer algo suele ser INTEND TO.'],
+        ['Intend', 'Tener intención de / proponerse', 'INTEND TO = tener intención de hacer algo. PRETEND = fingir que algo es cierto.'],
+        ['Success', 'Éxito', 'SUCCESS = éxito. SUCESO en español suele ser EVENT o INCIDENT, según el caso.'],
+        ['Event', 'Suceso / acontecimiento', 'EVENT = suceso o acontecimiento. SUCCESS = éxito; se parecen a “éxito” y “suceso”, pero no significan lo mismo.'],
+        ['Exit', 'Salida', 'EXIT = salida. “Éxito” es SUCCESS; EXIT no significa éxito.'],
+        ['Carpet', 'Alfombra', 'CARPET = alfombra. “Carpeta” (para papeles o archivos) es FOLDER.'],
+        ['Folder', 'Carpeta / directorio de archivos', 'FOLDER = carpeta. CARPET = alfombra.'],
+        ['Fabric', 'Tela / tejido', 'FABRIC = tela. “Fábrica” es FACTORY.'],
+        ['Factory', 'Fábrica', 'FACTORY = fábrica. FABRIC = tela o tejido.'],
+        ['Parents', 'Padres', 'PARENTS = padres. “Parientes” es RELATIVES.'],
+        ['Relatives', 'Parientes / familiares', 'RELATIVES = parientes. PARENTS = padres.'],
+        ['College', 'Universidad / centro de educación superior', 'COLLEGE suele ser educación superior, según el país. “Colegio” normalmente es SCHOOL; no son equivalentes automáticos.'],
+        ['School', 'Escuela / colegio', 'SCHOOL suele ser escuela o colegio. COLLEGE suele referirse a estudios superiores en inglés estadounidense.'],
+        ['Lecture', 'Conferencia / clase magistral', 'LECTURE = charla o clase impartida. “Lectura” es READING.'],
+        ['Reading', 'Lectura', 'READING = lectura. LECTURE = conferencia o clase impartida.'],
+        ['Idiom', 'Modismo / expresión idiomática', 'IDIOM = expresión cuyo sentido no siempre se deduce de sus palabras. “Idioma” es LANGUAGE.'],
+        ['Language', 'Idioma / lengua', 'LANGUAGE = idioma. IDIOM = modismo o expresión idiomática.'],
+        ['Notice', 'Aviso / notificación; notar', 'NOTICE puede ser un aviso o el verbo “notar”. “Noticia” suele ser NEWS.'],
+        ['News', 'Noticias / información noticiosa', 'NEWS = noticias y normalmente es incontable en inglés. NOTICE = aviso o notificación.'],
+        ['Contest', 'Concurso / competición', 'CONTEST suele ser un concurso. El verbo español “contestar” es ANSWER o RESPOND.'],
+        ['Answer', 'Responder / respuesta', 'ANSWER = responder o respuesta. CONTEST suele ser concurso; como verbo, puede significar impugnar o cuestionar.'],
+        ['Preservative', 'Conservante', 'PRESERVATIVE = sustancia que conserva alimentos o productos. “Preservativo” es CONDOM.'],
+        ['Condom', 'Preservativo / condón', 'CONDOM = preservativo. PRESERVATIVE = conservante.'],
+        ['Support', 'Apoyar / respaldar', 'SUPPORT = apoyar. “Soportar” en el sentido de tolerar suele ser PUT UP WITH o ENDURE.'],
+        ['Endure', 'Soportar / aguantar algo difícil', 'ENDURE = soportar o resistir algo difícil. SUPPORT normalmente significa apoyar o respaldar.'],
+        ['Large', 'Grande / de gran tamaño', 'LARGE = grande. “Largo” es LONG.'],
+        ['Long', 'Largo / de gran longitud', 'LONG = largo en distancia o duración. LARGE = grande en tamaño o cantidad.'],
+        ['Succeed', 'Tener éxito / lograr algo', 'SUCCEED = tener éxito o lograr algo. “Suceder” es HAPPEN o OCCUR.'],
+        ['Happen', 'Ocurrir / suceder', 'HAPPEN = ocurrir. SUCCEED = tener éxito; no traduzcas “suceder” por SUCCEED.'],
+        ['Comprehensive', 'Completo / exhaustivo / integral', 'COMPREHENSIVE = que cubre mucho o todo. “Comprensivo” (que entiende a los demás) suele ser UNDERSTANDING.'],
+        ['Understanding', 'Comprensivo / que entiende a los demás', 'UNDERSTANDING puede significar comprensivo como adjetivo. COMPREHENSIVE = completo o exhaustivo.'],
+        ['Resume', 'Reanudar / retomar', 'RESUME como verbo = reanudar. “Resumir” es SUMMARIZE. (Resume también puede ser CV en inglés estadounidense.)'],
+        ['Summarize', 'Resumir', 'SUMMARIZE = hacer un resumen. RESUME como verbo = continuar o reanudar.'],
+        ['Commodity', 'Mercancía / producto básico', 'COMMODITY = mercancía o materia prima. “Comodidad” suele ser COMFORT o COMFORTABLE, según la frase.'],
+        ['Comfort', 'Comodidad / consuelo', 'COMFORT = comodidad o consuelo. COMMODITY = mercancía o producto básico.'],
+        ['Casualty', 'Víctima / persona afectada por un accidente o conflicto', 'CASUALTY = víctima o persona herida/fallecida en un accidente o conflicto. “Casualidad” es COINCIDENCE.'],
+        ['Coincidence', 'Casualidad / coincidencia', 'COINCIDENCE = casualidad. CASUALTY = víctima o persona afectada por un accidente o conflicto.'],
+        ['Educated', 'Con educación / instruido', 'EDUCATED suele referirse a formación o estudios. “Educado” en el sentido de cortés suele ser POLITE.'],
+        ['Polite', 'Cortés / educado en el trato', 'POLITE = cortés. EDUCATED = con formación o estudios; puede traducirse como educado en otro sentido.'],
+        ['Argument', 'Discusión / argumento razonado', 'ARGUMENT suele ser discusión o conjunto de razones. “Argumento” de una película o novela suele ser PLOT.'],
+        ['Plot', 'Trama / argumento de una historia', 'PLOT = trama de una historia. ARGUMENT suele ser discusión o razonamiento.'],
+        ['Career', 'Carrera profesional / trayectoria laboral', 'CAREER = trayectoria profesional. “Carrera” como competición de velocidad es RACE.'],
+        ['Race', 'Carrera / competición', 'RACE = carrera o competición. CAREER = trayectoria profesional.'],
+        ['Billion', 'Mil millones (1,000,000,000)', 'En inglés actual de uso general, BILLION suele ser 1,000,000,000. En la escala larga tradicional del español, “billón” es 1,000,000,000,000.'],
+        ['Actual', 'Real / verdadero', 'ACTUAL como adjetivo inglés significa real o verdadero. “Actualmente” es CURRENTLY; ACTUALLY significa “en realidad”.']
+      ]
+    },
+    {
+      id: 'confusion-connectors',
+      name: 'CONECTORES · Traducciones parecidas, usos distintos',
+      accent: '#0f766e',
+      items: [
+        ['Although', 'Aunque', 'ALTHOUGH introduce una oración con sujeto y verbo: Although it was late, we stayed. DESPITE necesita un sustantivo o verbo en -ing, salvo “despite the fact that…”.'],
+        ['Even though', 'Aunque / a pesar de que', 'EVEN THOUGH enfatiza el contraste con un hecho real: Even though it rained, we went out. EVEN IF plantea una condición hipotética.'],
+        ['Though', 'Aunque', 'THOUGH es parecido a ALTHOUGH y suele ser más flexible; también puede aparecer al final: It was good, though.'],
+        ['Despite', 'A pesar de', 'DESPITE va seguido de un sustantivo o verbo en -ing: despite the rain / despite being tired. ALTHOUGH va seguido de una oración.'],
+        ['In spite of', 'A pesar de', 'IN SPITE OF tiene la misma estructura que DESPITE: in spite of the rain. No pongas directamente sujeto + verbo después de OF.'],
+        ['However', 'Sin embargo', 'HOWEVER conecta ideas contrastantes y suele llevar puntuación propia: It was late. However, we stayed. BUT suele unir ideas dentro de una misma oración.'],
+        ['Nevertheless', 'No obstante / aun así', 'NEVERTHELESS significa “aun así” y suele sonar más formal; presenta algo que ocurre pese a lo anterior.'],
+        ['Even so', 'Aun así', 'EVEN SO presenta un resultado que sorprende o contradice lo esperado a partir de lo anterior. Se parece a NEVERTHELESS.'],
+        ['Whereas', 'Mientras que', 'WHEREAS compara o contrapone dos hechos: I like tea, whereas he likes coffee. No suele expresar simultaneidad temporal.'],
+        ['While', 'Mientras / mientras que', 'WHILE puede indicar simultaneidad (“mientras”) o contraste (“mientras que”). WHEREAS se usa principalmente para contrastar.'],
+        ['Instead', 'En su lugar / en vez de eso', 'INSTEAD suele reemplazar una acción o cosa: We stayed home instead. INSTEAD OF va antes de un sustantivo o verbo en -ing.'],
+        ['Instead of', 'En lugar de', 'INSTEAD OF + sustantivo o verbo en -ing: instead of driving. INSTEAD puede aparecer solo: We walked instead.'],
+        ['Rather', 'Más bien / en realidad', 'RATHER puede corregir o precisar una idea. RATHER THAN significa “en vez de” cuando se compara o elige entre opciones.'],
+        ['Rather than', 'En vez de / en lugar de', 'RATHER THAN presenta una alternativa: walk rather than drive. INSTEAD OF también significa “en lugar de”, pero la estructura puede variar.'],
+        ['Otherwise', 'De lo contrario / si no', 'OTHERWISE advierte qué ocurrirá si no se hace algo: Hurry up; otherwise, we’ll be late. No significa simplemente “en otro lugar”.'],
+        ['Because', 'Porque', 'BECAUSE va seguido de una oración: because it rained. BECAUSE OF va seguido de un sustantivo o frase nominal: because of the rain.'],
+        ['Because of', 'Por / debido a', 'BECAUSE OF + sustantivo: because of the rain. BECAUSE + sujeto y verbo: because it rained.'],
+        ['Due to', 'Debido a', 'DUE TO suele ir seguido de un sustantivo o frase nominal: due to the weather. Es parecido a BECAUSE OF.'],
+        ['Owing to', 'Debido a / a causa de', 'OWING TO tiene sentido parecido a DUE TO y suele ser más formal: owing to bad weather.'],
+        ['Since', 'Ya que / desde', 'SINCE puede significar “ya que” al explicar una causa, o “desde” al hablar del tiempo: Since you’re here… / since Monday. El contexto decide.'],
+        ['As', 'Como / ya que / mientras', 'AS tiene varios usos: causa (as I was tired), tiempo (as I arrived) o comparación. No lo traduzcas siempre igual; el contexto importa.'],
+        ['Therefore', 'Por lo tanto', 'THEREFORE introduce una consecuencia lógica y suele sonar formal. SO también significa “así que”, pero es más común en conversación.'],
+        ['Consequently', 'Por consiguiente / como consecuencia', 'CONSEQUENTLY enfatiza que algo ocurrió como consecuencia de lo anterior; es más formal que SO.'],
+        ['Thus', 'Por tanto / así pues', 'THUS expresa consecuencia o resultado y suele ser formal o académico. THEREFORE es una alternativa cercana.'],
+        ['Hence', 'Por tanto / de ahí', 'HENCE expresa consecuencia y es bastante formal: Hence the decision. En conversación suele ser más natural SO o THAT’S WHY.'],
+        ['As a result', 'Como resultado / como consecuencia', 'AS A RESULT destaca el resultado producido por algo. CONSEQUENTLY cumple una función parecida, pero es un adverbio.'],
+        ['So', 'Así que / por eso', 'SO puede introducir una consecuencia: It was raining, so we stayed home. SO también puede significar “tan” en so big; mira la estructura.'],
+        ['Moreover', 'Además / es más', 'MOREOVER añade un argumento o dato y suele ser formal. ALSO es más cotidiano y normalmente se integra dentro de la oración.'],
+        ['Furthermore', 'Además / es más', 'FURTHERMORE añade información que refuerza un argumento; es formal y parecido a MOREOVER.'],
+        ['In addition', 'Además', 'IN ADDITION añade otro dato o argumento. IN ADDITION TO va seguido de un sustantivo o verbo en -ing.'],
+        ['Besides', 'Además / aparte de', 'BESIDES puede añadir otro argumento (“además”) o significar “aparte de”. No siempre equivale al ALSO más neutro.'],
+        ['Also', 'También', 'ALSO suele ir antes del verbo principal, pero después de BE: I also work / She is also here. TOO y AS WELL suelen ir al final.'],
+        ['Too', 'También', 'TOO con sentido de “también” suele ir al final: I want one too. Para “demasiado”, aparece en usos como too expensive.'],
+        ['As well', 'También', 'AS WELL significa “también” y suele ir al final: She came as well. ALSO normalmente va dentro de la oración.'],
+        ['In fact', 'De hecho', 'IN FACT añade una precisión, confirma o corrige una impresión: I thought he was older. In fact, he is 20.'],
+        ['Indeed', 'En efecto / ciertamente', 'INDEED enfatiza o confirma algo, a veces con tono formal. IN FACT suele presentar una precisión o corregir una impresión previa.'],
+        ['For example', 'Por ejemplo', 'FOR EXAMPLE introduce un caso concreto. FOR INSTANCE casi siempre puede sustituirlo; la diferencia suele ser de estilo, no de significado.'],
+        ['For instance', 'Por ejemplo', 'FOR INSTANCE significa prácticamente lo mismo que FOR EXAMPLE. Ambos presentan un ejemplo específico.'],
+        ['Such as', 'Como / tales como', 'SUCH AS introduce ejemplos, normalmente antes de nombres: fruits such as apples. LIKE también puede dar ejemplos, especialmente de manera informal.'],
+        ['Like', 'Como / parecido a', 'LIKE expresa similitud y también se usa informalmente para introducir ejemplos. SUCH AS señala ejemplos concretos de una categoría.'],
+        ['Finally', 'Finalmente / por último', 'FINALLY suele ordenar pasos o indicar el último punto. EVENTUALLY significa que algo ocurrió después de cierto tiempo.'],
+        ['Eventually', 'Finalmente / con el tiempo', 'EVENTUALLY indica que algo pasó al cabo de un tiempo. FINALLY puede significar el último paso de una lista: Finally, add salt.'],
+        ['In the end', 'Al final', 'IN THE END destaca el resultado final después de un proceso: In the end, we agreed. AT THE END indica el final de algo concreto.'],
+        ['Ultimately', 'En última instancia / a fin de cuentas', 'ULTIMATELY destaca el resultado o la conclusión más importante. FINALLY suele indicar secuencia o que algo ocurrió tras esperar.'],
+        ['At last', 'Por fin', 'AT LAST suele transmitir que algo esperado tardó en llegar: At last, the bus came. FINALLY es más neutral.'],
+        ['Then', 'Luego / entonces', 'THEN puede indicar el siguiente paso (“luego”) o una consecuencia (“entonces”). AFTERWARDS significa después de un evento.'],
+        ['Afterwards', 'Después / posteriormente', 'AFTERWARDS significa después de lo que se acaba de mencionar. MEANWHILE significa que algo pasa durante el mismo periodo.'],
+        ['Meanwhile', 'Mientras tanto', 'MEANWHILE presenta algo que ocurre al mismo tiempo que otra situación. AFTERWARDS indica que ocurre más tarde.'],
+        ['In the meantime', 'Mientras tanto / entretanto', 'IN THE MEANTIME describe el intervalo antes de que ocurra otra cosa; MEANWHILE destaca acciones simultáneas. A menudo son intercambiables.'],
+        ['Until', 'Hasta que', 'UNTIL marca el límite temporal: wait until Friday. BY THE TIME significa “para cuando” y suele indicar qué ya habrá ocurrido en ese momento.'],
+        ['By the time', 'Para cuando / cuando ya', 'BY THE TIME sitúa un hecho respecto de otro momento, a menudo algo ya completado: By the time I arrived, she had left.'],
+        ['Once', 'Una vez que / cuando', 'ONCE puede significar “una vez que” para indicar que algo sucede después de cumplirse una condición. ONCE también puede significar “una vez” como frecuencia.'],
+        ['Unless', 'A menos que / si no', 'UNLESS significa aproximadamente IF… NOT: You won’t pass unless you study. No equivale a EVERY TIME o “hasta que”.'],
+        ['Even if', 'Incluso si / aunque', 'EVEN IF plantea una condición hipotética que no cambiaría el resultado. EVEN THOUGH presenta un hecho real que contrasta con el resultado.'],
+        ['Provided that', 'Siempre que / con tal de que', 'PROVIDED THAT establece una condición necesaria y suele ser formal. AS LONG AS puede expresar la misma condición de forma más cotidiana.'],
+        ['As long as', 'Siempre que / mientras', 'AS LONG AS puede significar “siempre que” como condición o “mientras” hablando de duración; el contexto es clave.'],
+        ['In case', 'Por si / en caso de que', 'IN CASE expresa precaución ante algo posible: Take an umbrella in case it rains. IF presenta una condición más directa.'],
+        ['In case of', 'En caso de + sustantivo', 'IN CASE OF va seguido de un sustantivo: in case of fire. IN CASE normalmente va seguido de una oración: in case there is a fire.'],
+        ['Whether', 'Si / si acaso (entre opciones)', 'WHETHER se usa en alternativas o dudas indirectas: I don’t know whether to go. IF suele introducir una condición.'],
+        ['As well as', 'Además de / así como', 'AS WELL AS conecta elementos y significa “además de” o “así como”. ALSO significa “también” y suele colocarse dentro de la oración.'],
+        ['In other words', 'En otras palabras', 'IN OTHER WORDS reformula la misma idea para aclararla. FOR EXAMPLE no reformula: presenta un caso específico.'],
+        ['That is to say', 'Es decir', 'THAT IS TO SAY aclara o reformula algo, con tono formal. FOR INSTANCE introduce un ejemplo, no una reformulación.'],
+        ['In short', 'En resumen / en pocas palabras', 'IN SHORT resume la idea. IN THE END habla del resultado final después de un proceso; no son intercambiables.'],
+        ['On the whole', 'En general', 'ON THE WHOLE resume una valoración global (“en general”). ALL IN ALL es muy parecido y también concluye una valoración.'],
+        ['All in all', 'En general / en conjunto / a fin de cuentas', 'ALL IN ALL resume una valoración de conjunto. IN CONCLUSION suele marcar explícitamente una conclusión, especialmente en textos.']
+      ]
+    },
   ],
   similarBlockDefs: [
     {
@@ -4005,9 +4151,9 @@ window.VOCAB_PRACTICE_CATALOG = {
 (() => {
   'use strict';
 
-  // VERSIÓN DE LA APP: 2.1
+  // VERSIÓN DE LA APP: 2.3
   // IMPORTANTE: CAMBIA APP_VERSION SIEMPRE QUE AGREGUES O MODIFIQUES FUNCIONALIDAD.
-  const APP_VERSION = '2.1';
+  const APP_VERSION = '2.3';
 
   const CATALOG = window.VOCAB_PRACTICE_CATALOG;
   if (
@@ -4163,7 +4309,7 @@ window.VOCAB_PRACTICE_CATALOG = {
 
   const SPECIAL_BLOCKS = SPECIAL_BLOCK_DEFS.map(block => ({
     ...block,
-    items: block.items.map(([english, spanish], index) => ({
+    items: block.items.map(([english, spanish, note = ''], index) => ({
       uid: `${block.id}::${index + 1}`,
       sourceId: `${block.id}::${index + 1}`,
       blockId: block.id,
@@ -4174,7 +4320,7 @@ window.VOCAB_PRACTICE_CATALOG = {
       spanishVariants: splitVariants(spanish),
       difficulty: 'special',
       repeated: false,
-      note: ''
+      note: String(note || '')
     }))
   }));
 
