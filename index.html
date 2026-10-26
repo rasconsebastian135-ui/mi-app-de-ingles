@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Practicador de vocabulario inglés-español con categorías de dificultad, errores, repaso y estadísticas.">
 <meta name="theme-color" content="#4f46e5">
-<title>Practicador de Vocabulario · Versión 2.0</title>
+<title>Practicador de Vocabulario · Versión 2.1</title>
 <style>
-  *, *::before, *::after { box-sizing: border-box; }
+*, *::before, *::after { box-sizing: border-box; }
 
   :root {
     color-scheme: light;
@@ -2414,7 +2414,20 @@
   .chip.streak.fx-fire,
   .fx-ripple { animation: none !important; }
 }
- 
+
+/* Accesibilidad: reducir movimiento si el sistema operativo lo solicita. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
 </style>
 </head>
 <body>
@@ -2422,7 +2435,7 @@
 <div class="app">
   <header class="topbar">
     <div class="topbar-left">
-      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v2.0</span>
+      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v2.1</span>
       <div class="brand">
         <div class="brand-mark">V</div>
         <div>
@@ -2459,7 +2472,7 @@
       <div class="home-dashboard">
         <header class="home-intro">
           <div class="home-intro-copy">
-            <p class="home-eyebrow">TU ESPACIO DE ESTUDIO <span>·</span> VERSIÓN 2.0</p>
+            <p class="home-eyebrow">TU ESPACIO DE ESTUDIO <span>·</span> VERSIÓN 2.1</p>
             <h2 id="setup-title">¿Qué vas a practicar hoy?</h2>
             <p>Elige el vocabulario, selecciona la dirección y empieza. Las opciones avanzadas están aparte para que no estorben.</p>
           </div>
@@ -2546,7 +2559,7 @@
           </section>
         </details>
 
-        <div class="home-footer"><span>Practicador de Vocabulario <strong>v2.0</strong></span><span>El avance se guarda localmente.</span><button id="btn-reset" class="link-danger hidden" type="button" title="Borrar todo el progreso guardado">Borrar progreso</button><span id="total-progress" class="hidden"></span></div>
+        <div class="home-footer"><span>Practicador de Vocabulario <strong>v2.1</strong></span><span>El avance se guarda localmente.</span><button id="btn-reset" class="link-danger hidden" type="button" title="Borrar todo el progreso guardado">Borrar progreso</button><span id="total-progress" class="hidden"></span></div>
       </div>
     </section>
 
@@ -2766,17 +2779,13 @@
 <div id="toasts" class="toasts" aria-live="polite"></div>
 
 <script>
-(() => {
-  'use strict';
-
-  // VERSIÓN DE LA APP: 2.0
-  // IMPORTANTE: CAMBIA APP_VERSION SIEMPRE QUE AGREGUES O MODIFIQUES FUNCIONALIDAD.
-  const APP_VERSION = '2.0';
-
-  /* ======================================================================
-     DATOS · vocabData con las 504 entradas originales
-     ====================================================================== */
-  const vocabData = { "total": 504, "vocabulary": [
+/*
+ * CATÁLOGO ESTÁTICO
+ * Vocabulario base, dificultad manual y definiciones de bloques.
+ * Se carga antes de app.js; la lógica de estudio vive en app.js.
+ */
+window.VOCAB_PRACTICE_CATALOG = {
+  vocabulary: { "total": 500, "vocabulary": [
     {"id": 1, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "Where is...?", "spanish": "¿Dónde está...?"},
     {"id": 2, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "It's here.", "spanish": "Está aquí."},
     {"id": 3, "section": "GIVING DIRECTIONS & LOCATION WORDS", "english": "It's there.", "spanish": "Está allí."},
@@ -3277,120 +3286,8 @@
     {"id": 502, "section": "LUGARES Y EDIFICIOS", "english": "Wheelchair seating area", "spanish": "Espacio para sillas de ruedas"},
     {"id": 503, "section": "LUGARES Y EDIFICIOS", "english": "Windmill", "spanish": "Molino de viento"},
     {"id": 504, "section": "LUGARES Y EDIFICIOS", "english": "Zoo", "spanish": "Zoológico"}
-  ]};
-
-  /* ======================================================================
-     UTILIDADES
-     ====================================================================== */
-  const $  = (sel, root = document) => root.querySelector(sel);
-  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
-
-  const normalize = value => String(value ?? '')
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[¿?¡!.,;:()[\]{}"«»…]/g, ' ')
-    .replace(/['’`´]/g, '')
-    .replace(/[-–—]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-
-  // "Sigue esta calle (o carretera)" acepta con y sin lo de paréntesis
-  const stripParens = value => String(value ?? '').replace(/\([^)]*\)/g, ' ');
-  const answerForms = variant =>
-    [...new Set([normalize(variant), normalize(stripParens(variant))].filter(Boolean))];
-
-  const splitVariants = value => String(value ?? '')
-    .split('/')
-    .map(part => part.trim())
-    .filter(Boolean);
-
-  const firstLetter = value => {
-    const cleaned = String(value ?? '').replace(/^[¿¡"'“”‘’(\[]+/, '').trim();
-    return Array.from(cleaned)[0] || '';
-  };
-
-  const shuffle = list => {
-    const a = list.slice();
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-  };
-
-  function levenshtein(a, b) {
-    if (a === b) return 0;
-    if (!a.length) return b.length;
-    if (!b.length) return a.length;
-    let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
-    for (let i = 1; i <= a.length; i++) {
-      const cur = [i];
-      for (let j = 1; j <= b.length; j++) {
-        cur[j] = Math.min(
-          prev[j] + 1,
-          cur[j - 1] + 1,
-          prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
-        );
-      }
-      prev = cur;
-    }
-    return prev[b.length];
-  }
-
-  const formatDuration = ms => {
-    const totalSec = Math.max(0, Math.round(ms / 1000));
-    const m = Math.floor(totalSec / 60);
-    const s = totalSec % 60;
-    return m ? `${m}m ${String(s).padStart(2, '0')}s` : `${s}s`;
-  };
-
-  /* ======================================================================
-     PREPARACIÓN DE DATOS
-     ====================================================================== */
-  const rawEntries = (vocabData && Array.isArray(vocabData.vocabulary) ? vocabData.vocabulary : [])
-    .map((v, i) => ({
-      id: v.id ?? i + 1,
-      section: String(v.section || 'General').trim(),
-      english: String(v.english || '').trim(),
-      spanish: String(v.spanish || '').trim(),
-      note: String(v.note || '').trim()
-    }))
-    .filter(v =>
-      v.english && v.spanish &&
-      !/\(columna/i.test(v.english) &&
-      !/\(columna/i.test(v.spanish)
-    );
-
-  const dedupeSeen = new Set();
-  const entries = rawEntries.filter(v => {
-    const key = `${v.section}|${normalize(v.english)}|${normalize(v.spanish)}`;
-    if (dedupeSeen.has(key)) return false;
-    dedupeSeen.add(key);
-    return true;
-  });
-
-  const enCounts = new Map();
-  const esCounts = new Map();
-  entries.forEach(v => {
-    splitVariants(v.english).forEach(p => {
-      const k = normalize(p);
-      enCounts.set(k, (enCounts.get(k) || 0) + 1);
-    });
-    splitVariants(v.spanish).forEach(p => {
-      const k = normalize(p);
-      esCounts.set(k, (esCounts.get(k) || 0) + 1);
-    });
-  });
-
-  /* ======================================================================
-     DIFICULTAD MANUAL POR ID
-     ----------------------------------------------------------------------
-     easy   = Regalada   (cognados casi idénticos, palabras muy básicas)
-     medium = Intermedia (comunes pero no cognados directos)
-     hard   = Difícil    (compuestas, frases largas, términos técnicos)
-     ====================================================================== */
-  const DIFFICULTY_MAP = {
+  ]},
+  difficultyMap: {
     // ---- GIVING DIRECTIONS & LOCATION WORDS (1-50) ----
     1:'easy', 2:'easy', 3:'easy', 4:'easy', 5:'medium', 6:'medium',
     7:'easy', 8:'easy', 9:'easy', 10:'medium', 11:'medium', 12:'medium',
@@ -3485,40 +3382,8 @@
     489:'easy', 490:'easy', 491:'easy', 492:'medium', 493:'medium', 494:'hard',
     495:'easy', 496:'medium', 497:'medium', 498:'medium', 499:'easy', 500:'medium',
     501:'hard', 502:'hard', 503:'medium', 504:'easy'
-  };
-
-  function expandEntry(raw) {
-    const enVariants = splitVariants(raw.english);
-    const esVariants = splitVariants(raw.spanish);
-    const count = Math.max(enVariants.length, esVariants.length);
-    const pick = (arr, i) => (arr.length === 1 ? arr[0] : arr[i % arr.length]);
-
-    const repeated =
-      enVariants.some(p => (enCounts.get(normalize(p)) || 0) > 1) ||
-      esVariants.some(p => (esCounts.get(normalize(p)) || 0) > 1);
-
-    const difficulty = DIFFICULTY_MAP[raw.id] || 'medium';
-
-    return Array.from({ length: count }, (_, i) => ({
-      uid: `${raw.id}::${i}`,
-      sourceId: raw.id,
-      section: raw.section,
-      english: pick(enVariants, i),
-      spanish: pick(esVariants, i),
-      englishVariants: enVariants,
-      spanishVariants: esVariants,
-      difficulty,
-      repeated,
-      note: raw.note
-    }));
-  }
-
-  const QUESTIONS = entries.flatMap(expandEntry);
-
-  /* ======================================================================
-     BLOQUES ESPECIALES · listas independientes, practicables y estudiables
-     ====================================================================== */
-  const SPECIAL_BLOCK_DEFS = [
+  },
+  specialBlockDefs: [
     {
       id: 'special-actions-verbs',
       name: 'ACTIONS (VERBS) – ACCIONES (VERBOS)',
@@ -3938,60 +3803,8 @@
         ['Alternatively', 'Alternativamente']
       ]
     }
-  ];
-
-  const SPECIAL_BLOCKS = SPECIAL_BLOCK_DEFS.map(block => ({
-    ...block,
-    items: block.items.map(([english, spanish], index) => ({
-      uid: `${block.id}::${index + 1}`,
-      sourceId: `${block.id}::${index + 1}`,
-      blockId: block.id,
-      section: block.name,
-      english,
-      spanish,
-      englishVariants: splitVariants(english),
-      spanishVariants: splitVariants(spanish),
-      difficulty: 'special',
-      repeated: false,
-      note: ''
-    }))
-  }));
-
-  const SPECIAL_QUESTIONS = SPECIAL_BLOCKS.flatMap(block => block.items);
-  const ALL_QUESTIONS = [...QUESTIONS, ...SPECIAL_QUESTIONS];
-  const QUESTION_BY_UID = new Map(ALL_QUESTIONS.map(q => [q.uid, q]));
-
-  /* ======================================================================
-     BLOQUES
-     ====================================================================== */
-  const SESSION_SIZE = 30;
-  const DIFFICULTIES = ['easy', 'medium', 'hard'];
-  const DIFF_LABEL = { easy: 'Regalada', medium: 'Intermedia', hard: 'Difícil' };
-
-  const BLOCKS = [];
-  DIFFICULTIES.forEach(diff => {
-    const items = QUESTIONS.filter(q => q.difficulty === diff);
-    const total = Math.max(1, Math.ceil(items.length / SESSION_SIZE));
-    for (let i = 0, n = 1; i < items.length; i += SESSION_SIZE, n++) {
-      const id = `${diff}-${n}`;
-      const slice = items.slice(i, i + SESSION_SIZE);
-      slice.forEach(q => { q.blockId = id; });
-      BLOCKS.push({
-        id,
-        name: `Bloque ${n}/${total} · ${DIFF_LABEL[diff]}`,
-        difficulty: diff,
-        items: slice
-      });
-    }
-  });
-
-
-  /* ======================================================================
-     VERSIÓN 2.0 · BLOQUES NORMALES DE EXPRESIONES SIMILARES
-     Reutilizan exclusivamente tarjetas del vocabulario principal. No son
-     bloques especiales y una tarjeta puede aparecer en varios grupos.
-     ====================================================================== */
-  const SIMILAR_BLOCK_DEFS = [
+  ],
+  similarBlockDefs: [
     {
       id: 'similar-proximity',
       name: 'Proximidad · next to / beside / near / close to',
@@ -4184,7 +3997,217 @@
       accent: '#0d9488',
       expressions: ['Happy', 'Sad', 'Angry', 'Calm']
     }
-  ];
+  ]
+};
+
+
+(() => {
+  'use strict';
+
+  // VERSIÓN DE LA APP: 2.1
+  // IMPORTANTE: CAMBIA APP_VERSION SIEMPRE QUE AGREGUES O MODIFIQUES FUNCIONALIDAD.
+  const APP_VERSION = '2.1';
+
+  const CATALOG = window.VOCAB_PRACTICE_CATALOG;
+  if (
+    !CATALOG ||
+    !Array.isArray(CATALOG.vocabulary?.vocabulary) ||
+    !CATALOG.difficultyMap ||
+    typeof CATALOG.difficultyMap !== 'object' ||
+    !Array.isArray(CATALOG.specialBlockDefs) ||
+    !Array.isArray(CATALOG.similarBlockDefs)
+  ) {
+    throw new Error('El catálogo no se cargó correctamente o tiene una estructura incompleta.');
+  }
+
+  /* Catálogo estático cargado desde catalog.js. */
+  const vocabData = CATALOG.vocabulary;
+  /* ======================================================================
+     UTILIDADES
+     ====================================================================== */
+  const $  = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+  const normalize = value => String(value ?? '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[¿?¡!.,;:()[\]{}"«»…]/g, ' ')
+    .replace(/['’`´]/g, '')
+    .replace(/[-–—]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  // "Sigue esta calle (o carretera)" acepta con y sin lo de paréntesis
+  const stripParens = value => String(value ?? '').replace(/\([^)]*\)/g, ' ');
+  const answerForms = variant =>
+    [...new Set([normalize(variant), normalize(stripParens(variant))].filter(Boolean))];
+
+  const splitVariants = value => String(value ?? '')
+    .split('/')
+    .map(part => part.trim())
+    .filter(Boolean);
+
+  const firstLetter = value => {
+    const cleaned = String(value ?? '').replace(/^[¿¡"'“”‘’(\[]+/, '').trim();
+    return Array.from(cleaned)[0] || '';
+  };
+
+  const shuffle = list => {
+    const a = list.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+
+  function levenshtein(a, b) {
+    if (a === b) return 0;
+    if (!a.length) return b.length;
+    if (!b.length) return a.length;
+    let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+    for (let i = 1; i <= a.length; i++) {
+      const cur = [i];
+      for (let j = 1; j <= b.length; j++) {
+        cur[j] = Math.min(
+          prev[j] + 1,
+          cur[j - 1] + 1,
+          prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+        );
+      }
+      prev = cur;
+    }
+    return prev[b.length];
+  }
+
+  const formatDuration = ms => {
+    const totalSec = Math.max(0, Math.round(ms / 1000));
+    const m = Math.floor(totalSec / 60);
+    const s = totalSec % 60;
+    return m ? `${m}m ${String(s).padStart(2, '0')}s` : `${s}s`;
+  };
+
+  /* ======================================================================
+     PREPARACIÓN DE DATOS
+     ====================================================================== */
+  const rawEntries = (vocabData && Array.isArray(vocabData.vocabulary) ? vocabData.vocabulary : [])
+    .map((v, i) => ({
+      id: v.id ?? i + 1,
+      section: String(v.section || 'General').trim(),
+      english: String(v.english || '').trim(),
+      spanish: String(v.spanish || '').trim(),
+      note: String(v.note || '').trim()
+    }))
+    .filter(v =>
+      v.english && v.spanish &&
+      !/\(columna/i.test(v.english) &&
+      !/\(columna/i.test(v.spanish)
+    );
+
+  const dedupeSeen = new Set();
+  const entries = rawEntries.filter(v => {
+    const key = `${v.section}|${normalize(v.english)}|${normalize(v.spanish)}`;
+    if (dedupeSeen.has(key)) return false;
+    dedupeSeen.add(key);
+    return true;
+  });
+
+  const enCounts = new Map();
+  const esCounts = new Map();
+  entries.forEach(v => {
+    splitVariants(v.english).forEach(p => {
+      const k = normalize(p);
+      enCounts.set(k, (enCounts.get(k) || 0) + 1);
+    });
+    splitVariants(v.spanish).forEach(p => {
+      const k = normalize(p);
+      esCounts.set(k, (esCounts.get(k) || 0) + 1);
+    });
+  });
+
+  /* Niveles manuales por ID: definidos en catalog.js. */
+  const DIFFICULTY_MAP = CATALOG.difficultyMap;
+
+  function expandEntry(raw) {
+    const enVariants = splitVariants(raw.english);
+    const esVariants = splitVariants(raw.spanish);
+    const count = Math.max(enVariants.length, esVariants.length);
+    const pick = (arr, i) => (arr.length === 1 ? arr[0] : arr[i % arr.length]);
+
+    const repeated =
+      enVariants.some(p => (enCounts.get(normalize(p)) || 0) > 1) ||
+      esVariants.some(p => (esCounts.get(normalize(p)) || 0) > 1);
+
+    const difficulty = DIFFICULTY_MAP[raw.id] || 'medium';
+
+    return Array.from({ length: count }, (_, i) => ({
+      uid: `${raw.id}::${i}`,
+      sourceId: raw.id,
+      section: raw.section,
+      english: pick(enVariants, i),
+      spanish: pick(esVariants, i),
+      englishVariants: enVariants,
+      spanishVariants: esVariants,
+      difficulty,
+      repeated,
+      note: raw.note
+    }));
+  }
+
+  const QUESTIONS = entries.flatMap(expandEntry);
+
+  /* Bloques especiales independientes, definidos en catalog.js. */
+  const SPECIAL_BLOCK_DEFS = CATALOG.specialBlockDefs;
+
+  const SPECIAL_BLOCKS = SPECIAL_BLOCK_DEFS.map(block => ({
+    ...block,
+    items: block.items.map(([english, spanish], index) => ({
+      uid: `${block.id}::${index + 1}`,
+      sourceId: `${block.id}::${index + 1}`,
+      blockId: block.id,
+      section: block.name,
+      english,
+      spanish,
+      englishVariants: splitVariants(english),
+      spanishVariants: splitVariants(spanish),
+      difficulty: 'special',
+      repeated: false,
+      note: ''
+    }))
+  }));
+
+  const SPECIAL_QUESTIONS = SPECIAL_BLOCKS.flatMap(block => block.items);
+  const ALL_QUESTIONS = [...QUESTIONS, ...SPECIAL_QUESTIONS];
+  const QUESTION_BY_UID = new Map(ALL_QUESTIONS.map(q => [q.uid, q]));
+
+  /* ======================================================================
+     BLOQUES
+     ====================================================================== */
+  const SESSION_SIZE = 30;
+  const DIFFICULTIES = ['easy', 'medium', 'hard'];
+  const DIFF_LABEL = { easy: 'Regalada', medium: 'Intermedia', hard: 'Difícil' };
+
+  const BLOCKS = [];
+  DIFFICULTIES.forEach(diff => {
+    const items = QUESTIONS.filter(q => q.difficulty === diff);
+    const total = Math.max(1, Math.ceil(items.length / SESSION_SIZE));
+    for (let i = 0, n = 1; i < items.length; i += SESSION_SIZE, n++) {
+      const id = `${diff}-${n}`;
+      const slice = items.slice(i, i + SESSION_SIZE);
+      slice.forEach(q => { q.blockId = id; });
+      BLOCKS.push({
+        id,
+        name: `Bloque ${n}/${total} · ${DIFF_LABEL[diff]}`,
+        difficulty: diff,
+        items: slice
+      });
+    }
+  });
+
+
+  /* Bloques de expresiones similares; sus definiciones están en catalog.js. */
+  const SIMILAR_BLOCK_DEFS = CATALOG.similarBlockDefs;
 
   const SIMILAR_BLOCKS = SIMILAR_BLOCK_DEFS.map(def => {
     const wanted = new Set(def.expressions.map(normalize));
@@ -4292,17 +4315,39 @@
 
   const db = loadDB();
 
+  const SAVE_DEBOUNCE_MS = 100;
   let saveTimer = null;
+
+  function persistDB({ notifyOnError = false } = {}) {
+    try {
+      localStorage.setItem(DB_KEY, JSON.stringify(db));
+      return true;
+    } catch {
+      if (notifyOnError) toast('No se pudo guardar el progreso', 'error');
+      return false;
+    }
+  }
+
   function saveDB() {
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => {
-      try {
-        localStorage.setItem(DB_KEY, JSON.stringify(db));
-      } catch {
-        toast('No se pudo guardar el progreso', 'error');
-      }
-    }, 100);
+      saveTimer = null;
+      persistDB({ notifyOnError: true });
+    }, SAVE_DEBOUNCE_MS);
   }
+
+  // No perder la última modificación si se cierra o se envía la página a segundo plano.
+  function flushPendingSave() {
+    if (saveTimer === null) return;
+    clearTimeout(saveTimer);
+    saveTimer = null;
+    persistDB();
+  }
+
+  window.addEventListener('pagehide', flushPendingSave);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') flushPendingSave();
+  });
 
   /* ======================================================================
      ESTADO DE SESIÓN
@@ -7524,7 +7569,7 @@
   init();
 })();
 
- /* ================================================================
+/* ================================================================
    SISTEMA DE EFECTOS VISTOSOS · v2.1
    Confetti en canvas, ripple, tilt 3D, reveal, count-up, racha
    ================================================================ */
@@ -7539,6 +7584,10 @@
   canvas.setAttribute('aria-hidden', 'true');
   document.body.appendChild(canvas);
   const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    canvas.remove();
+    return;
+  }
   let particles = [];
   let rafId = null;
 
@@ -7802,6 +7851,7 @@
     });
   }
 })();
+
 </script>
 </body>
 </html>
