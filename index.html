@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Practicador de vocabulario inglés-español con categorías de dificultad, errores, repaso y estadísticas.">
 <meta name="theme-color" content="#4f46e5">
-<title>Practicador de Vocabulario · Versión 2.4</title>
+<title>Practicador de Vocabulario · Versión 2.6</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 
@@ -2429,6 +2429,25 @@
 }
 
 
+
+  /* Modo de rendimiento: nada de animaciones ni transiciones salvo el confeti en canvas. */
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+  .btn:hover:not(:disabled), .card:hover, .cat-btn:hover:not(:disabled),
+  .pinned-block-card:hover, .item-row:hover, .explore-block-btn:hover,
+  .stat:hover, .session-choice:hover, .pin-choice:hover, .main-nav-btn:hover,
+  .vocab-card:hover, .mode-row:hover, .icon-btn:hover, .back-btn:hover,
+  .link-danger:hover, .block-picker-button:hover, .mode-launch-card:hover,
+  .tool-link:hover, .mistake-shortcut:hover, .vocab-category-btn:hover {
+    transform: none !important;
+    filter: none !important;
+  }
+  /* El giro de las flashcards es funcional, pero instantáneo; el confeti no usa CSS. */
+  #fx-canvas { display: block !important; }
+
 </style>
 </head>
 <body>
@@ -2436,7 +2455,7 @@
 <div class="app">
   <header class="topbar">
     <div class="topbar-left">
-      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v2.4</span>
+      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v2.5</span>
       <div class="brand">
         <div class="brand-mark">V</div>
         <div>
@@ -4143,6 +4162,26 @@ window.VOCAB_PRACTICE_CATALOG = {
       name: 'Estados de ánimo · happy / sad / angry / calm',
       accent: '#0d9488',
       expressions: ['Happy', 'Sad', 'Angry', 'Calm']
+    },
+    {
+      id: 'similar-existing-confusions',
+      name: 'Palabras que se confunden · falsos amigos y conectores',
+      accent: '#ea580c',
+      // Estos son filtros sobre tarjetas que ya existen; no crean vocabulario nuevo.
+      sourceBlockIds: ['confusion-false-friends'],
+      includeSpecial: true,
+      expressions: [
+        'Because', 'Because of', 'Due to', 'Owing to', 'Since', 'As',
+        'Therefore', 'Consequently', 'Thus', 'Hence', 'As a result', 'So',
+        'Moreover', 'Furthermore', 'In addition', 'Besides', 'Also', 'Too', 'As well', 'As well as',
+        'However', 'Nevertheless', 'Nonetheless', 'Although', 'Even though', 'Whereas', 'While',
+        'Despite', 'In spite of', 'On the other hand', 'On the contrary',
+        'Finally', 'Eventually', 'In the end', 'Ultimately', 'At last', 'Then', 'Next', 'After',
+        'Before', 'Afterwards', 'Meanwhile', 'In the meantime', 'Until', 'By the time', 'Once',
+        'Unless', 'Even if', 'Provided that', 'As long as', 'In case', 'In case of', 'Whether',
+        'For example', 'For instance', 'Such as', 'Like', 'In other words', 'That is to say',
+        'In short', 'On the whole', 'All in all'
+      ]
     }
   ]
 };
@@ -4153,7 +4192,7 @@ window.VOCAB_PRACTICE_CATALOG = {
 
   // VERSIÓN DE LA APP: 2.3
   // IMPORTANTE: CAMBIA APP_VERSION SIEMPRE QUE AGREGUES O MODIFIQUES FUNCIONALIDAD.
-  const APP_VERSION = '2.4';
+  const APP_VERSION = '2.6';
 
   const CATALOG = window.VOCAB_PRACTICE_CATALOG;
   if (
@@ -4378,9 +4417,25 @@ window.VOCAB_PRACTICE_CATALOG = {
   const SIMILAR_BLOCK_DEFS = CATALOG.similarBlockDefs;
 
   const SIMILAR_BLOCKS = SIMILAR_BLOCK_DEFS.map(def => {
-    const wanted = new Set(def.expressions.map(normalize));
-    const seen = new Set();
-    const items = QUESTIONS.filter(q => wanted.has(normalize(q.english)) && !seen.has(q.uid) && seen.add(q.uid));
+    const wanted = new Set((def.expressions || []).map(normalize));
+    const sourceBlockIds = new Set(def.sourceBlockIds || []);
+    // La nueva categoría reutiliza preguntas existentes. Solo ella puede leer
+    // tarjetas especiales; las categorías anteriores conservan su selección original.
+    const candidates = def.includeSpecial ? [...SPECIAL_QUESTIONS, ...QUESTIONS] : QUESTIONS;
+    const seenUids = new Set();
+    const seenCardContent = new Set();
+    const items = [];
+    candidates.forEach(q => {
+      const matches = sourceBlockIds.has(q.blockId) || wanted.has(normalize(q.english));
+      if (!matches || seenUids.has(q.uid)) return;
+      // Evita duplicar una tarjeta cuando inglés y español ya coinciden exactamente,
+      // pero conserva entradas con traducciones distintas cuando sí son diferentes.
+      const contentKey = `${normalize(q.english)}|${normalize(q.spanish)}`;
+      if (seenCardContent.has(contentKey)) return;
+      seenUids.add(q.uid);
+      seenCardContent.add(contentKey);
+      items.push(q);
+    });
     items.forEach(q => {
       q.extraBlockIds = [...new Set([...(q.extraBlockIds || []), def.id])];
     });
@@ -5461,17 +5516,15 @@ window.VOCAB_PRACTICE_CATALOG = {
 
     const groupMembers = state.groups.get(entry.groupKey) || [entry];
     const notes = [];
+    // Las notas pueden contener la traducción y deben ayudar DESPUÉS del intento,
+    // nunca funcionar como una pista involuntaria antes de responder.
     if (item.note) notes.push(`Nota: ${item.note}`);
     if (groupMembers.length > 1) {
       notes.push(`Sale ${groupMembers.length} veces en este bloque: da una traducción distinta cada vez, en el orden que quieras.`);
     }
-    if (notes.length) {
-      el.wordNote.textContent = notes.join(' · ');
-      el.wordNote.classList.remove('hidden');
-    } else {
-      el.wordNote.textContent = '';
-      el.wordNote.classList.add('hidden');
-    }
+    state.currentNotes = notes;
+    el.wordNote.textContent = notes.join(' · ');
+    el.wordNote.classList.add('hidden');
 
     // Respuestas ya gastadas por otra tarjeta del mismo enunciado (en este bloque)
     const usedNow = groupMembers.filter(m => m.claimed && m.usedText);
@@ -5792,11 +5845,13 @@ window.VOCAB_PRACTICE_CATALOG = {
 
     el.feedback.hidden = false;
     el.feedback.className = 'feedback error';
-    el.feedback.replaceChildren(
+    const revealLines = [
       line('Respuesta revelada', 'fb-line'),
-      line(expected, 'fb-line fb-dim'),
-      ...extraLines(entry).map(t => line(t, 'fb-line fb-dim'))
-    );
+      line(expected, 'fb-line fb-dim')
+    ];
+    if (item.note) revealLines.push(line(item.note, 'fb-line fb-dim'));
+    revealLines.push(...extraLines(entry).map(t => line(t, 'fb-line fb-dim')));
+    el.feedback.replaceChildren(...revealLines);
 
     saveForReview(item, 'reveal');
     updateCounters();
@@ -5865,6 +5920,20 @@ window.VOCAB_PRACTICE_CATALOG = {
         submitAnswer(true);
       }
     }, seconds * 1000);
+  }
+
+  function revealCurrentNotes() {
+    if (state.studyMode?.feedback === 'blind') {
+      el.wordNote.classList.add('hidden');
+      return;
+    }
+    if (state.currentNotes?.length) {
+      el.wordNote.textContent = state.currentNotes.join(' · ');
+      el.wordNote.classList.remove('hidden');
+    } else {
+      el.wordNote.textContent = '';
+      el.wordNote.classList.add('hidden');
+    }
   }
 
   function submitAnswer(isTimeout = false) {
@@ -5940,6 +6009,7 @@ window.VOCAB_PRACTICE_CATALOG = {
     el.input.classList.remove('valid-other');
     state.answered = true;
     clearCardTimers();
+    revealCurrentNotes();
     el.input.disabled = true;
     el.answerIdle.classList.add('hidden');
     el.btnSubmit.classList.add('hidden');
@@ -5966,9 +6036,9 @@ window.VOCAB_PRACTICE_CATALOG = {
         el.input.classList.add('correct');
         el.feedback.hidden = false;
         el.feedback.className = 'feedback success';
-        el.feedback.replaceChildren(
-          line(state.usedHint ? 'Correcto (con pista)' : 'Correcto')
-        );
+        const feedbackLines = [line(state.usedHint ? 'Correcto (con pista)' : 'Correcto')];
+        if (item.note) feedbackLines.push(line(item.note, 'fb-line fb-dim'));
+        el.feedback.replaceChildren(...feedbackLines);
       }
       recordItemAttempt(item, 'correct', userAnswer, state.usedHint);
 
@@ -5997,6 +6067,7 @@ window.VOCAB_PRACTICE_CATALOG = {
         el.feedback.hidden = false;
         el.feedback.className = 'feedback error';
         const nodes = [line(isTimeout ? `Se acabó el tiempo. Respuesta correcta: ${expectedFor(entry, slot)}` : `Respuesta correcta: ${expectedFor(entry, slot)}`)];
+        if (item.note) nodes.push(line(item.note, 'fb-line fb-dim'));
         if (!isTimeout && result.near) nodes.push(line('Casi. Revisa la ortografía.', 'fb-line fb-dim'));
         if (result.alreadyUsed) {
           nodes.push(line('Esa respuesta ya la usaste en otra tarjeta de este bloque.', 'fb-line fb-dim'));
@@ -6133,7 +6204,7 @@ window.VOCAB_PRACTICE_CATALOG = {
           const statusLabel = r.status === 'correct' ? 'Correcta' : r.status === 'revealed' ? 'Respuesta revelada' : 'Incorrecta';
           const userAnswer = r.userAnswer?.trim() || 'Sin respuesta';
           const expected = r.expectedAnswer || (r.direction === 'EN-ES' ? r.item.spanish : r.item.english);
-          meta.textContent = `Pregunta ${position}/${total} · ${statusLabel} · ${blockName} · Tu respuesta: ${userAnswer} · Respuesta esperada: ${expected}`;
+          meta.textContent = `Pregunta ${position}/${total} · ${statusLabel} · ${blockName} · Tu respuesta: ${userAnswer} · Respuesta esperada: ${expected}${r.item.note ? ` · Nota: ${r.item.note}` : ''}`;
         } else {
           const answerText = r.userAnswer?.trim()
             ? `Tu respuesta: ${r.userAnswer.trim()}`
@@ -7052,6 +7123,7 @@ window.VOCAB_PRACTICE_CATALOG = {
     { id: 'inverse', name: 'Español → inglés', icon: '⬅️', group: 'practice', description: 'Parte de la traducción en español para obligarte a recuperar la expresión inglesa.', tags: ['ES → EN'], config: { feedback: 'instant', direction: 'ES-EN', allowHints: true } },
     { id: 'bidirectional', name: 'Bidireccional aleatorio', icon: '🔄', group: 'practice', description: 'Alterna al azar entre inglés → español y español → inglés.', tags: ['Dirección aleatoria'], config: { feedback: 'instant', direction: 'MIX', allowHints: true } },
     { id: 'active-recall', name: 'Recuperación activa', icon: '🧠', group: 'practice', description: 'Responde sin pistas y recibe feedback al enviar. Al final vuelve a probar, una vez, las tarjetas que fallaste.', tags: ['Recuerdo libre', 'Segunda vuelta'], config: { feedback: 'instant', allowHints: false, repeatFailures: true } },
+    { id: 'sprint-four', name: 'Sprint intensivo · 4 días', icon: '📆', group: 'adaptive', description: 'Reparte todo el vocabulario existente en cuatro jornadas, incorpora errores guardados y repite los fallos al terminar. Sin pistas.', tags: ['Todo el vocabulario', 'Meta de 4 días'], config: { feedback: 'instant', direction: 'MIX', allowHints: false, repeatFailures: true, weighting: 'adaptive', preserveOrder: true, scopeOverride: 'sprint-four', sizeOverride: 'all' } },
     { id: 'exact-recall', name: 'Escritura exacta a ciegas', icon: '⌨️', group: 'practice', description: 'Combina recuperación sin feedback con tolerancia estricta a la ortografía.', tags: ['Sin feedback', 'Exactitud'], config: { feedback: 'blind', strict: true, allowHints: false } },
     { id: 'mistakes', name: 'Repaso de errores', icon: '🔁', group: 'reinforce', description: 'Practica únicamente tarjetas que tengas guardadas como errores.', tags: ['Solo errores'], config: { feedback: 'instant', allowHints: true, scopeOverride: 'mistakes' } },
     { id: 'review', name: 'Repasar guardadas', icon: '📌', group: 'reinforce', description: 'Practica las tarjetas que mandaste a Revisar con pista o respuesta revelada.', tags: ['Revisar'], config: { feedback: 'instant', allowHints: false, scopeOverride: 'review' } },
@@ -7105,14 +7177,56 @@ window.VOCAB_PRACTICE_CATALOG = {
     return QUESTIONS.slice();
   }
 
+  function sprintLocalDayOrdinal(date) {
+    return Math.floor(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86400000);
+  }
+
+  function getFourDaySprintItems() {
+    const today = new Date();
+    const todayOrdinal = sprintLocalDayOrdinal(today);
+    const dateKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    let plan = db.settings.fourDaySprint;
+    let startOrdinal = NaN;
+    if (plan && /^\d{4}-\d{2}-\d{2}$/.test(String(plan.startDate || ''))) {
+      const [year, month, day] = plan.startDate.split('-').map(Number);
+      startOrdinal = Math.floor(Date.UTC(year, month - 1, day) / 86400000);
+    }
+    const elapsedDays = todayOrdinal - startOrdinal;
+
+    // El plan se reinicia al comenzar un nuevo ciclo de cuatro días.
+    if (!Number.isFinite(startOrdinal) || elapsedDays < 0 || elapsedDays >= 4) {
+      plan = { startDate: dateKey };
+      db.settings.fourDaySprint = plan;
+      saveDB();
+      startOrdinal = todayOrdinal;
+    }
+
+    const dayIndex = Math.max(0, Math.min(3, todayOrdinal - startOrdinal));
+    const allItems = [...new Map(ALL_QUESTIONS.map(item => [item.uid, item])).values()];
+    const start = Math.floor(allItems.length * dayIndex / 4);
+    const end = Math.floor(allItems.length * (dayIndex + 1) / 4);
+    const todaysItems = allItems.slice(start, end);
+    const todaysIds = new Set(todaysItems.map(item => item.uid));
+    const pendingMistakes = allItems.filter(item => Boolean(db.mistakes?.[item.uid]) && !todaysIds.has(item.uid));
+    const items = [...new Map([...todaysItems, ...pendingMistakes].map(item => [item.uid, item])).values()];
+    return { items, dayIndex, dailyCount: todaysItems.length, pendingCount: pendingMistakes.length, totalCount: allItems.length };
+  }
+
   function startAdvancedMode(modeId, settings = {}) {
     const mode = advancedModeById.get(modeId);
     if (!mode) return;
-    let items = mode.config.scopeOverride
-      ? resolveAdvancedScope(mode.config.scopeOverride)
-      : resolveAdvancedScope(settings.scope || 'block');
-    if (mode.config.scopeOverride === 'all') items = ALL_QUESTIONS.slice();
-    if (mode.config.scopeOverride === 'confusion') items = resolveAdvancedScope('confusion');
+    let sprintInfo = null;
+    let items;
+    if (modeId === 'sprint-four') {
+      sprintInfo = getFourDaySprintItems();
+      items = sprintInfo.items;
+    } else {
+      items = mode.config.scopeOverride
+        ? resolveAdvancedScope(mode.config.scopeOverride)
+        : resolveAdvancedScope(settings.scope || 'block');
+      if (mode.config.scopeOverride === 'all') items = ALL_QUESTIONS.slice();
+      if (mode.config.scopeOverride === 'confusion') items = resolveAdvancedScope('confusion');
+    }
     if (!items.length) {
       toast(mode.config.scopeOverride === 'mistakes' ? 'Todavía no tienes errores guardados.' : mode.config.scopeOverride === 'review' ? 'No hay tarjetas guardadas en Revisar.' : 'Ese conjunto no tiene tarjetas disponibles.', 'info');
       return;
@@ -7137,6 +7251,9 @@ window.VOCAB_PRACTICE_CATALOG = {
     };
     closeModal();
     startSession(items, `mode:${modeId}`, config);
+    if (sprintInfo) {
+      toast(`Día ${sprintInfo.dayIndex + 1}/4 · ${sprintInfo.dailyCount} tarjetas de hoy + ${sprintInfo.pendingCount} errores pendientes`, 'info');
+    }
   }
 
   function buildAdvancedModesModal(options = {}) {
@@ -7226,7 +7343,7 @@ window.VOCAB_PRACTICE_CATALOG = {
 
     function visibleModes() {
       const query = search.value.trim().toLocaleLowerCase('es');
-      const recommended = new Set(['blind','active-recall','mistakes','adaptive']);
+      const recommended = new Set(['blind','active-recall','mistakes','adaptive','sprint-four']);
       return ADVANCED_MODES.filter(mode => {
         const matchesCategory = query ? true : (activeCategory === 'all' ||
           (activeCategory === 'recommended' ? recommended.has(mode.id) : mode.group === activeCategory));
@@ -7815,15 +7932,13 @@ window.VOCAB_PRACTICE_CATALOG = {
 })();
 
 /* ================================================================
-   SISTEMA DE EFECTOS VISTOSOS · v2.1.1
-   Confetti en canvas, ripple, tilt 3D, reveal, count-up, racha
+   CONFETI SOLAMENTE · sin animaciones decorativas
    ================================================================ */
-(function initFx(){
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  if (window.__fxReady) return;
-  window.__fxReady = true;
+(function initConfettiOnly(){
+  'use strict';
+  if (window.__confettiOnlyReady) return;
+  window.__confettiOnlyReady = true;
 
-  /* ---------- Canvas + partículas ---------- */
   const canvas = document.createElement('canvas');
   canvas.id = 'fx-canvas';
   canvas.setAttribute('aria-hidden', 'true');
@@ -7833,267 +7948,138 @@ window.VOCAB_PRACTICE_CATALOG = {
     canvas.remove();
     return;
   }
-  let particles = [];
-  let rafId = null;
 
-  function resize(){
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width  = window.innerWidth  * dpr;
-    canvas.height = window.innerHeight * dpr;
-    canvas.style.width  = window.innerWidth  + 'px';
-    canvas.style.height = window.innerHeight + 'px';
+  let particles = [];
+  let rafId = 0;
+
+  function resizeCanvas(){
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(window.innerWidth * dpr);
+    canvas.height = Math.round(window.innerHeight * dpr);
+    canvas.style.width = `${window.innerWidth}px`;
+    canvas.style.height = `${window.innerHeight}px`;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
-  resize();
-  window.addEventListener('resize', resize);
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas, { passive: true });
 
   function tick(){
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
     const gravity = 0.18;
     for (let i = particles.length - 1; i >= 0; i--){
       const p = particles[i];
       p.vy += gravity;
       p.vx *= 0.994;
-      p.x  += p.vx;
-      p.y  += p.vy;
+      p.x += p.vx;
+      p.y += p.vy;
       p.rot += p.vr;
-      p.life--;
-      if (p.life <= 0 || p.y > window.innerHeight + 40){ particles.splice(i,1); continue; }
-
+      p.life -= 1;
+      if (p.life <= 0 || p.y > window.innerHeight + 40){
+        particles.splice(i, 1);
+        continue;
+      }
       ctx.save();
       ctx.translate(p.x, p.y);
       ctx.rotate(p.rot);
       ctx.globalAlpha = Math.max(0, p.life / p.maxLife);
       ctx.fillStyle = p.color;
-
       if (p.shape === 'circle'){
         ctx.beginPath();
-        ctx.arc(0, 0, p.size * .5, 0, Math.PI * 2);
+        ctx.arc(0, 0, p.size * 0.5, 0, Math.PI * 2);
         ctx.fill();
       } else if (p.shape === 'ribbon'){
-        ctx.fillRect(-p.size * .5, -p.size * .14, p.size, p.size * .28);
+        ctx.fillRect(-p.size * 0.5, -p.size * 0.14, p.size, p.size * 0.28);
       } else {
-        ctx.fillRect(-p.size * .4, -p.size * .4, p.size * .8, p.size * .8);
+        ctx.fillRect(-p.size * 0.4, -p.size * 0.4, p.size * 0.8, p.size * 0.8);
       }
       ctx.restore();
     }
-    if (particles.length){ rafId = requestAnimationFrame(tick); }
-    else { rafId = null; ctx.clearRect(0, 0, canvas.width, canvas.height); }
+    if (particles.length){
+      rafId = requestAnimationFrame(tick);
+    } else {
+      rafId = 0;
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    }
   }
 
   function spawn(x, y, opts = {}){
     const palette = opts.colors || ['#6858ff','#8f6bff','#38bdf8','#10b981','#fbbf24','#f43f70','#a855f7'];
-    const count = opts.count || 26;
-    const spread = opts.spread || 9;
-    const lift  = opts.lift || 5;
+    const count = Math.min(80, Math.max(0, Number(opts.count) || 26));
+    const spread = Number(opts.spread) || 9;
+    const lift = Number(opts.lift) || 5;
     for (let i = 0; i < count; i++){
-      const ang = Math.random() * Math.PI * 2;
-      const spd = 2.5 + Math.random() * spread;
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 2.5 + Math.random() * spread;
       particles.push({
         x, y,
-        vx: Math.cos(ang) * spd,
-        vy: Math.sin(ang) * spd - lift,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - lift,
         rot: Math.random() * Math.PI,
-        vr: (Math.random() - .5) * .32,
+        vr: (Math.random() - 0.5) * 0.32,
         size: 5 + Math.random() * 7,
         color: palette[(Math.random() * palette.length) | 0],
-        shape: Math.random() < .4 ? 'ribbon' : (Math.random() < .5 ? 'circle' : 'square'),
+        shape: Math.random() < 0.4 ? 'ribbon' : (Math.random() < 0.5 ? 'circle' : 'square'),
         life: 70 + Math.random() * 50,
         maxLife: 110
       });
     }
-    if (!rafId) rafId = requestAnimationFrame(tick);
+    if (!rafId && particles.length) rafId = requestAnimationFrame(tick);
   }
 
   function rain(opts = {}){
     const palette = ['#6858ff','#8f6bff','#38bdf8','#10b981','#fbbf24','#f43f70','#a855f7','#22d3ee'];
-    const count = opts.count || 120;
+    const count = Math.min(220, Math.max(0, Number(opts.count) || 120));
     for (let i = 0; i < count; i++){
       particles.push({
         x: Math.random() * window.innerWidth,
         y: -20 - Math.random() * 220,
-        vx: (Math.random() - .5) * 3,
+        vx: (Math.random() - 0.5) * 3,
         vy: 1.5 + Math.random() * 3.2,
         rot: Math.random() * Math.PI,
-        vr: (Math.random() - .5) * .28,
+        vr: (Math.random() - 0.5) * 0.28,
         size: 6 + Math.random() * 9,
         color: palette[(Math.random() * palette.length) | 0],
-        shape: Math.random() < .5 ? 'ribbon' : 'square',
+        shape: Math.random() < 0.5 ? 'ribbon' : 'square',
         life: 220 + Math.random() * 90,
         maxLife: 300
       });
     }
-    if (!rafId) rafId = requestAnimationFrame(tick);
+    if (!rafId && particles.length) rafId = requestAnimationFrame(tick);
   }
-
   window.__fx = { spawn, rain };
 
-  /* ---------- Ripple en botones ---------- */
-  document.addEventListener('pointerdown', ev => {
-    const el = ev.target.closest(
-      '.btn, .cat-btn, .vocab-card, .main-nav-btn, .session-nav-btn, ' +
-      '.mode-row-start, .icon-btn, .pinned-block-open, .pinned-block-flash, ' +
-      '.vocab-category-btn, .mode-filter'
-    );
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    const size = Math.max(r.width, r.height) * 1.4;
-    const dot = document.createElement('span');
-    dot.className = 'fx-ripple';
-    dot.style.width = dot.style.height = size + 'px';
-    dot.style.left = (ev.clientX - r.left - size / 2) + 'px';
-    dot.style.top  = (ev.clientY - r.top  - size / 2) + 'px';
-    el.appendChild(dot);
-    setTimeout(() => dot.remove(), 620);
-  }, { passive: true });
-
-  /* ---------- Reveal del prompt por letras ---------- */
-  const prompt = document.getElementById('word-prompt');
-  if (prompt){
-    const reveal = () => {
-      const text = prompt.textContent;
-      if (!text) return;
-      prompt.textContent = '';
-      const parts = text.split(/(\s+)/);
-      let i = 0;
-      for (const chunk of parts){
-        if (!chunk) continue;
-        if (/^\s+$/.test(chunk)){ prompt.appendChild(document.createTextNode(chunk)); continue; }
-        const span = document.createElement('span');
-        span.className = 'prompt-word';
-        /* Evita que las frases largas acumulen varios segundos de desenfoque. */
-        span.style.animationDelay = (Math.min(i++, 8) * 12) + 'ms';
-        span.textContent = chunk;
-        prompt.appendChild(span);
-      }
-    };
-    new MutationObserver(() => {
-      if (prompt.querySelector('.prompt-word')) return;
-      const txt = prompt.textContent;
-      if (!txt) return;
-      // También anima de nuevo si una tarjeta repite exactamente el mismo término.
-      reveal();
-    }).observe(prompt, { childList: true, characterData: true, subtree: false });
-  }
-
-  /* ---------- Count-up en números de stats ---------- */
-  function animateNumber(node, target){
-    if (node.dataset.fxAnimating === '1') return;
-    if (node.dataset.fxTarget === String(target)) return;
-    node.dataset.fxTarget = String(target);
-    node.dataset.fxAnimating = '1';
-
-    const t0 = performance.now();
-    const dur = 550;
-    const step = t => {
-      const p = Math.min(1, (t - t0) / dur);
-      const eased = 1 - Math.pow(1 - p, 3);
-      node.textContent = Math.round(target * eased);
-      if (p < 1) requestAnimationFrame(step);
-      else {
-        node.textContent = target;
-        node.dataset.fxAnimating = '0';
-      }
-    };
-    node.classList.add('fx-pop');
-    setTimeout(() => node.classList.remove('fx-pop'), 580);
-    requestAnimationFrame(step);
-  }
-
-  ['stat-total','stat-streak','res-correct','res-wrong','res-valid'].forEach(id => {
-    const node = document.getElementById(id);
-    if (!node) return;
-    node.dataset.fxTarget = node.textContent.trim();
-    new MutationObserver(() => {
-      if (node.dataset.fxAnimating === '1') return;
-      const v = parseInt(node.textContent, 10);
-      if (!isNaN(v) && node.dataset.fxTarget !== String(v)) animateNumber(node, v);
-    }).observe(node, { childList: true, characterData: true, subtree: true });
-  });
-
-  /* ---------- Fuego en el chip de racha ---------- */
-  const streakChip = document.getElementById('chip-streak');
-  if (streakChip){
-    new MutationObserver(() => {
-      if (!streakChip.classList.contains('hidden')) streakChip.classList.add('fx-fire');
-      else streakChip.classList.remove('fx-fire');
-    }).observe(streakChip, { attributes: true, attributeFilter: ['class'] });
-  }
-
-  /* ---------- Confetti al acertar ---------- */
-  const form  = document.getElementById('answer-form');
+  // Confeti pequeño al acertar. No se inyectan efectos en botones ni en las palabras.
+  const form = document.getElementById('answer-form');
   const input = document.getElementById('answer-input');
   if (form && input){
     form.addEventListener('submit', () => {
-      setTimeout(() => {
-        const fb = document.getElementById('feedback');
-        if (!fb || fb.hidden || !fb.classList.contains('success')) return;
-        const r = input.getBoundingClientRect();
-        spawn(r.left + r.width / 2, r.top + r.height / 2, {
-          count: 30, spread: 10, lift: 7,
+      window.setTimeout(() => {
+        const feedback = document.getElementById('feedback');
+        if (!feedback || feedback.hidden || !feedback.classList.contains('success')) return;
+        const rect = input.getBoundingClientRect();
+        spawn(rect.left + rect.width / 2, rect.top + rect.height / 2, {
+          count: 30,
           colors: ['#10b981','#34d399','#6ee7b7','#fbbf24','#38bdf8','#6858ff']
         });
-        // Spark extra en el chip de racha si está visible
-        if (streakChip && !streakChip.classList.contains('hidden')){
-          const sr = streakChip.getBoundingClientRect();
-          spawn(sr.left + sr.width / 2, sr.top + sr.height / 2, {
-            count: 14, spread: 5, lift: 3,
-            colors: ['#fbbf24','#f97316','#f43f5e']
-          });
-        }
-      }, 60);
+      }, 40);
     });
   }
 
-  /* ---------- Confetti al terminar con buena nota ---------- */
+  // Confeti de celebración al finalizar una sesión con resultado suficiente.
   const resultsView = document.getElementById('view-results');
   if (resultsView){
-    new MutationObserver(() => {
+    let lastCelebratedSession = '';
+    const observer = new MutationObserver(() => {
       if (!resultsView.classList.contains('is-active')) return;
-      const acc = (document.getElementById('res-accuracy')?.textContent || '').trim();
-      const pct = parseInt(acc, 10);
-      if (isNaN(pct)) return;
-      if (pct >= 90)      setTimeout(() => rain({ count: 180 }), 280);
-      else if (pct >= 70) setTimeout(() => rain({ count: 120 }), 280);
-      else if (pct >= 50) setTimeout(() => rain({ count: 60  }), 280);
-    }).observe(resultsView, { attributes: true, attributeFilter: ['class'] });
-  }
-
-  /* ---------- Tilt 3D en tarjeta de práctica y flashcard ---------- */
-  function addTilt(el, max = 5){
-    if (!el) return;
-    let frame = null;
-    el.addEventListener('pointermove', ev => {
-      if (window.matchMedia('(hover: none)').matches) return;
-      const r = el.getBoundingClientRect();
-      const px = (ev.clientX - r.left) / r.width  - .5;
-      const py = (ev.clientY - r.top ) / r.height - .5;
-      if (frame) cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        el.style.transform =
-          `perspective(900px) rotateX(${-py * max}deg) rotateY(${px * max}deg)`;
-      });
+      const accuracyText = (document.getElementById('res-accuracy')?.textContent || '').trim();
+      const accuracy = Number.parseInt(accuracyText, 10);
+      const sessionText = `${document.getElementById('res-time')?.textContent || ''}|${accuracyText}|${document.getElementById('res-correct')?.textContent || ''}|${document.getElementById('res-wrong')?.textContent || ''}`;
+      if (!Number.isFinite(accuracy) || accuracy < 50 || sessionText === lastCelebratedSession) return;
+      lastCelebratedSession = sessionText;
+      const count = accuracy >= 90 ? 180 : accuracy >= 70 ? 120 : 60;
+      window.setTimeout(() => rain({ count }), 80);
     });
-    el.addEventListener('pointerleave', () => {
-      if (frame) cancelAnimationFrame(frame);
-      el.style.transform = '';
-    });
-  }
-  addTilt(document.getElementById('word-card'), 4);
-  addTilt(document.getElementById('flashcard'), 6);
-
-  /* ---------- Botón principal magnético ---------- */
-  const primaryBtn = document.getElementById('btn-start');
-  if (primaryBtn && !window.matchMedia('(hover: none)').matches){
-    primaryBtn.addEventListener('pointermove', ev => {
-      const r = primaryBtn.getBoundingClientRect();
-      const px = (ev.clientX - r.left) / r.width  - .5;
-      const py = (ev.clientY - r.top ) / r.height - .5;
-      primaryBtn.style.transform = `translate(${px * 6}px, ${py * 4}px)`;
-    });
-    primaryBtn.addEventListener('pointerleave', () => {
-      primaryBtn.style.transform = '';
-    });
+    observer.observe(resultsView, { attributes: true, attributeFilter: ['class'] });
   }
 })();
 
