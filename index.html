@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Practicador de vocabulario inglés-español con categorías de dificultad, errores, repaso y estadísticas.">
 <meta name="theme-color" content="#4f46e5">
-<title>Practicador de Vocabulario · Versión 2.3</title>
+<title>Practicador de Vocabulario · Versión 2.4</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; }
 
@@ -2436,7 +2436,7 @@
 <div class="app">
   <header class="topbar">
     <div class="topbar-left">
-      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v2.3</span>
+      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v2.4</span>
       <div class="brand">
         <div class="brand-mark">V</div>
         <div>
@@ -4153,7 +4153,7 @@ window.VOCAB_PRACTICE_CATALOG = {
 
   // VERSIÓN DE LA APP: 2.3
   // IMPORTANTE: CAMBIA APP_VERSION SIEMPRE QUE AGREGUES O MODIFIQUES FUNCIONALIDAD.
-  const APP_VERSION = '2.3';
+  const APP_VERSION = '2.4';
 
   const CATALOG = window.VOCAB_PRACTICE_CATALOG;
   if (
@@ -4209,23 +4209,44 @@ window.VOCAB_PRACTICE_CATALOG = {
     return a;
   };
 
-  function levenshtein(a, b) {
+  // Distancia de edición con límite: en la validación solo interesan 1–2
+  // errores tipográficos. El cálculo se acota a esa banda y evita que pegar
+  // una respuesta enorme bloquee el hilo principal del navegador.
+  function levenshtein(a, b, maxDistance = Infinity) {
+    a = String(a ?? '');
+    b = String(b ?? '');
+    const limit = Number.isFinite(maxDistance) ? Math.max(0, Math.floor(maxDistance)) : Infinity;
+
     if (a === b) return 0;
-    if (!a.length) return b.length;
-    if (!b.length) return a.length;
-    let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+    if (Math.abs(a.length - b.length) > limit) return limit + 1;
+    if (!a.length) return b.length <= limit ? b.length : limit + 1;
+    if (!b.length) return a.length <= limit ? a.length : limit + 1;
+    if (a.length > b.length) [a, b] = [b, a];
+
+    const cutoff = limit + 1;
+    let prev = Array.from({ length: b.length + 1 }, (_, i) => i <= limit ? i : cutoff);
+
     for (let i = 1; i <= a.length; i++) {
-      const cur = [i];
-      for (let j = 1; j <= b.length; j++) {
+      const cur = new Array(b.length + 1).fill(cutoff);
+      cur[0] = i <= limit ? i : cutoff;
+      const start = Math.max(1, i - limit);
+      const end = Math.min(b.length, i + limit);
+      let rowMin = cur[0];
+
+      for (let j = start; j <= end; j++) {
         cur[j] = Math.min(
           prev[j] + 1,
           cur[j - 1] + 1,
           prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
         );
+        if (cur[j] < rowMin) rowMin = cur[j];
       }
+
+      if (rowMin > limit) return cutoff;
       prev = cur;
     }
-    return prev[b.length];
+
+    return prev[b.length] <= limit ? prev[b.length] : cutoff;
   }
 
   const formatDuration = ms => {
@@ -4389,7 +4410,8 @@ window.VOCAB_PRACTICE_CATALOG = {
   // Mismo bloque + misma dirección + mismo enunciado = mismo grupo
   const makeGroupKey = (q, dir) => `${q.blockId}|${dir}|${normalize(promptOf(q, dir))}`;
 
-  // Índice global (para avisar "esa traducción es válida pero de otro bloque")
+  // Índices globales de enunciados y respuestas. El índice de respuestas evita
+  // recorrer todo el vocabulario cada vez que una respuesta es incorrecta.
   const GLOBAL_PROMPTS = { 'EN-ES': new Map(), 'ES-EN': new Map() };
   ALL_QUESTIONS.forEach(q => ['EN-ES', 'ES-EN'].forEach(dir => {
     const k = normalize(promptOf(q, dir));
@@ -4397,6 +4419,36 @@ window.VOCAB_PRACTICE_CATALOG = {
     if (!map.has(k)) map.set(k, []);
     map.get(k).push(q);
   }));
+
+  const GLOBAL_ANSWERS = {
+    normalized: { 'EN-ES': new Map(), 'ES-EN': new Map() },
+    strict: { 'EN-ES': new Map(), 'ES-EN': new Map() }
+  };
+
+  function addAnswerToIndex(index, key, question) {
+    let bucket = index.get(key);
+    if (!bucket) {
+      bucket = [];
+      index.set(key, bucket);
+    }
+    bucket.push(question);
+  }
+
+  ALL_QUESTIONS.forEach(q => ['EN-ES', 'ES-EN'].forEach(dir => {
+    const normalizedKeys = new Set();
+    const strictKeys = new Set();
+    allOf(q, dir).forEach(answer => {
+      normalizedKeys.add(normalize(answer));
+      strictKeys.add(strictNormalize(answer));
+    });
+    normalizedKeys.forEach(key => addAnswerToIndex(GLOBAL_ANSWERS.normalized[dir], key, q));
+    strictKeys.forEach(key => addAnswerToIndex(GLOBAL_ANSWERS.strict[dir], key, q));
+  }));
+
+  // Los nombres de bloque tampoco necesitan reconstruirse al fallar cada tarjeta.
+  const BLOCK_NAMES_BY_UID = new Map(
+    ALL_QUESTIONS.map(q => [q.uid, blockNamesForQuestion(q)])
+  );
 
   /* ======================================================================
      ALMACENAMIENTO
@@ -5591,19 +5643,24 @@ window.VOCAB_PRACTICE_CATALOG = {
 
     // Busca coincidencias exactas/aceptadas en otras tarjetas y devuelve
     // TODOS los bloques normales/especiales en que aparece esa respuesta.
-    const otherMatches = ALL_QUESTIONS.filter(q => {
+    const answerKey = state.studyMode?.strict ? strictNormalize(value) : normalize(value);
+    const answerIndex = state.studyMode?.strict
+      ? GLOBAL_ANSWERS.strict[direction]
+      : GLOBAL_ANSWERS.normalized[direction];
+    const otherMatches = (answerIndex.get(answerKey) || []).filter(q => {
       if (q.uid === item.uid) return false;
       if (q.blockId === item.blockId && !(q.extraBlockIds || []).length) return false;
-      const options = allOf(q, direction);
-      return options.some(answer => answersEqual(answer, value));
+      return true;
     });
     const blockNameSet = new Set();
-    otherMatches.forEach(q => blockNamesForQuestion(q).forEach(name => blockNameSet.add(name)));
+    otherMatches.forEach(q => {
+      (BLOCK_NAMES_BY_UID.get(q.uid) || blockNamesForQuestion(q)).forEach(name => blockNameSet.add(name));
+    });
     const otherBlocks = [...blockNameSet];
 
     const near = accepted.some(a => {
       const tolerance = a.length <= 5 ? 1 : 2;
-      return levenshtein(user, a) <= tolerance;
+      return levenshtein(user, a, tolerance) <= tolerance;
     });
 
     return {
@@ -5814,6 +5871,11 @@ window.VOCAB_PRACTICE_CATALOG = {
     if (state.answered) return;
 
     const entry = currentEntry();
+    if (!entry || !entry.item) {
+      clearCardTimers();
+      finishSession();
+      return;
+    }
     const { item, direction } = entry;
     const userAnswer = el.input.value;
 
@@ -5823,7 +5885,24 @@ window.VOCAB_PRACTICE_CATALOG = {
       return;
     }
 
-    const result = checkAnswer(userAnswer, entry);
+    let result;
+    try {
+      result = checkAnswer(userAnswer, entry);
+    } catch (error) {
+      // Un fallo del validador no debe dejar la tarjeta deshabilitada ni perder
+      // el control de navegación. Nada se registra hasta que checkAnswer termina.
+      console.error('No se pudo comprobar la respuesta:', error);
+      clearCardTimers();
+      state.answered = false;
+      el.input.disabled = false;
+      el.btnSubmit.classList.remove('hidden');
+      el.btnNext.classList.add('hidden');
+      el.feedback.hidden = false;
+      el.feedback.className = 'feedback error';
+      el.feedback.textContent = 'No se pudo comprobar esta respuesta. No se registró el intento; vuelve a intentarlo.';
+      el.input.focus();
+      return;
+    }
     const isBlind = state.studyMode?.feedback === 'blind';
 
     // Respuesta válida, pero de otra tarjeta/bloque: NO termina la tarjeta.
@@ -6047,7 +6126,7 @@ window.VOCAB_PRACTICE_CATALOG = {
 
         const meta = document.createElement('span');
         meta.className = 'rl-meta';
-        const blockNames = blockNamesForQuestion(r.item);
+        const blockNames = BLOCK_NAMES_BY_UID.get(r.item.uid) || blockNamesForQuestion(r.item);
         const blockName = blockNames.join(' · ') || r.item.blockId || 'Bloque';
         const position = state.results.indexOf(r) + 1;
         if (blindReview) {
