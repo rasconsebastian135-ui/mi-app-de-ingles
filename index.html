@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Practicador de vocabulario inglés-español con categorías de dificultad, errores, repaso y estadísticas.">
 <meta name="theme-color" content="#4f46e5">
-<title>Practicador de Vocabulario · Versión 2.0</title>
+<title>Practicador de Vocabulario · Versión 2.1</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; }
 
@@ -839,6 +839,7 @@
   .explore-block-btn:focus-visible { outline: none; border-color: var(--primary); box-shadow: var(--ring), var(--shadow-sm); }
   .explore-block-main { min-width: 0; }
   .explore-block-name { display: block; font-size: .82rem; font-weight: 850; line-height: 1.25; }
+  .mastery-star { display: inline-block; margin-right: 4px; color: #e9a008; font-size: 1.02em; font-weight: 1000; text-shadow: 0 1px 8px rgba(233,160,8,.22); }
   .explore-block-count { display: block; margin-top: 3px; font-size: .68rem; color: var(--muted); }
   .explore-block-play {
     display: grid; place-items: center; min-width: 34px; height: 34px; padding: 0 9px;
@@ -2378,7 +2379,7 @@
 <div class="app">
   <header class="topbar">
     <div class="topbar-left">
-      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v2.0</span>
+      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v2.1</span>
       <div class="brand">
         <div class="brand-mark">V</div>
         <div>
@@ -2415,7 +2416,7 @@
       <div class="home-dashboard">
         <header class="home-intro">
           <div class="home-intro-copy">
-            <p class="home-eyebrow">TU ESPACIO DE ESTUDIO <span>·</span> VERSIÓN 2.0</p>
+            <p class="home-eyebrow">TU ESPACIO DE ESTUDIO <span>·</span> VERSIÓN 2.1</p>
             <h2 id="setup-title">¿Qué vas a practicar hoy?</h2>
             <p>Elige el vocabulario, selecciona la dirección y empieza. Las opciones avanzadas están aparte para que no estorben.</p>
           </div>
@@ -2502,7 +2503,7 @@
           </section>
         </details>
 
-        <div class="home-footer"><span>Practicador de Vocabulario <strong>v2.0</strong></span><span>El avance se guarda localmente.</span><button id="btn-reset" class="link-danger hidden" type="button" title="Borrar todo el progreso guardado">Borrar progreso</button><span id="total-progress" class="hidden"></span></div>
+        <div class="home-footer"><span>Practicador de Vocabulario <strong>v2.1</strong></span><span>El avance se guarda localmente.</span><button id="btn-reset" class="link-danger hidden" type="button" title="Borrar todo el progreso guardado">Borrar progreso</button><span id="total-progress" class="hidden"></span></div>
       </div>
     </section>
 
@@ -2725,9 +2726,9 @@
 (() => {
   'use strict';
 
-  // VERSIÓN DE LA APP: 2.0
+  // VERSIÓN DE LA APP: 2.1
   // IMPORTANTE: CAMBIA APP_VERSION SIEMPRE QUE AGREGUES O MODIFIQUES FUNCIONALIDAD.
-  const APP_VERSION = '2.0';
+  const APP_VERSION = '2.1';
 
   /* ======================================================================
      DATOS · vocabData con las 504 entradas originales
@@ -4139,19 +4140,160 @@
       name: 'Estados de ánimo · happy / sad / angry / calm',
       accent: '#0d9488',
       expressions: ['Happy', 'Sad', 'Angry', 'Calm']
+    },
+
+    // BLOQUES DE CONFUSIÓN DIRIGIDA: tarjetas que el propio vocabulario
+    // traduce de forma muy parecida o que comparten casi toda la expresión.
+    {
+      id: 'confusion-baggage-claim', targeted: true,
+      name: 'Confusión · baggage claim / luggage claim area',
+      accent: '#0e7490',
+      expressions: ['Baggage claim', 'Luggage claim area'],
+      learningTip: 'Las dos se refieren a recoger el equipaje. En este vocabulario, “Baggage claim” se glosa como mostrador y “Luggage claim area” como zona; no memorices una diferencia rígida más allá de la formulación de cada tarjeta.'
+    },
+    {
+      id: 'confusion-airport-lounge', targeted: true,
+      name: 'Confusión · airport lounge / VIP lounge',
+      accent: '#0e7490',
+      cards: [{ sourceId: 313, english: 'Airport lounge' }, { sourceId: 313, english: 'VIP lounge' }, { sourceId: 494, english: 'VIP lounge' }],
+      learningTip: 'Las traducciones se solapan: una entrada agrupa “Airport lounge / VIP lounge” y otra vuelve a registrar “VIP lounge” con “Sala de espera VIP”. Este bloque mantiene juntas las tres tarjetas porque “VIP lounge” no tiene una única traducción española universal.'
+    },
+    {
+      id: 'confusion-inspection-area', targeted: true,
+      name: 'Confusión · customs / secondary inspection area',
+      accent: '#0e7490',
+      expressions: ['Customs inspection area', 'Secondary inspection area'],
+      learningTip: 'Ambas son zonas de inspección. “Customs” señala aduanas y “secondary” indica una inspección secundaria o adicional.'
+    },
+    {
+      id: 'confusion-checkpoint', targeted: true,
+      name: 'Confusión · security / border checkpoint',
+      accent: '#0e7490',
+      expressions: ['Security checkpoint', 'Border checkpoint'],
+      learningTip: 'Checkpoint significa puesto o punto de control. “Security” se centra en seguridad; “border” se centra en la frontera.'
+    },
+    {
+      id: 'confusion-court-courthouse', targeted: true,
+      name: 'Confusión · court / courthouse',
+      accent: '#0e7490',
+      expressions: ['Court', 'Courthouse'],
+      learningTip: '“Court” puede significar cancha o tribunal, según el contexto. “Courthouse” es el edificio donde se encuentran los tribunales; fíjate en la terminación -house.'
+    },
+    {
+      id: 'confusion-parking', targeted: true,
+      name: 'Confusión · parking lot / parking control booth',
+      accent: '#0e7490',
+      cards: [{ sourceId: 446, english: 'Parking lot' }, { sourceId: 447, english: 'Parking control booth' }],
+      learningTip: '“Parking lot” es todo el estacionamiento; “parking control booth” es la caseta de control dentro de ese entorno.'
+    },
+    {
+      id: 'confusion-dock-docks', targeted: true,
+      name: 'Confusión · dock / docks',
+      accent: '#0e7490',
+      expressions: ['Dock', 'Docks'],
+      learningTip: 'En estas dos tarjetas, tanto “Dock” como “Docks” se traducen como “muelle”. La diferencia inglesa es singular/plural; el español registrado no te da una pista adicional, así que recuerda ambas formas explícitamente.'
+    },
+    {
+      id: 'confusion-street-sign', targeted: true,
+      name: 'Confusión · street sign / street name sign',
+      accent: '#0e7490',
+      expressions: ['Street sign', 'Street name sign'],
+      learningTip: '“Street sign” es una señal de calle en general. “Street name sign” especifica que la señal muestra el nombre de la calle.'
+    },
+    {
+      id: 'confusion-crossings', targeted: true,
+      name: 'Confusión · crosswalk / pedestrian / railroad crossing',
+      accent: '#0e7490',
+      expressions: ['Crosswalk', 'Pedestrian crossing', 'Railroad crossing'],
+      learningTip: '“Crosswalk” y “pedestrian crossing” se solapan como cruce peatonal. “Railroad crossing” también es un cruce, pero de vías ferroviarias.'
+    },
+    {
+      id: 'confusion-projection', targeted: true,
+      name: 'Confusión · projection booth / screening room / auditorium',
+      accent: '#0e7490',
+      expressions: ['Projection booth', 'Screening room', 'Auditorium'],
+      learningTip: 'En estas tarjetas, “Projection booth” es la cabina; “Screening room / Auditorium” aparece traducido como sala de proyección. Recuerda la diferencia básica entre cabina y sala.'
+    },
+    {
+      id: 'confusion-arcade', targeted: true,
+      name: 'Confusión · arcade / arcade corner',
+      accent: '#0e7490',
+      expressions: ['Arcade', 'Arcade corner'],
+      learningTip: '“Arcade” es el salón de juegos; “arcade corner” es una zona de videojuegos dentro de un establecimiento, según la nota de la tarjeta.'
+    },
+    {
+      id: 'confusion-back-verbs', targeted: true, source: 'special',
+      name: 'Confusión · come / get / go / bring / give / take back',
+      accent: '#7c3aed',
+      expressions: ['Come back', 'Get back', 'Go back', 'Bring back', 'Give back', 'Take back'],
+      learningTip: 'En el propio bloque, “come/get/go back” comparten “regresar”; “bring back” es “traer de vuelta”; “give back” y “take back” se traducen como “devolver”. Aprende la traducción concreta que muestra cada tarjeta.'
+    },
+    {
+      id: 'confusion-wait-phrasals', targeted: true, source: 'special',
+      name: 'Confusión · hang on / hold on',
+      accent: '#7c3aed',
+      expressions: ['Hang on', 'Hold on'],
+      learningTip: 'Las dos tarjetas se traducen como “esperar”. Son expresiones muy cercanas; practica reconocer la forma inglesa, no intentes inventar una diferencia española que el vocabulario no marca.'
+    },
+    {
+      id: 'confusion-warning-phrasals', targeted: true, source: 'special',
+      name: 'Confusión · look out / watch out',
+      accent: '#7c3aed',
+      expressions: ['Look out', 'Watch out'],
+      learningTip: 'Ambas significan “tener cuidado” en las tarjetas. Memorízalas como dos formas inglesas para la misma advertencia.'
+    },
+    {
+      id: 'confusion-fill-phrasals', targeted: true, source: 'special',
+      name: 'Confusión · fill in / fill out',
+      accent: '#7c3aed',
+      expressions: ['Fill in', 'Fill out'],
+      learningTip: 'Las dos pueden referirse a completar información. En tu lista, “fill in” es “completar” y “fill out” es “llenar un formulario”; la segunda se asocia explícitamente con formularios.'
+    },
+    {
+      id: 'confusion-in-case', targeted: true, source: 'special',
+      name: 'Confusión · in case / in case of',
+      accent: '#7c3aed',
+      expressions: ['In case', 'In case of'],
+      learningTip: 'Tu lista traduce ambas como “en caso de”. La diferencia está en la construcción: “in case” suele introducir una situación o cláusula; “in case of” va seguido de un sustantivo o grupo nominal.'
+    },
+    {
+      id: 'confusion-instead', targeted: true, source: 'special',
+      name: 'Confusión · instead / instead of',
+      accent: '#7c3aed',
+      expressions: ['Instead', 'Instead of'],
+      learningTip: 'Las dos expresan sustitución. “Instead” puede aparecer solo (“en su lugar”); “instead of” introduce aquello que se sustituye (“en lugar de”).'
+    },
+    {
+      id: 'confusion-because', targeted: true, source: 'special',
+      name: 'Confusión · because / because of',
+      accent: '#7c3aed',
+      expressions: ['Because', 'Because of'],
+      learningTip: 'Ambas expresan causa. “Because” suele ir seguido de una oración; “because of”, de un sustantivo o grupo nominal.'
+    },
+    {
+      id: 'confusion-takeaway', targeted: true, source: 'special',
+      name: 'Confusión · takeaway / to go / take away',
+      accent: '#7c3aed',
+      expressions: ['Takeaway', 'To go', 'Take away'],
+      learningTip: '“Takeaway” y “to go” se traducen como “para llevar” en las tarjetas de variedades del inglés; “take away” es el phrasal verb traducido como “llevarse”. Atención a la forma y al uso.'
     }
   ];
 
   const SIMILAR_BLOCKS = SIMILAR_BLOCK_DEFS.map(def => {
-    const wanted = new Set(def.expressions.map(normalize));
+    const sourceItems = def.source === 'special' ? SPECIAL_QUESTIONS : QUESTIONS;
+    const wanted = new Set((def.expressions || []).map(normalize));
+    const matches = q => def.cards
+      ? def.cards.some(card => String(card.sourceId) === String(q.sourceId) && normalize(card.english) === normalize(q.english))
+      : wanted.has(normalize(q.english));
     const seen = new Set();
-    const items = QUESTIONS.filter(q => wanted.has(normalize(q.english)) && !seen.has(q.uid) && seen.add(q.uid));
+    const items = sourceItems.filter(q => matches(q) && !seen.has(q.uid) && seen.add(q.uid));
     items.forEach(q => {
       q.extraBlockIds = [...new Set([...(q.extraBlockIds || []), def.id])];
     });
     return {
       id: def.id, name: def.name, difficulty: 'medium', items,
-      isConfusion: true, isSpecial: false, accent: def.accent,
+      isConfusion: true, isTargetedConfusion: Boolean(def.targeted), isSpecial: false,
+      accent: def.accent, learningTip: def.learningTip || '',
       kind: 'practice', countLabel: `${items.length} tarjetas`
     };
   }).filter(block => block.items.length > 0);
@@ -4160,6 +4302,72 @@
     BLOCKS.find(b => b.id === id) ||
     SIMILAR_BLOCKS.find(b => b.id === id) ||
     SPECIAL_BLOCKS.find(b => b.id === id) || null;
+
+  function isBlockMastered(blockId) {
+    return Array.isArray(db?.settings?.masteredBlocks) && db.settings.masteredBlocks.includes(blockId);
+  }
+
+  function blockLabel(block, extra = '') {
+    return `${isBlockMastered(block.id) ? '★ ' : ''}${block.name}${extra}`;
+  }
+
+  function setBlockHeading(node, block) {
+    node.replaceChildren();
+    if (isBlockMastered(block.id)) {
+      const star = document.createElement('span');
+      star.className = 'mastery-star';
+      star.textContent = '★';
+      star.title = 'Dominado: todas las tarjetas correctas, sin errores ni pistas';
+      star.setAttribute('aria-label', 'Bloque dominado');
+      node.appendChild(star);
+      node.appendChild(document.createTextNode(' '));
+    }
+    node.appendChild(document.createTextNode(block.name));
+  }
+
+  function sameUidSet(left, right) {
+    const a = new Set((left || []).map(item => item.uid));
+    const b = new Set((right || []).map(item => item.uid));
+    return a.size > 0 && a.size === b.size && [...a].every(uid => b.has(uid));
+  }
+
+  function exactBlockForItems(items) {
+    const candidates = [
+      ...SIMILAR_BLOCKS.filter(block => block.isTargetedConfusion),
+      ...BLOCKS,
+      ...SIMILAR_BLOCKS.filter(block => !block.isTargetedConfusion),
+      ...SPECIAL_BLOCKS
+    ];
+    return candidates.find(block => sameUidSet(items, block.items)) || null;
+  }
+
+  function appendCurrentBlockLearningTip(target) {
+    const block = state.activeBlockId ? findStudyBlock(state.activeBlockId) : null;
+    if (block?.learningTip && target && !target.hidden) {
+      target.appendChild(line(`Clave para memorizar: ${block.learningTip}`, 'fb-line fb-dim'));
+    }
+  }
+
+  function canEarnBlockStar() {
+    const block = state.activeBlockId ? findStudyBlock(state.activeBlockId) : null;
+    if (!block || isBlockMastered(block.id) || state.failuresRepeated) return false;
+    if (!sameUidSet(state.sessionContentItems, block.items)) return false;
+    if (state.results.length !== block.items.length) return false;
+    const answered = new Set();
+    for (const result of state.results) {
+      if (result.status !== 'correct' || result.usedHint || answered.has(result.item.uid)) return false;
+      answered.add(result.item.uid);
+    }
+    return answered.size === block.items.length && block.items.every(item => answered.has(item.uid));
+  }
+
+  function refreshMasteryIndicators() {
+    $$('#block-select option[data-block-id]').forEach(option => {
+      const block = findStudyBlock(option.dataset.blockId);
+      if (block) option.textContent = blockLabel(block, option.dataset.countSuffix || '');
+    });
+    renderPinnedBlocks();
+  }
 
   function blockNamesForQuestion(q) {
     const ids = [...new Set([q.blockId, ...(q.extraBlockIds || []), ...(q.blockId ? [] : [])].filter(Boolean))];
@@ -4198,7 +4406,7 @@
     stats: { answered: 0, correct: 0, bestStreak: 0, currentStreak: 0, sessions: 0 },
     itemStats: {},
     history: [],
-    settings: { theme: null, mode: 'EN-ES', pinnedBlocks: [] }
+    settings: { theme: null, mode: 'EN-ES', pinnedBlocks: [], masteredBlocks: [] }
   });
 
   function readJSON(key) {
@@ -4658,28 +4866,46 @@
       BLOCKS.filter(b => b.difficulty === diff).forEach(block => {
         const option = document.createElement('option');
         option.value = block.id;
-        option.textContent = `${block.name} (${block.items.length} preguntas)`;
+        option.dataset.blockId = block.id;
+        option.dataset.countSuffix = ` (${block.items.length} preguntas)`;
+        option.textContent = blockLabel(block, option.dataset.countSuffix);
         group.appendChild(option);
       });
       el.blockSelect.appendChild(group);
     });
 
     const similarGroup = document.createElement('optgroup');
-    similarGroup.label = 'Bloques normales · expresiones similares';
-    SIMILAR_BLOCKS.forEach(block => {
+    similarGroup.label = 'Bloques generales · expresiones relacionadas';
+    SIMILAR_BLOCKS.filter(block => !block.isTargetedConfusion).forEach(block => {
       const option = document.createElement('option');
       option.value = block.id;
-      option.textContent = `${block.name} (${block.items.length} tarjetas)`;
+      option.dataset.blockId = block.id;
+      option.dataset.countSuffix = ` (${block.items.length} tarjetas)`;
+      option.textContent = blockLabel(block, option.dataset.countSuffix);
       similarGroup.appendChild(option);
     });
     el.blockSelect.appendChild(similarGroup);
+
+    const confusionGroup = document.createElement('optgroup');
+    confusionGroup.label = 'Confusiones concretas · traducciones muy parecidas';
+    SIMILAR_BLOCKS.filter(block => block.isTargetedConfusion).forEach(block => {
+      const option = document.createElement('option');
+      option.value = block.id;
+      option.dataset.blockId = block.id;
+      option.dataset.countSuffix = ` (${block.items.length} tarjetas)`;
+      option.textContent = blockLabel(block, option.dataset.countSuffix);
+      confusionGroup.appendChild(option);
+    });
+    el.blockSelect.appendChild(confusionGroup);
 
     const specialGroup = document.createElement('optgroup');
     specialGroup.label = 'Bloques especiales';
     SPECIAL_BLOCKS.forEach(block => {
       const option = document.createElement('option');
       option.value = block.id;
-      option.textContent = `${block.name} (${block.items.length} palabras)`;
+      option.dataset.blockId = block.id;
+      option.dataset.countSuffix = ` (${block.items.length} palabras)`;
+      option.textContent = blockLabel(block, option.dataset.countSuffix);
       specialGroup.appendChild(option);
     });
     el.blockSelect.appendChild(specialGroup);
@@ -4990,7 +5216,7 @@
 
       const name = document.createElement('div');
       name.className = 'pinned-block-name';
-      name.textContent = block.name;
+      setBlockHeading(name, block);
 
       const count = document.createElement('div');
       count.className = 'pinned-block-count';
@@ -5083,7 +5309,7 @@
 
         const name = document.createElement('span');
         name.className = 'pin-choice-name';
-        name.textContent = block.name;
+        setBlockHeading(name, block);
 
         const meta = document.createElement('span');
         meta.className = 'pin-choice-meta';
@@ -5129,6 +5355,7 @@
 
     clearCardTimers();
     state.sessionContentItems = [...new Map(items.map(item => [item.uid, item])).values()];
+    state.activeBlockId = exactBlockForItems(state.sessionContentItems)?.id || null;
     state.allowCurrentScope = false;
     state.studyMode = studyMode;
     state.failuresRepeated = false;
@@ -5686,6 +5913,7 @@
         el.feedback.replaceChildren(
           line(state.usedHint ? 'Correcto (con pista)' : 'Correcto')
         );
+        appendCurrentBlockLearningTip(el.feedback);
       }
       recordItemAttempt(item, 'correct', userAnswer, state.usedHint);
 
@@ -5720,6 +5948,8 @@
           nodes.push(line('Esa respuesta ya la usaste en otra tarjeta de este bloque.', 'fb-line fb-dim'));
         }
         extraLines(entry).forEach(t => nodes.push(line(t, 'fb-line fb-dim')));
+        const activeLearningBlock = state.activeBlockId ? findStudyBlock(state.activeBlockId) : null;
+        if (activeLearningBlock?.learningTip) nodes.push(line(`Clave para memorizar: ${activeLearningBlock.learningTip}`, 'fb-line fb-dim'));
         if (userAnswer.trim()) nodes.push(line(`Tu respuesta: ${userAnswer}`, 'fb-line fb-dim'));
         el.feedback.replaceChildren(...nodes);
       }
@@ -5790,6 +6020,14 @@
 
   function finishSession() {
     clearCardTimers();
+    let newlyMasteredBlock = null;
+    if (canEarnBlockStar()) {
+      newlyMasteredBlock = findStudyBlock(state.activeBlockId);
+      if (!Array.isArray(db.settings.masteredBlocks)) db.settings.masteredBlocks = [];
+      db.settings.masteredBlocks.push(newlyMasteredBlock.id);
+      saveDB();
+      refreshMasteryIndicators();
+    }
     const total = state.results.length;
     const correct = state.results.filter(r => r.status === 'correct').length;
     const validOther = state.results.filter(r => r.status === 'valid-other').length;
@@ -5821,6 +6059,12 @@
       summary += ` ${passed ? 'APROBADO' : 'NO APROBADO'}: ${Math.round(passRate * 100)}% (mínimo ${Math.round((state.studyMode.threshold || 0.85) * 100)}%).`;
     }
     if (state.failuresRepeated) summary += ' La sesión incluyó una segunda vuelta de los errores.';
+    if (state.studyMode?.id === 'memorize-unknown') {
+      const masteredNow = state.sessionContentItems.filter(item => (Number(db.itemStats?.[item.uid]?.mastery) || 0) >= 5).length;
+      const totalSelected = state.sessionContentItems.length;
+      summary += ` Memorización: ${masteredNow}/${totalSelected} tarjetas de esta sesión tienen cinco aciertos sin pistas; las restantes siguen en aprendizaje.`;
+    }
+    if (newlyMasteredBlock) summary += ' ★ Bloque dominado sin errores ni pistas.';
     el.resSummary.textContent = summary;
 
     const failed = unresolvedFailedResults();
@@ -5873,6 +6117,7 @@
 
     updateCounters();
     showView('results');
+    if (newlyMasteredBlock) toast(`★ Bloque dominado: ${newlyMasteredBlock.name}`, 'success', { duration: 5200 });
   }
 
   /* ======================================================================
@@ -6457,7 +6702,7 @@
 
       const text = document.createElement('span');
       const strong = document.createElement('strong');
-      strong.textContent = block.name;
+      setBlockHeading(strong, block);
       const small = document.createElement('small');
       small.textContent = `${block.items.length} ${special ? 'palabras' : 'tarjetas'} · práctica y flashcards disponibles`;
       text.append(strong, small);
@@ -6540,7 +6785,7 @@
       : selectedMode === 'ES-EN'
         ? 'Español → Inglés'
         : 'Mezcla';
-    blocksHint.textContent = `Cada bloque puede contestarse normalmente o abrirse como flashcards · Dirección: ${modeLabel}`;
+    blocksHint.textContent = `Cada bloque puede contestarse normalmente o abrirse como flashcards · Dirección: ${modeLabel} · ★ = bloque completado sin errores ni pistas`;
     blocksSection.appendChild(blocksHint);
 
     const renderBlockButton = (block, special = false) => {
@@ -6559,7 +6804,7 @@
 
       const name = document.createElement('span');
       name.className = 'explore-block-name';
-      name.textContent = block.name;
+      setBlockHeading(name, block);
 
       const count = document.createElement('span');
       count.className = 'explore-block-count';
@@ -6778,7 +7023,8 @@
     { id: 'weak', name: 'Puntos débiles', icon: '🎯', group: 'reinforce', description: 'Prioriza tarjetas con muchos errores, baja precisión o dominio insuficiente.', tags: ['Por desempeño'], config: { feedback: 'instant', allowHints: true, weighting: 'weak', preserveOrder: true } },
     { id: 'adaptive', name: 'Sesión adaptativa', icon: '🧩', group: 'adaptive', description: 'Combina errores, baja precisión y tarjetas nunca practicadas; ordena primero las que conviene reforzar.', tags: ['Selección adaptativa'], config: { feedback: 'instant', allowHints: true, weighting: 'adaptive', preserveOrder: true } },
     { id: 'repeat-failures', name: 'Repetir errores al final', icon: '🌀', group: 'adaptive', description: 'Al terminar la primera vuelta, repite una vez las tarjetas incorrectas.', tags: ['Segunda vuelta'], config: { feedback: 'instant', allowHints: true, repeatFailures: true } },
-    { id: 'full-unseen', name: 'Tarjetas menos practicadas', icon: '🌱', group: 'adaptive', description: 'Prioriza las tarjetas que nunca has contestado o que llevas más tiempo sin practicar.', tags: ['Cobertura'], config: { feedback: 'instant', allowHints: false, weighting: 'spaced', preserveOrder: true } }
+    { id: 'full-unseen', name: 'Tarjetas menos practicadas', icon: '🌱', group: 'adaptive', description: 'Prioriza las tarjetas que nunca has contestado o que llevas más tiempo sin practicar.', tags: ['Cobertura'], config: { feedback: 'instant', allowHints: false, weighting: 'spaced', preserveOrder: true } },
+    { id: 'memorize-unknown', name: 'Memorizar lo que aún no domino', icon: '🧠', group: 'reinforce', description: 'Prioriza tarjetas nuevas, con errores o con menos de cinco aciertos sin pistas. No permite pistas y repite los fallos al final.', tags: ['Sin pistas', 'Tarjetas débiles primero', 'Segunda vuelta'], config: { feedback: 'instant', allowHints: false, weighting: 'adaptive', scopeOverride: 'unknown', preserveOrder: true, repeatFailures: true } }
   ];
   const advancedModeById = new Map(ADVANCED_MODES.map(mode => [mode.id, mode]));
 
@@ -6811,6 +7057,10 @@
   function resolveAdvancedScope(value) {
     if (value === 'main') return QUESTIONS.slice();
     if (value === 'all') return ALL_QUESTIONS.slice();
+    if (value === 'unknown') return ALL_QUESTIONS.filter(item => {
+      const p = itemPerformance(item);
+      return p.mastery < 5 || p.errorRecord > 0 || Boolean(db.review[item.uid]);
+    });
     if (value === 'mistakes') return mistakeItems();
     if (value === 'review') return reviewItems();
     if (value === 'confusion') return [...new Map(SIMILAR_BLOCKS.flatMap(block => block.items).map(item => [item.uid, item])).values()];
@@ -6832,7 +7082,14 @@
     if (mode.config.scopeOverride === 'all') items = ALL_QUESTIONS.slice();
     if (mode.config.scopeOverride === 'confusion') items = resolveAdvancedScope('confusion');
     if (!items.length) {
-      toast(mode.config.scopeOverride === 'mistakes' ? 'Todavía no tienes errores guardados.' : mode.config.scopeOverride === 'review' ? 'No hay tarjetas guardadas en Revisar.' : 'Ese conjunto no tiene tarjetas disponibles.', 'info');
+      const emptyMessage = mode.config.scopeOverride === 'mistakes'
+        ? 'Todavía no tienes errores guardados.'
+        : mode.config.scopeOverride === 'review'
+          ? 'No hay tarjetas guardadas en Revisar.'
+          : mode.config.scopeOverride === 'unknown'
+            ? '¡Ya dominas todas las tarjetas registradas!'
+            : 'Ese conjunto no tiene tarjetas disponibles.';
+      toast(emptyMessage, 'info');
       return;
     }
     const weighting = mode.config.weighting || null;
@@ -6847,6 +7104,7 @@
     const selectedDirection = settings.direction || getMode();
     const config = {
       ...mode.config,
+      id: modeId,
       name: mode.name,
       direction: mode.config.direction || selectedDirection,
       preserveOrder: true,
@@ -6903,8 +7161,8 @@
         {value:'block',text:'Bloque seleccionado'}, {value:'main',text:'Vocabulario principal'},
         {value:'all',text:'Todo, incluidos especiales'}, {value:'easy',text:'Dificultad regalada'},
         {value:'medium',text:'Dificultad intermedia'}, {value:'hard',text:'Dificultad difícil'},
-        {value:'confusion',text:'Expresiones similares'}, {value:'mistakes',text:'Solo errores guardados'},
-        {value:'review',text:'Solo Revisar'}
+        {value:'confusion',text:'Expresiones similares'}, {value:'unknown',text:'Tarjetas aún no dominadas'},
+        {value:'mistakes',text:'Solo errores guardados'}, {value:'review',text:'Solo Revisar'}
       ];
     controls.append(
       makeSelect('Contenido', 'v2-scope', scopeOptions, initialBlock),
@@ -7063,7 +7321,7 @@
       { id: 'all-vocab', name: 'Principal + bloques especiales', description: 'Incluye la colección y los bloques especiales', group: 'quick', items: ALL_QUESTIONS, countLabel: `${ALL_QUESTIONS.length} preguntas`, icon: '🗂️', searchableItems: false }
     ];
     const normal = BLOCKS.map(block => ({ ...block, group: 'main', icon: '▦', description: `Dificultad ${DIFF_LABEL[block.difficulty]?.toLowerCase() || 'intermedia'}`, countLabel: `${block.items.length} tarjetas`, searchableItems: true }));
-    const similar = SIMILAR_BLOCKS.map(block => ({ ...block, group: 'similar', icon: '⇄', description: 'Bloque normal para distinguir expresiones cercanas', countLabel: `${block.items.length} tarjetas`, searchableItems: true }));
+    const similar = SIMILAR_BLOCKS.map(block => ({ ...block, group: 'similar', icon: block.isTargetedConfusion ? '⚠' : '⇄', description: block.isTargetedConfusion ? 'Confusión dirigida: tarjetas con traducciones solapadas o expresiones muy parecidas' : 'Bloque general para distinguir expresiones cercanas', countLabel: `${block.items.length} tarjetas`, searchableItems: true }));
     const special = SPECIAL_BLOCKS.map(block => ({ ...block, group: 'special', icon: '✦', description: 'Colección especial independiente', countLabel: `${block.items.length} tarjetas`, searchableItems: true }));
     return [...quick, ...normal, ...similar, ...special];
   }
@@ -7277,7 +7535,10 @@
         option.setAttribute('aria-pressed', String(activeValue === candidate.id));
         const icon = document.createElement('span'); icon.className = 'vocab-card-icon'; icon.textContent = candidate.icon || '▦'; icon.setAttribute('aria-hidden', 'true');
         const copy = document.createElement('span'); copy.className = 'vocab-card-copy';
-        const name = document.createElement('strong'); name.textContent = candidate.name;
+        const name = document.createElement('strong');
+        const candidateBlock = findStudyBlock(candidate.id);
+        if (candidateBlock) setBlockHeading(name, candidateBlock);
+        else name.textContent = candidate.name;
         const detail = document.createElement('small');
         detail.textContent = vocabularyCandidateDetails(candidate);
         option.title = `${candidate.name}. ${candidate.description || ''} ${vocabularyCandidateDetails(candidate)}`.trim();
@@ -7439,8 +7700,10 @@
     db.stats = { answered: 0, correct: 0, bestStreak: 0, currentStreak: 0, sessions: 0 };
     db.itemStats = {};
     db.history = [];
+    db.settings.masteredBlocks = [];
     saveDB();
     updateCounters();
+    refreshMasteryIndicators();
     toast('Progreso borrado', 'success');
   });
 
