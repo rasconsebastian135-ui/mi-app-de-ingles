@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Practicador de vocabulario inglés-español con categorías de dificultad, errores, repaso y estadísticas.">
 <meta name="theme-color" content="#4f46e5">
-<title>Practicador de Vocabulario · Versión 2.2</title>
+<title>Practicador de Vocabulario · Versión 2.3.1</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; }
 
@@ -637,7 +637,9 @@
   .chip.bad  { background: var(--danger-soft);  color: var(--danger); }
   .chip.streak { background: var(--warn-soft); color: var(--warn); }
 
-  .practice-stage { display: grid; place-items: center; min-height: 500px; perspective: 1000px; }
+  .practice-stage { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; min-height: 500px; perspective: 1000px; }
+  .answer-actions-outside { width: min(660px, 100%); display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .answer-actions-outside .btn { width: 100%; }
 
   .word-card {
     width: min(660px, 100%);
@@ -2381,6 +2383,164 @@
     .confetti-layer { display: none !important; }
   }
 
+
+  /* ========================================================================
+     RACHA · progreso visible, recompensas por hitos y sonido opcional
+     ======================================================================== */
+  .streak-hud {
+    display: grid;
+    gap: 10px;
+    margin: 0 0 18px;
+    padding: 13px 15px 12px;
+    border: 1px solid rgba(104,88,255,.24);
+    border-radius: 18px;
+    background:
+      radial-gradient(circle at 0% 0%, rgba(245,158,11,.15), transparent 38%),
+      linear-gradient(120deg, var(--surface-solid), var(--surface-2));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.34), 0 8px 22px rgba(49,58,104,.08);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    transition: border-color .25s ease, box-shadow .25s ease, background .25s ease;
+  }
+  .streak-hud::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,.10) 48%, transparent 72%);
+    opacity: .55;
+  }
+  .streak-hud-top { display: flex; align-items: center; gap: 11px; min-width: 0; position: relative; z-index: 1; }
+  .streak-icon-wrap {
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    background: linear-gradient(145deg, rgba(245,158,11,.19), rgba(244,63,112,.10));
+    border: 1px solid rgba(245,158,11,.24);
+    box-shadow: 0 5px 16px rgba(245,158,11,.09), inset 0 1px 0 rgba(255,255,255,.4);
+    font-size: 1.35rem;
+    transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
+  }
+  .streak-hud-copy { min-width: 0; flex: 1 1 auto; }
+  .streak-hud-line { display: flex; align-items: baseline; gap: 9px; min-width: 0; }
+  .streak-hud-label { color: var(--muted); font-size: .64rem; font-weight: 950; letter-spacing: .12em; }
+  .streak-value { font-size: 1.5rem; line-height: 1; font-weight: 1000; letter-spacing: -.045em; font-variant-numeric: tabular-nums; color: var(--text); }
+  .streak-next { margin: 4px 0 0; color: var(--muted); font-size: .74rem; font-weight: 650; line-height: 1.3; overflow-wrap: anywhere; }
+  .streak-sound-toggle {
+    flex: 0 0 35px;
+    width: 35px;
+    height: 35px;
+    display: grid;
+    place-items: center;
+    border-radius: 11px;
+    background: var(--surface-3);
+    color: var(--text-2);
+    border: 1px solid var(--border);
+    font-size: .95rem;
+    transition: transform .16s ease, background .16s ease, border-color .16s ease;
+    position: relative;
+    z-index: 2;
+  }
+  .streak-sound-toggle:hover { transform: translateY(-1px) scale(1.04); border-color: var(--border-2); background: var(--surface-solid); }
+  .streak-sound-toggle:active { transform: scale(.94); }
+  .streak-sound-toggle:focus-visible { outline: none; box-shadow: var(--ring); }
+  .streak-meter-track {
+    height: 10px;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(127,127,127,.12);
+    border: 1px solid var(--border);
+    box-shadow: inset 0 2px 3px rgba(0,0,0,.07);
+    position: relative;
+    z-index: 1;
+  }
+  .streak-meter-fill {
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #f59e0b, #fb7185, #a855f7);
+    background-size: 180% 100%;
+    box-shadow: 0 0 12px rgba(245,158,11,.30);
+    transition: width .38s cubic-bezier(.2,.8,.2,1), filter .25s ease;
+  }
+  .streak-hud[data-tier="warm"] { border-color: rgba(245,158,11,.42); box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 8px 24px rgba(245,158,11,.10); }
+  .streak-hud[data-tier="hot"] { border-color: rgba(244,63,112,.38); box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 8px 27px rgba(244,63,112,.12), 0 0 18px rgba(245,158,11,.08); }
+  .streak-hud[data-tier="fire"] { border-color: rgba(168,85,247,.48); box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 10px 30px rgba(168,85,247,.16), 0 0 20px rgba(244,63,112,.09); }
+  .streak-hud[data-tier="legendary"] { border-color: rgba(245,158,11,.7); background: radial-gradient(circle at 0% 0%, rgba(245,158,11,.22), transparent 42%), linear-gradient(120deg, var(--surface-solid), var(--surface-2)); box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 12px 34px rgba(245,158,11,.16), 0 0 24px rgba(168,85,247,.12); }
+  .streak-hud[data-tier="legendary"] .streak-value { color: #d97706; text-shadow: 0 2px 18px rgba(245,158,11,.20); }
+  [data-theme="dark"] .streak-hud[data-tier="legendary"] .streak-value { color: #ffc857; }
+  .streak-hud[data-tier="hot"] .streak-meter-fill { background: linear-gradient(90deg, #f59e0b, #f43f70, #fb7185); }
+  .streak-hud[data-tier="fire"] .streak-meter-fill { background: linear-gradient(90deg, #f43f70, #a855f7, #38bdf8); }
+  .streak-hud[data-tier="legendary"] .streak-meter-fill { background: linear-gradient(90deg, #f59e0b, #f43f70, #a855f7, #38bdf8); }
+  .streak-hud.is-pulsing { animation: streakHudPulse .68s cubic-bezier(.2,.8,.2,1); }
+  .streak-hud.is-pulsing .streak-icon-wrap { animation: streakIconKick .68s cubic-bezier(.2,.8,.2,1); }
+  .chip.streak.is-warm { background: linear-gradient(135deg, #fff1d8, #ffe4b5); color: #9a5800; border-color: rgba(245,158,11,.30); }
+  .chip.streak.is-hot { background: linear-gradient(135deg, #ffe5ed, #ffd0df); color: #be123c; border-color: rgba(244,63,112,.32); }
+  .chip.streak.is-fire { background: linear-gradient(135deg, #f3e6ff, #e9d5ff); color: #7e22ce; border-color: rgba(168,85,247,.38); box-shadow: 0 0 16px rgba(168,85,247,.16); }
+  .chip.streak.is-legendary { background: linear-gradient(135deg, #fff1b8, #ffcf70); color: #78350f; border-color: rgba(245,158,11,.56); box-shadow: 0 0 20px rgba(245,158,11,.22); }
+  .chip.streak.streak-pop { animation: streakChipPop .62s cubic-bezier(.2,.8,.2,1); }
+
+  .streak-celebration {
+    position: fixed;
+    top: clamp(88px, 15vh, 160px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(440px, calc(100vw - 28px));
+    z-index: 1250;
+    pointer-events: none;
+    filter: drop-shadow(0 18px 30px rgba(39,25,99,.24));
+  }
+  .streak-celebration-card {
+    display: grid;
+    justify-items: center;
+    gap: 5px;
+    padding: 19px 22px 18px;
+    border: 1px solid rgba(255,255,255,.48);
+    border-radius: 23px;
+    text-align: center;
+    color: #fff;
+    background: radial-gradient(circle at 50% -20%, rgba(255,255,255,.38), transparent 48%), linear-gradient(125deg, #4f35cb 0%, #8b5cf6 47%, #ec4899 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.32), 0 14px 36px rgba(79,53,203,.25);
+    overflow: hidden;
+    position: relative;
+    animation: streakBannerIn .62s cubic-bezier(.16,1,.3,1) both;
+  }
+  .streak-celebration-card::before, .streak-celebration-card::after {
+    content: "✦";
+    position: absolute;
+    color: rgba(255,255,255,.58);
+    font-size: 1.6rem;
+    text-shadow: 0 0 15px rgba(255,255,255,.48);
+    animation: streakSparkle 1.35s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+  .streak-celebration-card::before { left: 17px; top: 13px; }
+  .streak-celebration-card::after { right: 18px; bottom: 11px; animation-delay: -.45s; }
+  .streak-celebration-eyebrow { font-size: .65rem; font-weight: 1000; letter-spacing: .16em; color: rgba(255,255,255,.84); }
+  .streak-celebration-title { font-size: clamp(1.28rem, 5vw, 1.8rem); line-height: 1.05; font-weight: 1000; letter-spacing: -.035em; text-shadow: 0 3px 18px rgba(28,16,80,.25); }
+  .streak-celebration-detail { max-width: 34ch; color: rgba(255,255,255,.91); font-size: .82rem; font-weight: 650; line-height: 1.4; }
+  .streak-celebration-record { margin-top: 5px; padding: 5px 10px; border-radius: 999px; background: linear-gradient(90deg, #fff0a6, #ffcf70); color: #78350f; border: 1px solid rgba(255,255,255,.55); font-size: .66rem; font-weight: 1000; letter-spacing: .04em; box-shadow: 0 4px 18px rgba(255,207,112,.24); }
+  .streak-celebration.tone-fire .streak-celebration-card { background: radial-gradient(circle at 50% -15%, rgba(255,255,255,.36), transparent 46%), linear-gradient(125deg, #be123c 0%, #f43f70 48%, #f59e0b 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,.36), 0 16px 42px rgba(225,29,72,.28); }
+  .streak-celebration.tone-legendary .streak-celebration-card { background: radial-gradient(circle at 50% -15%, rgba(255,255,255,.43), transparent 46%), linear-gradient(125deg, #92400e 0%, #d97706 35%, #a855f7 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,.42), 0 18px 48px rgba(217,119,6,.28), 0 0 30px rgba(168,85,247,.18); }
+  @keyframes streakHudPulse { 0% { transform: scale(1); } 38% { transform: scale(1.018); } 72% { transform: scale(.995); } 100% { transform: scale(1); } }
+  @keyframes streakIconKick { 0% { transform: rotate(0) scale(1); } 35% { transform: rotate(-12deg) scale(1.22); } 70% { transform: rotate(8deg) scale(.96); } 100% { transform: rotate(0) scale(1); } }
+  @keyframes streakChipPop { 0% { transform: scale(1); } 35% { transform: scale(1.18) rotate(-2deg); } 70% { transform: scale(.97) rotate(1deg); } 100% { transform: scale(1); } }
+  @keyframes streakBannerIn { 0% { opacity: 0; transform: translateY(-18px) scale(.84) rotate(-1.5deg); } 62% { opacity: 1; transform: translateY(3px) scale(1.025) rotate(.4deg); } 82% { transform: translateY(-2px) scale(.99); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+  @keyframes streakSparkle { from { transform: rotate(-12deg) scale(.75); opacity: .48; } to { transform: rotate(15deg) scale(1.18); opacity: 1; } }
+  @media (max-width: 460px) {
+    .streak-hud { margin-bottom: 14px; padding: 11px 12px 10px; }
+    .streak-icon-wrap { width: 37px; height: 37px; flex-basis: 37px; border-radius: 12px; }
+    .streak-value { font-size: 1.35rem; }
+    .streak-next { font-size: .69rem; }
+    .streak-celebration { top: 105px; }
+    .streak-celebration-card { padding: 17px 17px 16px; border-radius: 20px; }
+  }
+
 </style>
 </head>
 <body>
@@ -2388,7 +2548,7 @@
 <div class="app">
   <header class="topbar">
     <div class="topbar-left">
-      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v2.2</span>
+      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v2.3.1</span>
       <div class="brand">
         <div class="brand-mark">V</div>
         <div>
@@ -2425,7 +2585,7 @@
       <div class="home-dashboard">
         <header class="home-intro">
           <div class="home-intro-copy">
-            <p class="home-eyebrow">TU ESPACIO DE ESTUDIO <span>·</span> VERSIÓN 2.2</p>
+            <p class="home-eyebrow">TU ESPACIO DE ESTUDIO <span>·</span> VERSIÓN 2.3</p>
             <h2 id="setup-title">¿Qué vas a practicar hoy?</h2>
             <p>Elige el vocabulario, selecciona la dirección y empieza. Las opciones avanzadas están aparte para que no estorben.</p>
           </div>
@@ -2512,7 +2672,7 @@
           </section>
         </details>
 
-        <div class="home-footer"><span>Practicador de Vocabulario <strong>v2.2</strong></span><span>El avance se guarda localmente.</span><button id="btn-reset" class="link-danger hidden" type="button" title="Borrar todo el progreso guardado">Borrar progreso</button><span id="total-progress" class="hidden"></span></div>
+        <div class="home-footer"><span>Practicador de Vocabulario <strong>v2.3</strong></span><span>El avance se guarda localmente.</span><button id="btn-reset" class="link-danger hidden" type="button" title="Borrar todo el progreso guardado">Borrar progreso</button><span id="total-progress" class="hidden"></span></div>
       </div>
     </section>
 
@@ -2596,6 +2756,20 @@
             <span id="flag-history" class="tag tag-repeated hidden"></span>
           </div>
 
+          <section id="streak-hud" class="streak-hud" aria-label="Racha de aciertos">
+            <div class="streak-hud-top">
+              <div id="streak-icon-wrap" class="streak-icon-wrap" aria-hidden="true"><span id="streak-icon">🔥</span></div>
+              <div class="streak-hud-copy">
+                <div class="streak-hud-line"><span class="streak-hud-label">RACHA ACTUAL</span><strong id="streak-value" class="streak-value">0</strong></div>
+                <p id="streak-next" class="streak-next">2 aciertos seguidos activan el combo</p>
+              </div>
+              <button id="btn-streak-sound" class="streak-sound-toggle" type="button" aria-label="Desactivar sonidos de racha" aria-pressed="true" title="Sonidos de racha activados">🔊</button>
+            </div>
+            <div id="streak-meter-track" class="streak-meter-track" role="progressbar" aria-label="Progreso hacia la siguiente recompensa de racha" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <div id="streak-meter-fill" class="streak-meter-fill"></div>
+            </div>
+          </section>
+
           <div class="word-meta">
             <p id="word-section" class="eyebrow">General</p>
             <span id="flag-difficulty" class="tag tag-medium">INTERMEDIA</span>
@@ -2627,12 +2801,15 @@
               <button id="btn-reveal" class="btn btn-secondary" type="button">Revelar</button>
             </div>
 
-            <button id="btn-submit" class="btn btn-primary btn-lg" type="submit">Comprobar</button>
-            <button id="btn-next" class="btn btn-primary btn-lg hidden" type="button">Siguiente &rarr;</button>
           </form>
 
           <p id="shortcuts" class="shortcuts"></p>
         </article>
+
+        <div class="answer-actions-outside" aria-label="Acciones de respuesta">
+          <button id="btn-submit" class="btn btn-primary btn-lg" type="button">Comprobar</button>
+          <button id="btn-next" class="btn btn-primary btn-lg hidden" type="button">Siguiente &rarr;</button>
+        </div>
       </div>
     </section>
 
@@ -2717,6 +2894,15 @@
   </main>
 </div>
 
+<div id="streak-celebration" class="streak-celebration hidden" role="status" aria-live="polite" aria-atomic="true">
+  <div class="streak-celebration-card">
+    <span id="streak-celebration-eyebrow" class="streak-celebration-eyebrow">COMBO ACTIVADO</span>
+    <strong id="streak-celebration-title" class="streak-celebration-title">¡EN RACHA!</strong>
+    <span id="streak-celebration-detail" class="streak-celebration-detail">Dos respuestas correctas seguidas.</span>
+    <span id="streak-celebration-record" class="streak-celebration-record" hidden>✦ NUEVO RÉCORD PERSONAL</span>
+  </div>
+</div>
+
 <div id="modal" class="modal" hidden>
   <div class="modal-backdrop" data-close></div>
   <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-title">
@@ -2735,9 +2921,9 @@
 (() => {
   'use strict';
 
-  // VERSIÓN DE LA APP: 2.2
+  // VERSIÓN DE LA APP: 2.3
   // IMPORTANTE: CAMBIA APP_VERSION SIEMPRE QUE AGREGUES O MODIFIQUES FUNCIONALIDAD.
-  const APP_VERSION = '2.2';
+  const APP_VERSION = '2.3';
 
   /* ======================================================================
      DATOS · vocabData con las 504 entradas originales
@@ -4344,7 +4530,7 @@
     stats: { answered: 0, correct: 0, bestStreak: 0, currentStreak: 0, sessions: 0 },
     itemStats: {},
     history: [],
-    settings: { theme: null, mode: 'EN-ES', pinnedBlocks: [], reviewedBlocks: [] }
+    settings: { theme: null, mode: 'EN-ES', pinnedBlocks: [], reviewedBlocks: [], streakSounds: true }
   });
 
   function readJSON(key) {
@@ -4509,6 +4695,18 @@
     chipBad: $('#chip-bad'),
     chipValid: $('#chip-valid'),
     chipStreak: $('#chip-streak'),
+    streakHud: $('#streak-hud'),
+    streakIcon: $('#streak-icon'),
+    streakValue: $('#streak-value'),
+    streakNext: $('#streak-next'),
+    streakMeterTrack: $('#streak-meter-track'),
+    streakMeterFill: $('#streak-meter-fill'),
+    streakSound: $('#btn-streak-sound'),
+    streakCelebration: $('#streak-celebration'),
+    streakCelebrationEyebrow: $('#streak-celebration-eyebrow'),
+    streakCelebrationTitle: $('#streak-celebration-title'),
+    streakCelebrationDetail: $('#streak-celebration-detail'),
+    streakCelebrationRecord: $('#streak-celebration-record'),
 
     wordCard: $('#word-card'),
     flagMode: $('#flag-mode'),
@@ -4570,6 +4768,10 @@
      UI HELPERS
      ====================================================================== */
   function showView(name) {
+    if (name !== 'practice' && el.streakCelebration) {
+      el.streakCelebration.classList.add('hidden');
+      clearTimeout(streakCelebrationTimer);
+    }
     Object.entries(views).forEach(([key, node]) => {
       if (!node) return;
       node.classList.toggle('is-active', key === name);
@@ -4689,6 +4891,138 @@
 
     document.body.appendChild(layer);
     setTimeout(() => layer.remove(), 2200);
+  }
+
+  let streakAudioContext = null;
+  let streakCelebrationTimer = null;
+
+  function updateStreakSoundButton() {
+    if (!el.streakSound) return;
+    const enabled = db.settings.streakSounds !== false;
+    el.streakSound.textContent = enabled ? '🔊' : '🔇';
+    el.streakSound.setAttribute('aria-pressed', String(enabled));
+    el.streakSound.setAttribute('aria-label', enabled ? 'Desactivar sonidos de racha' : 'Activar sonidos de racha');
+    el.streakSound.title = enabled ? 'Sonidos de racha activados' : 'Sonidos de racha desactivados';
+  }
+
+  function playStreakSound(streak, isNewRecord = false) {
+    if (db.settings.streakSounds === false) return;
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+
+    try {
+      if (!streakAudioContext || streakAudioContext.state === 'closed') {
+        streakAudioContext = new AudioContextClass();
+      }
+      const context = streakAudioContext;
+      const play = () => {
+        if (!context || context.state === 'closed') return;
+        let notes = streak >= 20 ? [523.25, 659.25, 783.99, 1046.5]
+          : streak >= 10 ? [440, 554.37, 659.25, 880]
+          : streak >= 5 ? [523.25, 659.25, 783.99]
+          : [587.33, 783.99];
+        if (isNewRecord) notes = [523.25, 659.25, 783.99, 1046.5, 1318.51];
+        const startAt = context.currentTime + 0.025;
+        notes.forEach((frequency, index) => {
+          const oscillator = context.createOscillator();
+          const volume = context.createGain();
+          const noteStart = startAt + index * (isNewRecord ? 0.065 : 0.075);
+          oscillator.type = streak >= 10 || isNewRecord ? 'triangle' : 'sine';
+          oscillator.frequency.setValueAtTime(frequency, noteStart);
+          volume.gain.setValueAtTime(0.0001, noteStart);
+          volume.gain.exponentialRampToValueAtTime(isNewRecord ? 0.042 : 0.032, noteStart + 0.018);
+          volume.gain.exponentialRampToValueAtTime(0.0001, noteStart + 0.205);
+          oscillator.connect(volume);
+          volume.connect(context.destination);
+          oscillator.start(noteStart);
+          oscillator.stop(noteStart + 0.22);
+        });
+      };
+      if (streakAudioContext.state === 'suspended') {
+        streakAudioContext.resume().then(play).catch(() => {});
+      } else {
+        play();
+      }
+    } catch {
+      // El audio es un extra: una restricción del navegador nunca debe bloquear el ejercicio.
+    }
+  }
+
+  function streakCelebrationCopy(streak, isNewRecord, previousBestStreak) {
+    const copy = {
+      2: { eyebrow: 'COMBO ACTIVADO', title: '¡SE ENCENDIÓ LA RACHA!', detail: 'Dos aciertos seguidos. Ahora ve por el siguiente nivel.' },
+      3: { eyebrow: 'PRIMER HITO', title: '¡3 ENCADENADAS!', detail: 'El combo está vivo. Una más y llegas a cinco.' },
+      5: { eyebrow: 'RACHA EN ASCENSO', title: '¡ESTÁS EN RACHA!', detail: 'Cinco aciertos consecutivos. Mantén el ritmo.' },
+      7: { eyebrow: 'NIVEL CALIENTE', title: '¡IMPARABLE!', detail: 'Siete seguidas. La concentración está funcionando.' },
+      10: { eyebrow: 'DOBLE DÍGITO', title: '¡10 RESPUESTAS SEGUIDAS!', detail: 'La racha ya es seria. Siguiente objetivo: quince.' },
+      15: { eyebrow: 'MODO INCENDIO', title: '¡QUINCE IMPARABLES!', detail: 'Quince aciertos consecutivos. No aflojes el ritmo.' },
+      20: { eyebrow: 'MODO LEYENDA', title: '¡20 EN RACHA!', detail: 'Veinte seguidas. Esto ya es una racha extraordinaria.' },
+      25: { eyebrow: 'NIVEL ÉLITE', title: '¡VEINTICINCO!', detail: 'Una tras otra: estás dominando estas tarjetas.' },
+      30: { eyebrow: 'RACHA HISTÓRICA', title: '¡30 ACERTADAS SEGUIDAS!', detail: 'Treinta respuestas consecutivas. Siguiente parada: treinta y cinco.' }
+    };
+    if (isNewRecord && !copy[streak] && !(streak > 30 && streak % 5 === 0)) {
+      return {
+        eyebrow: 'NUEVO RÉCORD PERSONAL',
+        title: '¡NUEVA MEJOR RACHA!',
+        detail: `${streak} aciertos seguidos: superaste tu marca anterior de ${previousBestStreak}.`
+      };
+    }
+    if (copy[streak]) return copy[streak];
+    return {
+      eyebrow: streak >= 20 ? 'MODO LEYENDA' : 'RACHA QUE NO PARA',
+      title: `¡${streak} EN RACHA!`,
+      detail: `${streak} aciertos consecutivos. Tu siguiente objetivo está cada vez más cerca.`
+    };
+  }
+
+  function showStreakCelebration(streak, isNewRecord, previousBestStreak) {
+    const info = streakCelebrationCopy(streak, isNewRecord, previousBestStreak);
+    const banner = el.streakCelebration;
+    banner.classList.add('hidden');
+    banner.classList.remove('tone-combo', 'tone-fire', 'tone-legendary');
+    el.streakCelebrationEyebrow.textContent = info.eyebrow;
+    el.streakCelebrationTitle.textContent = info.title;
+    el.streakCelebrationDetail.textContent = info.detail;
+    el.streakCelebrationRecord.hidden = !isNewRecord;
+    const tone = streak >= 20 ? 'tone-legendary' : streak >= 7 ? 'tone-fire' : 'tone-combo';
+    banner.classList.add(tone);
+    void banner.offsetWidth;
+    banner.classList.remove('hidden');
+    clearTimeout(streakCelebrationTimer);
+    streakCelebrationTimer = setTimeout(() => banner.classList.add('hidden'), isNewRecord ? 2400 : 1850);
+  }
+
+  function celebrateStreak(streak, { isNewRecord = false, previousBestStreak = 0 } = {}) {
+    if (state.studyMode?.feedback === 'blind') return;
+    const milestone = STREAK_MILESTONES.includes(streak) || (streak > 30 && streak % 5 === 0);
+    const showBigReward = milestone || isNewRecord;
+
+    // Pulso de la barra y del contador en todos los aciertos; más energía en cada hito.
+    el.streakHud.classList.remove('is-pulsing');
+    void el.streakHud.offsetWidth;
+    el.streakHud.classList.add('is-pulsing');
+    el.chipStreak.classList.remove('streak-pop');
+    void el.chipStreak.offsetWidth;
+    el.chipStreak.classList.add('streak-pop');
+    setTimeout(() => {
+      el.streakHud.classList.remove('is-pulsing');
+      el.chipStreak.classList.remove('streak-pop');
+    }, 720);
+
+    const confettiCount = isNewRecord ? 120 : showBigReward ? Math.min(120, 72 + Math.floor(streak / 5) * 8) : 48;
+    launchConfetti({ count: confettiCount });
+    if (showBigReward) {
+      showStreakCelebration(streak, isNewRecord, previousBestStreak);
+      playStreakSound(streak, isNewRecord);
+      if (streak >= 5 || isNewRecord) {
+        const followUpCount = isNewRecord ? 56 : Math.min(68, 34 + Math.floor(streak / 3) * 5);
+        setTimeout(() => {
+          if (views.practice.classList.contains('is-active') && state.streak >= streak && state.studyMode?.feedback !== 'blind') {
+            launchConfetti({ count: followUpCount });
+          }
+        }, 190);
+      }
+    }
   }
 
   function difficultyTagClass(difficulty) {
@@ -5376,6 +5710,8 @@
     el.flagMode.textContent = state.studyMode?.name || (isReview ? 'REVISAR · SIN PISTA' : categoryLabel(state.categoryMode));
     el.flagMode.className = `tag ${isReview ? 'tag-review' : 'tag-primary'}`;
     $('.score-chips')?.classList.toggle('hidden', isBlind);
+    el.streakHud.classList.toggle('hidden', isBlind);
+    updateStreakHUD();
 
     el.flagRepeat.classList.toggle('hidden', !item.repeated);
 
@@ -5507,6 +5843,47 @@
     });
   }
 
+  const STREAK_MILESTONES = [2, 3, 5, 7, 10, 15, 20, 25, 30];
+
+  function nextStreakMilestone(streak) {
+    const next = STREAK_MILESTONES.find(value => value > streak);
+    return next ?? (Math.floor(streak / 5) + 1) * 5;
+  }
+
+  function previousStreakMilestone(streak) {
+    if (streak >= 30) return Math.floor(streak / 5) * 5;
+    const previous = STREAK_MILESTONES.filter(value => value <= streak);
+    return previous.length ? previous[previous.length - 1] : 0;
+  }
+
+  function updateStreakHUD() {
+    if (!el.streakHud) return;
+    const streak = Math.max(0, Number(state.streak) || 0);
+    const next = nextStreakMilestone(streak);
+    const previous = previousStreakMilestone(streak);
+    const segmentSize = Math.max(1, next - previous);
+    const progress = Math.max(0, Math.min(100, ((streak - previous) / segmentSize) * 100));
+    const remaining = Math.max(0, next - streak);
+    const tier = streak >= 20 ? 'legendary' : streak >= 10 ? 'fire' : streak >= 5 ? 'hot' : streak >= 2 ? 'warm' : 'start';
+
+    el.streakValue.textContent = String(streak);
+    el.streakIcon.textContent = streak >= 20 ? '🏆' : streak >= 10 ? '🔥' : streak >= 5 ? '⚡' : streak >= 2 ? '✨' : '🔥';
+    el.streakHud.dataset.tier = tier;
+    el.streakMeterFill.style.width = `${progress}%`;
+    el.streakMeterTrack.setAttribute('aria-valuenow', String(Math.round(progress)));
+    el.streakHud.setAttribute('aria-label', `Racha actual: ${streak} aciertos seguidos.`);
+    el.streakNext.textContent = streak === 0
+      ? '2 aciertos seguidos activan el combo'
+      : `${remaining} ${remaining === 1 ? 'acierto' : 'aciertos'} para la siguiente recompensa · objetivo ${next}`;
+
+    el.chipStreak.textContent = streak >= 10 ? `🔥 Racha ${streak}` : `Racha ${streak}`;
+    el.chipStreak.classList.toggle('hidden', streak < 2);
+    el.chipStreak.classList.toggle('is-warm', streak >= 2 && streak < 5);
+    el.chipStreak.classList.toggle('is-hot', streak >= 5 && streak < 10);
+    el.chipStreak.classList.toggle('is-fire', streak >= 10 && streak < 20);
+    el.chipStreak.classList.toggle('is-legendary', streak >= 20);
+  }
+
   function updateLiveChips() {
     const ok = state.results.filter(r => r.status === 'correct').length;
     const validOther = state.results.filter(r => r.status === 'valid-other').length;
@@ -5516,8 +5893,7 @@
     el.chipBad.textContent = `${bad} fallos`;
     el.chipValid.textContent = `${validOther} ${validOther === 1 ? 'válida fuera de tarjeta' : 'válidas fuera de tarjeta'}`;
     el.chipValid.classList.toggle('hidden', validOther === 0);
-    el.chipStreak.textContent = `Racha ${state.streak}`;
-    el.chipStreak.classList.toggle('hidden', state.streak < 2);
+    updateStreakHUD();
   }
 
   /* ======================================================================
@@ -5868,7 +6244,9 @@
         result.slot.usedText = userAnswer.trim();
       }
 
+      const previousBestStreak = Number(db.stats.bestStreak) || 0;
       state.streak += 1;
+      const isNewRecord = state.streak >= 2 && state.streak > previousBestStreak;
       db.stats.correct += 1;
       db.stats.currentStreak += 1;
       db.stats.bestStreak = Math.max(db.stats.bestStreak, db.stats.currentStreak);
@@ -5879,7 +6257,7 @@
         el.feedback.replaceChildren();
       } else {
         el.input.classList.add('correct');
-        launchConfetti();                            // 🎉 celebración al acertar
+        celebrateStreak(state.streak, { isNewRecord, previousBestStreak });
         el.feedback.hidden = false;
         el.feedback.className = 'feedback success';
         el.feedback.replaceChildren(
@@ -7681,13 +8059,38 @@
     toast('Progreso borrado', 'success');
   });
 
+  el.streakSound.addEventListener('click', () => {
+    db.settings.streakSounds = db.settings.streakSounds === false;
+    updateStreakSoundButton();
+    saveDB();
+    toast(db.settings.streakSounds ? 'Sonidos de racha activados' : 'Sonidos de racha desactivados', 'info');
+  });
+
   el.btnHint.addEventListener('click', useHint);
   el.btnReveal.addEventListener('click', revealAnswer);
   el.btnNext.addEventListener('click', goNext);
 
+  // El botón de comprobar está fuera de la tarjeta y del formulario: su clic
+  // llama directamente al verificador. Conservamos submit para accesibilidad y
+  // para cualquier envío programático del formulario.
+  el.btnSubmit.addEventListener('click', event => {
+    event.preventDefault();
+    if (!state.answered) submitAnswer();
+  });
+
   el.form.addEventListener('submit', event => {
     event.preventDefault();
-    submitAnswer();
+    if (!state.answered) submitAnswer();
+  });
+
+  // No dependemos del envío implícito del navegador: Enter comprueba aquí mismo.
+  // stopPropagation evita que el listener global reutilice el mismo Enter para
+  // saltar inmediatamente a la siguiente tarjeta tras marcar la respuesta.
+  el.input.addEventListener('keydown', event => {
+    if (event.key !== 'Enter' || event.isComposing) return;
+    event.preventDefault();
+    event.stopPropagation();
+    if (!state.answered) submitAnswer();
   });
 
   $$('input[name="mode"]').forEach(input => {
@@ -7751,6 +8154,7 @@
      ====================================================================== */
   function init() {
     initTheme();
+    updateStreakSoundButton();
     populateBlocks();
     syncBlockPickerLabel();
     updateVocabSelectionSummary();
