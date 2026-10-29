@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Practicador de vocabulario inglés-español con categorías de dificultad, errores, repaso y estadísticas.">
 <meta name="theme-color" content="#4f46e5">
-<title>Practicador de Vocabulario · Versión 2.3.2</title>
+<title>Practicador de Vocabulario · Versión 2.3.3</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; }
 
@@ -2576,6 +2576,49 @@
     .vocab-footer-actions .btn { min-width:0; }
   }
 
+
+  /* Filtro REGALADAS global: visible en todas las páginas de menú, no perdido dentro de Inicio. */
+  .easy-filter-strip {
+    flex:0 0 auto; display:flex; justify-content:center; align-items:center;
+    padding:7px clamp(12px,2.4vw,26px);
+    border-bottom:1px solid var(--border);
+    background:linear-gradient(90deg, color-mix(in srgb,var(--primary-soft) 48%,var(--surface-solid)), var(--surface-solid) 52%, color-mix(in srgb,var(--primary-soft) 38%,var(--surface-solid)));
+  }
+  .easy-filter-strip[hidden] { display:none !important; }
+  .easy-filter-strip .easy-filter-btn {
+    width:min(760px,100%); min-height:44px; margin:0; padding:8px 13px;
+    display:flex; align-items:center; gap:11px; text-align:left;
+    border:1px solid color-mix(in srgb,var(--primary) 28%,var(--border));
+    border-radius:13px; background:var(--surface-solid);
+    box-shadow:0 4px 14px rgba(60,55,130,.07),inset 0 1px 0 rgba(255,255,255,.5);
+  }
+  .easy-filter-strip .easy-filter-btn.is-active {
+    background:linear-gradient(100deg,var(--primary-soft),var(--surface-solid));
+    border-color:color-mix(in srgb,var(--primary) 48%,var(--border));
+    box-shadow:0 5px 18px rgba(104,88,255,.10),inset 0 1px 0 rgba(255,255,255,.6);
+  }
+  .easy-filter-strip .easy-filter-icon {
+    width:29px; height:29px; flex-basis:29px; border-radius:9px;
+    background:var(--primary); color:#fff; border:0; font-size:.9rem;
+  }
+  .easy-filter-strip .easy-filter-copy { display:grid; gap:2px; min-width:0; flex:1 1 auto; }
+  .easy-filter-strip .easy-filter-copy strong { color:var(--text); font-size:.77rem; line-height:1.2; font-weight:950; }
+  .easy-filter-strip .easy-filter-copy small { display:block; color:var(--muted); font-size:.65rem; line-height:1.3; }
+  .easy-filter-strip .easy-filter-state { padding:6px 9px; border-radius:999px; color:var(--muted); background:var(--surface-3); border:1px solid var(--border); font-size:.60rem; font-weight:950; white-space:nowrap; }
+  .easy-filter-strip .easy-filter-btn.is-active .easy-filter-state { color:var(--primary); background:var(--surface-solid); border-color:color-mix(in srgb,var(--primary) 32%,var(--border)); }
+  .easy-filter-strip .easy-filter-btn:focus-visible { outline:none; box-shadow:var(--ring),0 5px 18px rgba(104,88,255,.12); }
+  @media (max-width:620px) {
+    .easy-filter-strip { padding:5px 9px; }
+    .easy-filter-strip .easy-filter-btn { min-height:40px; padding:6px 8px; gap:8px; }
+    .easy-filter-strip .easy-filter-copy strong { font-size:.68rem; }
+    .easy-filter-strip .easy-filter-copy small { font-size:.57rem; }
+    .easy-filter-strip .easy-filter-state { padding:5px 7px; font-size:.54rem; }
+  }
+  @media (max-height:670px) and (max-width:620px) {
+    .easy-filter-strip { padding:3px 7px; }
+    .easy-filter-strip .easy-filter-btn { min-height:34px; padding:4px 7px; }
+    .easy-filter-strip .easy-filter-copy small { display:none; }
+  }
 </style>
 </head>
 <body>
@@ -2583,7 +2626,7 @@
 <div class="app">
   <header class="topbar">
     <div class="topbar-left">
-      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v2.3.2</span>
+      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v2.3.3</span>
       <div class="brand">
         <div class="brand-mark">V</div>
         <div>
@@ -2614,13 +2657,24 @@
     <button class="main-nav-btn" type="button" data-page="tools" data-short-label="Herram."><span aria-hidden="true">⚙</span><span>Herramientas</span></button>
   </nav>
 
+  <div id="easy-filter-strip" class="easy-filter-strip" aria-label="Filtro global de tarjetas regaladas">
+    <button id="btn-exclude-easy" class="easy-filter-btn is-active" type="button" aria-pressed="true">
+      <span id="easy-filter-icon" class="easy-filter-icon" aria-hidden="true">✓</span>
+      <span class="easy-filter-copy">
+        <strong id="easy-filter-label">Excluir tarjetas REGALADAS</strong>
+        <small id="easy-filter-detail">No aparecen en búsquedas, listados ni en Todo el vocabulario.</small>
+      </span>
+      <span id="easy-filter-state" class="easy-filter-state">ACTIVADO</span>
+    </button>
+  </div>
+
   <main>
     <!-- ============================ SETUP ============================ -->
     <section id="view-setup" class="view is-active" aria-labelledby="setup-title">
       <div class="home-dashboard">
         <header class="home-intro">
           <div class="home-intro-copy">
-            <p class="home-eyebrow">TU ESPACIO DE ESTUDIO <span>·</span> VERSIÓN 2.3.2</p>
+            <p class="home-eyebrow">TU ESPACIO DE ESTUDIO <span>·</span> VERSIÓN 2.3.3</p>
             <h2 id="setup-title">¿Qué vas a practicar hoy?</h2>
             <p>Elige el vocabulario, selecciona la dirección y empieza. Las opciones avanzadas están aparte para que no estorben.</p>
           </div>
@@ -2652,12 +2706,6 @@
               <label><input type="radio" name="mode" value="ES-EN" aria-label="Español a Inglés"><span>Español → inglés</span></label>
               <label><input type="radio" name="mode" value="MIX" aria-label="Mezcla aleatoria"><span>Mezclada</span></label>
             </div>
-
-            <button id="btn-exclude-easy" class="easy-filter-btn is-active" type="button" aria-pressed="true" title="Se aplica a sesiones generales; los bloques de dificultad regalada siguen disponibles.">
-              <span id="easy-filter-icon" class="easy-filter-icon" aria-hidden="true">✓</span>
-              <span class="easy-filter-copy"><strong id="easy-filter-label">Omitir tarjetas “regaladas”</strong><small>Solo se excluyen en sesiones generales; sus bloques siguen disponibles.</small></span>
-              <span id="easy-filter-state" class="easy-filter-state">EXCLUIDAS</span>
-            </button>
 
             <div class="setup-actions">
               <button id="btn-start" class="btn btn-primary btn-lg" type="button"><span>Empezar práctica</span><span class="arrow" aria-hidden="true">→</span></button>
@@ -2711,7 +2759,7 @@
           </section>
         </details>
 
-        <div class="home-footer"><span>Practicador de Vocabulario <strong>v2.3.2</strong></span><span>El avance se guarda localmente.</span><button id="btn-reset" class="link-danger hidden" type="button" title="Borrar todo el progreso guardado">Borrar progreso</button><span id="total-progress" class="hidden"></span></div>
+        <div class="home-footer"><span>Practicador de Vocabulario <strong>v2.3.3</strong></span><span>El avance se guarda localmente.</span><button id="btn-reset" class="link-danger hidden" type="button" title="Borrar todo el progreso guardado">Borrar progreso</button><span id="total-progress" class="hidden"></span></div>
       </div>
     </section>
 
@@ -2961,7 +3009,7 @@
 
   // VERSIÓN DE LA APP: 2.3
   // IMPORTANTE: CAMBIA APP_VERSION SIEMPRE QUE AGREGUES O MODIFIQUES FUNCIONALIDAD.
-  const APP_VERSION = '2.3.2';
+  const APP_VERSION = '2.3.3';
 
   /* ======================================================================
      DATOS · vocabData con las 504 entradas originales
@@ -4824,6 +4872,8 @@
     }
     const mainNav = $('#main-navigation');
     const immersive = ['practice', 'results', 'flashcards'].includes(name);
+    const easyFilterStrip = $('#easy-filter-strip');
+    if (easyFilterStrip) easyFilterStrip.hidden = immersive;
     main.classList.toggle('is-menu-page', !immersive);
     if (mainNav) {
       mainNav.hidden = immersive;
@@ -5311,8 +5361,8 @@
   /* ======================================================================
      SELECCIÓN DE ITEMS
      ====================================================================== */
-  // El filtro solo afecta colecciones generales. Si el usuario elige de forma
-  // explícita el nivel/bloque Regalada, esas tarjetas se mantienen disponibles.
+  // Filtro global: cualquier colección general pierde las tarjetas REGALADAS.
+  // La única excepción es una selección explícita del nivel Regalada.
   function generalItems(items) {
     const source = Array.isArray(items) ? items : [];
     return db.settings.excludeEasy === false
@@ -5324,7 +5374,7 @@
     if (DIFFICULTIES.includes(category)) {
       return QUESTIONS.filter(q => q.difficulty === category);
     }
-    if (category === 'review') return reviewItems();
+    if (category === 'review') return generalItems(reviewItems());
     if (category.startsWith('mistakes-')) {
       const difficulty = category.replace('mistakes-', '');
       return mistakeItems().filter(q => q.difficulty === difficulty);
@@ -5414,9 +5464,10 @@
     return mode;
   }
 
-  function startFlashcards(items, blockName = 'Vocabulario') {
-    if (!items || !items.length) {
-      toast('No hay tarjetas disponibles para estudiar', 'error');
+  function startFlashcards(items, blockName = 'Vocabulario', allowEasyOverride = false) {
+    items = allowEasyOverride ? (Array.isArray(items) ? items.slice() : []) : generalItems(items);
+    if (!items.length) {
+      toast('No hay tarjetas disponibles con el filtro actual. Desactiva «Excluir REGALADAS» para incluirlas.', 'info');
       return;
     }
 
@@ -5697,9 +5748,11 @@
   /* ======================================================================
      SESIÓN
      ====================================================================== */
-  function startSession(items, categoryMode = 'practice', studyMode = null) {
-    if (!items || !items.length) {
-      toast('No hay preguntas disponibles', 'error');
+  function startSession(items, categoryMode = 'practice', studyMode = null, allowEasyOverride = false) {
+    const explicitEasy = allowEasyOverride || categoryMode === 'easy' || categoryMode === 'mistakes-easy';
+    items = explicitEasy ? (Array.isArray(items) ? items.slice() : []) : generalItems(items);
+    if (!items.length) {
+      toast('No hay preguntas disponibles con el filtro actual. Desactiva «Excluir REGALADAS» para incluirlas.', 'info');
       return;
     }
 
@@ -6921,8 +6974,8 @@
     const body = document.createDocumentFragment();
 
     const sections = [
-      { key: 'mistakes', title: 'Errores', items: mistakeItems() },
-      { key: 'review',   title: 'Revisar', items: reviewItems() }
+      { key: 'mistakes', title: 'Errores', items: generalItems(mistakeItems()) },
+      { key: 'review',   title: 'Revisar', items: generalItems(reviewItems()) }
     ];
 
     let hasAny = false;
@@ -6995,7 +7048,7 @@
       practice.className = 'btn btn-primary';
       practice.textContent = 'Practicar todo';
       practice.addEventListener('click', () => {
-        const all = [...mistakeItems(), ...reviewItems()];
+        const all = [...generalItems(mistakeItems()), ...generalItems(reviewItems())];
         const uniqueByUid = [...new Map(all.map(i => [i.uid, i])).values()];
         closeModal();
         startSession(uniqueByUid, 'practice');
@@ -7067,9 +7120,9 @@
     };
 
     addTitle('Sesiones rápidas');
-    addChoice('Aleatorio', `${Math.min(SESSION_SIZE, QUESTIONS.length)} tarjetas mezcladas`, () => {
+    addChoice('Aleatorio', `${Math.min(SESSION_SIZE, generalItems(QUESTIONS).length)} tarjetas mezcladas`, () => {
       closeModal();
-      startSession(shuffle(QUESTIONS).slice(0, SESSION_SIZE), 'practice');
+      startSession(shuffle(generalItems(QUESTIONS)).slice(0, SESSION_SIZE), 'practice');
     });
 
     addTitle('Por dificultad');
@@ -7082,6 +7135,8 @@
     }
 
     const addBlockChoice = (block, special = false) => {
+      const visibleItems = generalItems(block.items);
+      if (!visibleItems.length) return;
       const row = document.createElement('div');
       row.className = 'session-choice session-block-choice';
 
@@ -7089,7 +7144,7 @@
       const strong = document.createElement('strong');
       setBlockHeading(strong, block);
       const small = document.createElement('small');
-      small.textContent = `${block.items.length} ${special ? 'palabras' : 'tarjetas'} · práctica y flashcards disponibles`;
+      small.textContent = `${visibleItems.length} ${special ? 'palabras' : 'tarjetas'} · práctica y flashcards disponibles`;
       text.append(strong, small);
 
       const actions = document.createElement('span');
@@ -7101,7 +7156,7 @@
       practice.textContent = 'Contestar';
       practice.addEventListener('click', () => {
         closeModal();
-        startSession(block.items, 'practice');
+        startSession(visibleItems, 'practice');
       });
 
       const flash = document.createElement('button');
@@ -7110,7 +7165,7 @@
       flash.textContent = '🎴 Flashcards';
       flash.addEventListener('click', () => {
         closeModal();
-        startFlashcards(block.items, block.name);
+        startFlashcards(visibleItems, block.name);
       });
 
       actions.append(practice, flash);
@@ -7139,7 +7194,7 @@
     }
 
     addTitle('Guardados');
-    const review = reviewItems();
+    const review = generalItems(reviewItems());
     addChoice('Revisar', `${review.length} tarjetas guardadas`, () => {
       if (!review.length) { toast('No hay tarjetas en Revisar', 'info'); return; }
       closeModal();
@@ -7174,6 +7229,8 @@
     blocksSection.appendChild(blocksHint);
 
     const renderBlockButton = (block, special = false) => {
+      const visibleItems = generalItems(block.items);
+      if (!visibleItems.length) return null;
       const wrap = document.createElement('div');
       wrap.className = special ? 'explore-special-wrap' : 'explore-block-wrap';
 
@@ -7193,7 +7250,7 @@
 
       const count = document.createElement('span');
       count.className = 'explore-block-count';
-      count.textContent = `${block.items.length} ${special ? 'palabras' : 'tarjetas'} · práctica`;
+      count.textContent = `${visibleItems.length} ${special ? 'palabras' : 'tarjetas'} · práctica`;
       main.append(name, count);
 
       const actionWrap = document.createElement('span');
@@ -7211,7 +7268,7 @@
       flash.setAttribute('aria-label', `Abrir ${block.name} como flashcards`);
       flash.addEventListener('click', event => {
         event.stopPropagation();
-        startFlashcards(block.items, block.name);
+        startFlashcards(visibleItems, block.name);
       });
 
       const reviewed = createBlockReviewToggle(block, () => setBlockHeading(name, block));
@@ -7233,11 +7290,11 @@
 
       actionWrap.append(practice, flash, reviewed, pin);
       button.append(main, actionWrap);
-      button.addEventListener('click', () => startSession(block.items, 'practice'));
+      button.addEventListener('click', () => startSession(visibleItems, 'practice'));
       button.addEventListener('keydown', event => {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault();
-          startSession(block.items, 'practice');
+          startSession(visibleItems, 'practice');
         }
       });
 
@@ -7247,7 +7304,7 @@
 
     const regularGrid = document.createElement('div');
     regularGrid.className = 'explore-block-grid';
-    BLOCKS.forEach(block => regularGrid.appendChild(renderBlockButton(block, false)));
+    BLOCKS.forEach(block => { const node = renderBlockButton(block, false); if (node) regularGrid.appendChild(node); });
     blocksSection.appendChild(regularGrid);
 
     const similarTitle = document.createElement('h3');
@@ -7257,7 +7314,7 @@
 
     const similarGrid = document.createElement('div');
     similarGrid.className = 'explore-block-grid';
-    SIMILAR_BLOCKS.forEach(block => similarGrid.appendChild(renderBlockButton(block, false)));
+    SIMILAR_BLOCKS.forEach(block => { const node = renderBlockButton(block, false); if (node) similarGrid.appendChild(node); });
     blocksSection.appendChild(similarGrid);
 
     const specialTitle = document.createElement('h3');
@@ -7267,7 +7324,7 @@
 
     const specialGrid = document.createElement('div');
     specialGrid.className = 'explore-block-grid';
-    SPECIAL_BLOCKS.forEach(block => specialGrid.appendChild(renderBlockButton(block, true)));
+    SPECIAL_BLOCKS.forEach(block => { const node = renderBlockButton(block, true); if (node) specialGrid.appendChild(node); });
     blocksSection.appendChild(specialGrid);
 
     wrapper.appendChild(blocksSection);
@@ -7295,9 +7352,10 @@
     const MAX = 80;
     function render(query) {
       const q = normalize(query);
+      const visibleVocabulary = generalItems(ALL_QUESTIONS);
       const matches = q
-        ? ALL_QUESTIONS.filter(item => normalize(item.english).includes(q) || normalize(item.spanish).includes(q))
-        : ALL_QUESTIONS;
+        ? visibleVocabulary.filter(item => normalize(item.english).includes(q) || normalize(item.spanish).includes(q))
+        : visibleVocabulary;
 
       const shown = matches.slice(0, MAX);
       info.textContent = matches.length
@@ -7451,7 +7509,7 @@
     }));
     if (value === 'mistakes') return generalItems(mistakeItems());
     if (value === 'review') return reviewItems();
-    if (value === 'confusion') return [...new Map(SIMILAR_BLOCKS.flatMap(block => block.items).map(item => [item.uid, item])).values()];
+    if (value === 'confusion') return generalItems([...new Map(SIMILAR_BLOCKS.flatMap(block => block.items).map(item => [item.uid, item])).values()]);
     if (value === 'current') return state.sessionContentItems.slice();
     if (['easy','medium','hard'].includes(value)) return QUESTIONS.filter(item => item.difficulty === value);
     if (value === 'block') {
@@ -7703,11 +7761,17 @@
     button.classList.toggle('is-active', excluded);
     button.setAttribute('aria-pressed', String(excluded));
     button.setAttribute('aria-label', excluded
-      ? 'Regaladas excluidas de sesiones generales; pulsa para incluirlas'
-      : 'Regaladas incluidas en sesiones generales; pulsa para excluirlas');
+      ? 'Filtro activado: las tarjetas REGALADAS no aparecen en listas, búsquedas ni colecciones completas. Pulsa para incluirlas.'
+      : 'Filtro desactivado: las tarjetas REGALADAS están incluidas. Pulsa para excluirlas de toda la aplicación.');
+    button.title = excluded
+      ? 'Activado: no verás REGALADAS en Todo el vocabulario, búsquedas ni sesiones generales. Puedes elegir el nivel Regalada para estudiarlas expresamente.'
+      : 'Desactivado: las REGALADAS vuelven a aparecer en las colecciones, búsquedas y sesiones.';
     $('#easy-filter-icon').textContent = excluded ? '✓' : '＋';
-    $('#easy-filter-label').textContent = excluded ? 'Omitir tarjetas “regaladas”' : 'Incluir tarjetas “regaladas”';
-    $('#easy-filter-state').textContent = excluded ? 'EXCLUIDAS' : 'INCLUIDAS';
+    $('#easy-filter-label').textContent = excluded ? 'Excluir REGALADAS de toda la aplicación' : 'Incluir REGALADAS en toda la aplicación';
+    $('#easy-filter-detail').textContent = excluded
+      ? 'Ocultas en búsquedas, bloques, flashcards y «Todo el vocabulario». Elige «Regalada» para estudiarlas expresamente.'
+      : 'Volverán a aparecer en búsquedas, bloques, flashcards y «Todo el vocabulario».';
+    $('#easy-filter-state').textContent = excluded ? 'ACTIVADO' : 'DESACTIVADO';
   }
 
   function refreshBroadOptionCounts() {
@@ -7719,6 +7783,7 @@
   }
 
   const vocabPickerState = { category: 'quick', difficulty: 'all', page: 0, query: '' };
+  let explicitEasyBlockSelection = false;
 
   const VOCAB_CATEGORY_DEFS = [
     { id: 'quick', label: 'Selección rápida', icon: '⚡' },
@@ -7729,21 +7794,34 @@
     { id: 'all', label: 'Todos', icon: '☷' }
   ];
 
-  function getVocabularyCandidates() {
+  function getVocabularyCandidates(allowExplicitEasy = false) {
+    const excludeEasy = db.settings.excludeEasy !== false && !allowExplicitEasy;
+    const visibleItems = items => excludeEasy ? generalItems(items) : (Array.isArray(items) ? items.slice() : []);
     const mainPool = generalItems(QUESTIONS);
     const fullPool = generalItems(ALL_QUESTIONS);
-    const exclusionDetail = db.settings.excludeEasy === false ? '' : ' · dificultad regalada excluida';
+    const exclusionDetail = db.settings.excludeEasy === false ? '' : ' · REGALADAS excluidas';
     const quick = [
-      { id: 'random', name: `Aleatoria · ${SESSION_SIZE} preguntas`, description: `Una selección distinta cada sesión${exclusionDetail}`, group: 'quick', items: mainPool, countLabel: `${SESSION_SIZE} preguntas al azar`, icon: '🎲', searchableItems: false },
+      { id: 'random', name: `Aleatoria · ${SESSION_SIZE} preguntas`, description: `Una selección distinta cada sesión${exclusionDetail}`, group: 'quick', items: mainPool, countLabel: `${Math.min(SESSION_SIZE, mainPool.length)} preguntas disponibles`, icon: '🎲', searchableItems: false },
       { id: 'all-main', name: 'Todo el vocabulario principal', description: `Practica la colección principal${exclusionDetail}`, group: 'quick', items: mainPool, countLabel: `${mainPool.length} preguntas`, icon: '📚', searchableItems: false },
       { id: 'all-vocab', name: 'Principal + bloques especiales', description: `Incluye la colección y los bloques especiales${exclusionDetail}`, group: 'quick', items: fullPool, countLabel: `${fullPool.length} preguntas`, icon: '🗂️', searchableItems: false }
     ];
-    const normal = BLOCKS.map(block => ({ ...block, group: 'main', icon: '▦', description: `Dificultad ${DIFF_LABEL[block.difficulty]?.toLowerCase() || 'intermedia'}`, countLabel: `${block.items.length} tarjetas`, searchableItems: true }));
-    const similar = SIMILAR_BLOCKS.map(block => ({ ...block, group: 'similar', icon: block.isTargetedConfusion ? '⚠' : '⇄', description: block.isTargetedConfusion ? 'Confusión dirigida: tarjetas con traducciones solapadas o expresiones muy parecidas' : 'Bloque general para distinguir expresiones cercanas', countLabel: `${block.items.length} tarjetas`, searchableItems: true }));
-    const special = SPECIAL_BLOCKS.map(block => ({ ...block, group: 'special', icon: '✦', description: 'Colección especial independiente', countLabel: `${block.items.length} tarjetas`, searchableItems: true }));
+    const normal = BLOCKS
+      .filter(block => !excludeEasy || block.difficulty !== 'easy')
+      .map(block => {
+        const items = visibleItems(block.items);
+        return { ...block, items, group: 'main', icon: '▦', description: `Dificultad ${DIFF_LABEL[block.difficulty]?.toLowerCase() || 'intermedia'}`, countLabel: `${items.length} tarjetas`, searchableItems: true };
+      })
+      .filter(block => block.items.length);
+    const similar = SIMILAR_BLOCKS.map(block => {
+      const items = visibleItems(block.items);
+      return { ...block, items, group: 'similar', icon: block.isTargetedConfusion ? '⚠' : '⇄', description: block.isTargetedConfusion ? 'Confusión dirigida: tarjetas con traducciones solapadas o expresiones muy parecidas' : 'Bloque general para distinguir expresiones cercanas', countLabel: `${items.length} tarjetas`, searchableItems: true };
+    }).filter(block => block.items.length);
+    const special = SPECIAL_BLOCKS.map(block => {
+      const items = visibleItems(block.items);
+      return { ...block, items, group: 'special', icon: '✦', description: 'Colección especial independiente', countLabel: `${items.length} tarjetas`, searchableItems: true };
+    }).filter(block => block.items.length);
     return [...quick, ...normal, ...similar, ...special];
   }
-
   function getCandidateSearchText(candidate) {
     const base = `${candidate.name} ${candidate.description || ''} ${candidate.group || ''} ${candidate.difficulty || ''}`;
     if (!candidate.searchableItems) return normalize(base);
@@ -7774,7 +7852,8 @@
       else if (value === 'all-vocab') currentCount.textContent = `${generalItems(ALL_QUESTIONS).length} tarjetas contando bloques especiales`; 
       else {
         const block = findStudyBlock(value);
-        currentCount.textContent = block ? `${block.items.length} tarjetas · ${block.isConfusion ? 'expresiones similares' : block.isSpecial ? 'bloque especial' : DIFF_LABEL[block.difficulty] || 'bloque de vocabulario'}` : 'Contenido de estudio';
+        const visibleCount = block ? (db.settings.excludeEasy === false || (explicitEasyBlockSelection && block.difficulty === 'easy') ? block.items.length : generalItems(block.items).length) : 0;
+        currentCount.textContent = block ? `${visibleCount} tarjetas · ${block.isConfusion ? 'expresiones similares' : block.isSpecial ? 'bloque especial' : DIFF_LABEL[block.difficulty] || 'bloque de vocabulario'}` : 'Contenido de estudio';
       }
     }
   }
@@ -7806,7 +7885,12 @@
     const diffFilters = $('#vocab-difficulty-filters');
     const pager = $('#vocab-pagination');
     if (!search || !grid || !tabs || !diffFilters || !pager) return;
-    const candidates = getVocabularyCandidates();
+    const searchingNow = Boolean(normalize(search.value.trim()));
+    const allowExplicitEasy = db.settings.excludeEasy !== false
+      && !searchingNow
+      && vocabPickerState.category === 'difficulty'
+      && vocabPickerState.difficulty === 'easy';
+    const candidates = getVocabularyCandidates(allowExplicitEasy);
 
     // Construye los controles de categoría una sola vez; sus estados son persistentes.
     if (!tabs.dataset.ready) {
@@ -7856,6 +7940,19 @@
       });
       tabs.dataset.ready = 'true';
     }
+
+    const refreshedCounts = {
+      quick: candidates.filter(candidate => candidate.group === 'quick').length,
+      main: candidates.filter(candidate => candidate.group === 'main').length,
+      difficulty: 3,
+      similar: candidates.filter(candidate => candidate.group === 'similar').length,
+      special: candidates.filter(candidate => candidate.group === 'special').length,
+      all: candidates.length
+    };
+    $$('.vocab-category-btn', tabs).forEach(tab => {
+      const count = tab.querySelector('.vocab-category-count');
+      if (count) count.textContent = String(refreshedCounts[tab.dataset.category] ?? 0);
+    });
 
     if (!diffFilters.dataset.ready) {
       const options = [
@@ -7968,6 +8065,7 @@
         option.append(icon, copy, stateIcon);
         option.addEventListener('click', () => {
           el.blockSelect.value = candidate.id;
+          explicitEasyBlockSelection = Boolean(candidateBlock && candidateBlock.difficulty === 'easy' && db.settings.excludeEasy !== false && allowExplicitEasy);
           syncBlockPickerLabel();
           updateVocabSelectionSummary();
           renderVocabularyPicker();
@@ -8013,19 +8111,37 @@
     if (value === 'all-vocab') {
       return { id: 'all-vocab', name: 'Vocabulario principal + bloques especiales', items: generalItems(ALL_QUESTIONS), accent: 'var(--primary)' };
     }
-    return findStudyBlock(value);
+    const block = findStudyBlock(value);
+    if (!block) return block;
+    const explicitEasy = db.settings.excludeEasy !== false
+      && explicitEasyBlockSelection
+      && block.difficulty === 'easy';
+    return { ...block, items: explicitEasy ? block.items.slice() : generalItems(block.items), allowEasyOverride: explicitEasy };
   }
 
   $('#btn-choose-block').addEventListener('click', buildBlockChooserModal);
 
   $('#btn-exclude-easy').addEventListener('click', () => {
     db.settings.excludeEasy = db.settings.excludeEasy === false;
+    if (db.settings.excludeEasy) {
+      const selectedBlock = findStudyBlock(el.blockSelect.value);
+      if (selectedBlock?.difficulty === 'easy') {
+        el.blockSelect.value = 'random';
+        syncBlockPickerLabel();
+      }
+      explicitEasyBlockSelection = false;
+      if (vocabPickerState.category === 'difficulty' && vocabPickerState.difficulty === 'easy') {
+        vocabPickerState.difficulty = 'all';
+      }
+    }
     saveDB();
     updateEasyExclusionButton();
     refreshBroadOptionCounts();
     updateVocabSelectionSummary();
     renderVocabularyPicker();
-    toast(db.settings.excludeEasy ? 'Las regaladas se omitirán en sesiones generales' : 'Las regaladas volverán a aparecer en sesiones generales', 'info');
+    toast(db.settings.excludeEasy
+      ? 'Filtro activado: las REGALADAS quedan ocultas en toda la aplicación.'
+      : 'Filtro desactivado: las REGALADAS vuelven a estar disponibles.', 'info');
   });
 
   // Navegación principal entre páginas; cada área tiene su propio espacio.
@@ -8059,22 +8175,22 @@
   });
   $('#vocab-start').addEventListener('click', () => {
     const block = selectedStudyBlock();
-    if (block) startSession(block.items, 'practice');
+    if (block) startSession(block.items, 'practice', null, Boolean(block.allowEasyOverride));
   });
   $('#vocab-flashcards').addEventListener('click', () => {
     const block = selectedStudyBlock();
-    if (block) startFlashcards(block.items, block.name);
+    if (block) startFlashcards(block.items, block.name, Boolean(block.allowEasyOverride));
   });
 
   $('#btn-start').addEventListener('click', () => {
     const block = selectedStudyBlock();
-    if (block) startSession(block.items, 'practice');
+    if (block) startSession(block.items, 'practice', null, Boolean(block.allowEasyOverride));
   });
 
   $('#btn-start-flashcards').addEventListener('click', () => {
     const block = selectedStudyBlock();
     if (!block) return;
-    startFlashcards(block.items, block.name);
+    startFlashcards(block.items, block.name, Boolean(block.allowEasyOverride));
   });
 
   $$('.cat-btn').forEach(button => {
