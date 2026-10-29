@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Practicador de vocabulario inglés-español con categorías de dificultad, errores, repaso y estadísticas.">
 <meta name="theme-color" content="#4f46e5">
-<title>Practicador de Vocabulario · Versión 2.3.1</title>
+<title>Practicador de Vocabulario · Versión 2.3.2</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; }
 
@@ -2541,6 +2541,41 @@
     .streak-celebration-card { padding: 17px 17px 16px; border-radius: 20px; }
   }
 
+
+
+  /* Preferencia global para excluir las preguntas más fáciles en sesiones generales. */
+  .easy-filter-btn {
+    width:100%; min-width:0; display:flex; align-items:center; gap:10px;
+    min-height:42px; margin-top:10px; padding:8px 11px; text-align:left;
+    border:1px solid var(--border); border-radius:12px;
+    background:var(--surface-2); color:var(--text-2);
+    transition:background .16s ease,border-color .16s ease,transform .16s ease;
+  }
+  .easy-filter-btn:hover { border-color:var(--border-2); background:var(--surface-3); }
+  .easy-filter-btn:active { transform:scale(.995); }
+  .easy-filter-btn.is-active { background:var(--primary-soft); border-color:color-mix(in srgb,var(--primary) 40%,var(--border)); }
+  .easy-filter-btn:focus-visible { outline:none; box-shadow:var(--ring); }
+  .easy-filter-icon { display:grid; place-items:center; width:25px; height:25px; flex:0 0 auto; border-radius:8px; background:var(--surface-solid); color:var(--muted); border:1px solid var(--border); font-size:.78rem; font-weight:950; }
+  .easy-filter-btn.is-active .easy-filter-icon { color:var(--primary); border-color:color-mix(in srgb,var(--primary) 25%,var(--border)); }
+  .easy-filter-copy { display:grid; gap:2px; min-width:0; flex:1 1 auto; }
+  .easy-filter-copy strong { font-size:.72rem; line-height:1.25; font-weight:900; }
+  .easy-filter-copy small { color:var(--muted); font-size:.60rem; line-height:1.3; }
+  .easy-filter-state { flex:0 0 auto; font-size:.55rem; font-weight:950; letter-spacing:.045em; color:var(--muted); white-space:nowrap; }
+  .easy-filter-btn.is-active .easy-filter-state { color:var(--primary); }
+  .vocab-footer-actions > div { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+  #view-tools .tools-actions { grid-template-columns:minmax(0,1fr); }
+  @media (max-height:760px) {
+    .easy-filter-btn { min-height:36px; margin-top:7px; padding:6px 9px; }
+    .easy-filter-copy small { display:none; }
+    .setup-panel .direction-heading { margin-top:9px; margin-bottom:6px; }
+    .setup-actions { margin-top:8px; }
+  }
+  @media (max-width:520px) {
+    .easy-filter-copy strong { font-size:.67rem; }
+    .easy-filter-state { font-size:.51rem; }
+    .vocab-footer-actions .btn { min-width:0; }
+  }
+
 </style>
 </head>
 <body>
@@ -2548,7 +2583,7 @@
 <div class="app">
   <header class="topbar">
     <div class="topbar-left">
-      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v2.3.1</span>
+      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v2.3.2</span>
       <div class="brand">
         <div class="brand-mark">V</div>
         <div>
@@ -2576,7 +2611,7 @@
     <button class="main-nav-btn" type="button" data-page="vocabulary" data-short-label="Vocab."><span aria-hidden="true">▦</span><span>Vocabulario</span></button>
     <button class="main-nav-btn" type="button" data-page="modes" data-short-label="Modos"><span aria-hidden="true">✦</span><span>Modos</span></button>
     <button class="main-nav-btn" type="button" data-page="review" data-short-label="Repaso"><span aria-hidden="true">↻</span><span>Repaso</span></button>
-    <button class="main-nav-btn" type="button" data-page="tools" data-short-label="Tools"><span aria-hidden="true">⚙</span><span>Herramientas</span></button>
+    <button class="main-nav-btn" type="button" data-page="tools" data-short-label="Herram."><span aria-hidden="true">⚙</span><span>Herramientas</span></button>
   </nav>
 
   <main>
@@ -2585,7 +2620,7 @@
       <div class="home-dashboard">
         <header class="home-intro">
           <div class="home-intro-copy">
-            <p class="home-eyebrow">TU ESPACIO DE ESTUDIO <span>·</span> VERSIÓN 2.3</p>
+            <p class="home-eyebrow">TU ESPACIO DE ESTUDIO <span>·</span> VERSIÓN 2.3.2</p>
             <h2 id="setup-title">¿Qué vas a practicar hoy?</h2>
             <p>Elige el vocabulario, selecciona la dirección y empieza. Las opciones avanzadas están aparte para que no estorben.</p>
           </div>
@@ -2618,8 +2653,14 @@
               <label><input type="radio" name="mode" value="MIX" aria-label="Mezcla aleatoria"><span>Mezclada</span></label>
             </div>
 
+            <button id="btn-exclude-easy" class="easy-filter-btn is-active" type="button" aria-pressed="true" title="Se aplica a sesiones generales; los bloques de dificultad regalada siguen disponibles.">
+              <span id="easy-filter-icon" class="easy-filter-icon" aria-hidden="true">✓</span>
+              <span class="easy-filter-copy"><strong id="easy-filter-label">Omitir tarjetas “regaladas”</strong><small>Solo se excluyen en sesiones generales; sus bloques siguen disponibles.</small></span>
+              <span id="easy-filter-state" class="easy-filter-state">EXCLUIDAS</span>
+            </button>
+
             <div class="setup-actions">
-              <button id="btn-start" class="btn btn-primary btn-lg" type="button"><span>Elegir modo y empezar</span><span class="arrow" aria-hidden="true">→</span></button>
+              <button id="btn-start" class="btn btn-primary btn-lg" type="button"><span>Empezar práctica</span><span class="arrow" aria-hidden="true">→</span></button>
               <button id="btn-start-flashcards" class="btn btn-secondary btn-lg" type="button"><span aria-hidden="true">▤</span><span>Estudiar con flashcards</span></button>
             </div>
             <p class="setup-reassurance"><span aria-hidden="true">✓</span> Tu progreso se guarda automáticamente en este dispositivo.</p>
@@ -2652,12 +2693,10 @@
           </aside>
         </div>
 
-        <section class="tools-panel" aria-label="Herramientas adicionales">
-          <div class="tools-intro"><span class="tools-spark" aria-hidden="true">✦</span><div><h3>¿Quieres practicar de otra forma?</h3><p>Elige un modo específico o consulta tus palabras.</p></div></div>
+        <section class="tools-panel" aria-label="Gestión de tarjetas">
+          <div class="tools-intro"><span class="tools-spark" aria-hidden="true">✦</span><div><h3>Gestionar tarjetas</h3><p>Los modos y el vocabulario están en la navegación principal.</p></div></div>
           <div class="tools-actions">
-            <button id="btn-advanced-modes" class="mode-launch-card" type="button"><span class="mode-launch-icon" aria-hidden="true">✦</span><span class="mode-launch-copy"><strong>Modos de estudio</strong><small>Examen a ciegas, repaso adaptativo y más</small></span><span class="tool-arrow" aria-hidden="true">↗</span></button>
-            <button id="btn-explore" class="tool-link" type="button"><span class="tool-link-icon" aria-hidden="true">⌕</span><span><strong>Explorar vocabulario</strong><small>Buscar palabras y expresiones</small></span><span class="tool-arrow" aria-hidden="true">→</span></button>
-            <button id="btn-manage" class="tool-link" type="button"><span class="tool-link-icon" aria-hidden="true">▣</span><span><strong>Tarjetas guardadas</strong><small>Gestionar tu lista de repaso</small></span><span class="tool-arrow" aria-hidden="true">→</span></button>
+            <button id="btn-manage" class="tool-link" type="button"><span class="tool-link-icon" aria-hidden="true">▣</span><span><strong>Tarjetas guardadas</strong><small>Gestiona tu lista de repaso</small></span><span class="tool-arrow" aria-hidden="true">→</span></button>
           </div>
         </section>
 
@@ -2672,7 +2711,7 @@
           </section>
         </details>
 
-        <div class="home-footer"><span>Practicador de Vocabulario <strong>v2.3</strong></span><span>El avance se guarda localmente.</span><button id="btn-reset" class="link-danger hidden" type="button" title="Borrar todo el progreso guardado">Borrar progreso</button><span id="total-progress" class="hidden"></span></div>
+        <div class="home-footer"><span>Practicador de Vocabulario <strong>v2.3.2</strong></span><span>El avance se guarda localmente.</span><button id="btn-reset" class="link-danger hidden" type="button" title="Borrar todo el progreso guardado">Borrar progreso</button><span id="total-progress" class="hidden"></span></div>
       </div>
     </section>
 
@@ -2694,8 +2733,7 @@
           <button id="vocab-next" class="btn btn-secondary btn-sm" type="button">Siguiente →</button>
         </div>
         <div class="vocab-footer-actions">
-          <button id="vocab-back-home" class="btn btn-secondary" type="button">Volver al inicio</button>
-          <div class="vocab-footer-choices"><button id="vocab-start" class="btn btn-secondary btn-lg" type="button" aria-label="Empezar una práctica rápida del vocabulario seleccionado">Práctica rápida <span aria-hidden="true">→</span></button><button id="vocab-choose-mode" class="btn btn-primary btn-lg" type="button">Elegir modo <span aria-hidden="true">✦</span></button><button id="vocab-flashcards" class="btn btn-secondary btn-lg" type="button">Flashcards</button></div>
+          <div class="vocab-footer-choices"><button id="vocab-start" class="btn btn-primary btn-lg" type="button" aria-label="Empezar una práctica rápida del vocabulario seleccionado">Práctica rápida <span aria-hidden="true">→</span></button><button id="vocab-flashcards" class="btn btn-secondary btn-lg" type="button">Flashcards</button></div>
         </div>
       </div>
     </section>
@@ -2923,7 +2961,7 @@
 
   // VERSIÓN DE LA APP: 2.3
   // IMPORTANTE: CAMBIA APP_VERSION SIEMPRE QUE AGREGUES O MODIFIQUES FUNCIONALIDAD.
-  const APP_VERSION = '2.3';
+  const APP_VERSION = '2.3.2';
 
   /* ======================================================================
      DATOS · vocabData con las 504 entradas originales
@@ -4530,7 +4568,7 @@
     stats: { answered: 0, correct: 0, bestStreak: 0, currentStreak: 0, sessions: 0 },
     itemStats: {},
     history: [],
-    settings: { theme: null, mode: 'EN-ES', pinnedBlocks: [], reviewedBlocks: [], streakSounds: true }
+    settings: { theme: null, mode: 'EN-ES', pinnedBlocks: [], reviewedBlocks: [], streakSounds: true, excludeEasy: true }
   });
 
   function readJSON(key) {
@@ -5147,12 +5185,12 @@
 
     const mainAllOption = document.createElement('option');
     mainAllOption.value = 'all-main';
-    mainAllOption.textContent = `Todo el vocabulario principal (${QUESTIONS.length})`;
+    mainAllOption.textContent = `Todo el vocabulario principal (${generalItems(QUESTIONS).length})`;
     el.blockSelect.appendChild(mainAllOption);
 
     const allOption = document.createElement('option');
     allOption.value = 'all-vocab';
-    allOption.textContent = `Principal + bloques especiales (${ALL_QUESTIONS.length})`;
+    allOption.textContent = `Principal + bloques especiales (${generalItems(ALL_QUESTIONS).length})`;
     el.blockSelect.appendChild(allOption);
 
     DIFFICULTIES.forEach(diff => {
@@ -5208,7 +5246,8 @@
     el.dataInfo.textContent =
       `${QUESTIONS.length} preguntas · ${entries.length} entradas únicas · ` +
       `${BLOCKS.length} bloques por dificultad · ${SIMILAR_BLOCKS.length} bloques normales de expresiones similares · ` +
-      `${SPECIAL_BLOCKS.length} bloques especiales (${SPECIAL_QUESTIONS.length} palabras)`;
+      `${SPECIAL_BLOCKS.length} bloques especiales (${SPECIAL_QUESTIONS.length} palabras)` +
+      (db.settings.excludeEasy === false ? ' · Regaladas incluidas en sesiones generales' : ' · Regaladas excluidas de sesiones generales');
   }
 
   /* ======================================================================
@@ -5272,6 +5311,15 @@
   /* ======================================================================
      SELECCIÓN DE ITEMS
      ====================================================================== */
+  // El filtro solo afecta colecciones generales. Si el usuario elige de forma
+  // explícita el nivel/bloque Regalada, esas tarjetas se mantienen disponibles.
+  function generalItems(items) {
+    const source = Array.isArray(items) ? items : [];
+    return db.settings.excludeEasy === false
+      ? source.slice()
+      : source.filter(item => item.difficulty !== 'easy');
+  }
+
   function getItemsForCategory(category) {
     if (DIFFICULTIES.includes(category)) {
       return QUESTIONS.filter(q => q.difficulty === category);
@@ -7395,13 +7443,13 @@
   }
 
   function resolveAdvancedScope(value) {
-    if (value === 'main') return QUESTIONS.slice();
-    if (value === 'all') return ALL_QUESTIONS.slice();
-    if (value === 'unknown') return ALL_QUESTIONS.filter(item => {
+    if (value === 'main') return generalItems(QUESTIONS);
+    if (value === 'all') return generalItems(ALL_QUESTIONS);
+    if (value === 'unknown') return generalItems(ALL_QUESTIONS.filter(item => {
       const p = itemPerformance(item);
       return p.mastery < 5 || p.errorRecord > 0 || Boolean(db.review[item.uid]);
-    });
-    if (value === 'mistakes') return mistakeItems();
+    }));
+    if (value === 'mistakes') return generalItems(mistakeItems());
     if (value === 'review') return reviewItems();
     if (value === 'confusion') return [...new Map(SIMILAR_BLOCKS.flatMap(block => block.items).map(item => [item.uid, item])).values()];
     if (value === 'current') return state.sessionContentItems.slice();
@@ -7419,11 +7467,13 @@
     let items = mode.config.scopeOverride
       ? resolveAdvancedScope(mode.config.scopeOverride)
       : resolveAdvancedScope(settings.scope || 'block');
-    if (mode.config.scopeOverride === 'all') items = ALL_QUESTIONS.slice();
+    if (mode.config.scopeOverride === 'all') items = generalItems(ALL_QUESTIONS);
     if (mode.config.scopeOverride === 'confusion') items = resolveAdvancedScope('confusion');
     if (!items.length) {
       const emptyMessage = mode.config.scopeOverride === 'mistakes'
-        ? 'Todavía no tienes errores guardados.'
+        ? (db.settings.excludeEasy !== false && mistakeItems().length
+            ? 'Tus errores guardados solo contienen tarjetas “regaladas”, excluidas por el filtro. Inclúyelas desde Inicio o elige ese nivel.'
+            : 'Todavía no tienes errores guardados.')
         : mode.config.scopeOverride === 'review'
           ? 'No hay tarjetas guardadas en Revisar.'
           : mode.config.scopeOverride === 'unknown'
@@ -7496,13 +7546,16 @@
       wrap.append(text, select); return wrap;
     };
     const initialBlock = preserveCurrent ? 'current' : 'block';
+    const excludeEasy = db.settings.excludeEasy !== false;
     const scopeOptions = [
         ...(preserveCurrent ? [{value:'current',text:`Mismo contenido de la sesión (${state.sessionContentItems.length} tarjetas)`}] : []),
-        {value:'block',text:'Bloque seleccionado'}, {value:'main',text:'Vocabulario principal'},
-        {value:'all',text:'Todo, incluidos especiales'}, {value:'easy',text:'Dificultad regalada'},
+        {value:'block',text:'Bloque seleccionado'},
+        {value:'main',text:excludeEasy ? 'Vocabulario principal (sin regaladas)' : 'Vocabulario principal'},
+        {value:'all',text:excludeEasy ? 'Todo salvo regaladas, incluidos especiales' : 'Todo, incluidos especiales'},
+        {value:'easy',text:'Dificultad regalada'},
         {value:'medium',text:'Dificultad intermedia'}, {value:'hard',text:'Dificultad difícil'},
         {value:'confusion',text:'Expresiones similares'}, {value:'unknown',text:'Tarjetas aún no dominadas'},
-        {value:'mistakes',text:'Solo errores guardados'}, {value:'review',text:'Solo Revisar'}
+        {value:'mistakes',text:excludeEasy ? 'Errores guardados (sin regaladas)' : 'Solo errores guardados'}, {value:'review',text:'Solo Revisar'}
       ];
     controls.append(
       makeSelect('Contenido', 'v2-scope', scopeOptions, initialBlock),
@@ -7643,6 +7696,28 @@
     label.textContent = selected?.textContent || 'Selecciona un bloque';
   }
 
+  function updateEasyExclusionButton() {
+    const button = $('#btn-exclude-easy');
+    if (!button) return;
+    const excluded = db.settings.excludeEasy !== false;
+    button.classList.toggle('is-active', excluded);
+    button.setAttribute('aria-pressed', String(excluded));
+    button.setAttribute('aria-label', excluded
+      ? 'Regaladas excluidas de sesiones generales; pulsa para incluirlas'
+      : 'Regaladas incluidas en sesiones generales; pulsa para excluirlas');
+    $('#easy-filter-icon').textContent = excluded ? '✓' : '＋';
+    $('#easy-filter-label').textContent = excluded ? 'Omitir tarjetas “regaladas”' : 'Incluir tarjetas “regaladas”';
+    $('#easy-filter-state').textContent = excluded ? 'EXCLUIDAS' : 'INCLUIDAS';
+  }
+
+  function refreshBroadOptionCounts() {
+    const mainOption = el.blockSelect.querySelector('option[value="all-main"]');
+    const allOption = el.blockSelect.querySelector('option[value="all-vocab"]');
+    if (mainOption) mainOption.textContent = `Todo el vocabulario principal (${generalItems(QUESTIONS).length})`;
+    if (allOption) allOption.textContent = `Principal + bloques especiales (${generalItems(ALL_QUESTIONS).length})`;
+    syncBlockPickerLabel();
+  }
+
   const vocabPickerState = { category: 'quick', difficulty: 'all', page: 0, query: '' };
 
   const VOCAB_CATEGORY_DEFS = [
@@ -7655,10 +7730,13 @@
   ];
 
   function getVocabularyCandidates() {
+    const mainPool = generalItems(QUESTIONS);
+    const fullPool = generalItems(ALL_QUESTIONS);
+    const exclusionDetail = db.settings.excludeEasy === false ? '' : ' · dificultad regalada excluida';
     const quick = [
-      { id: 'random', name: `Aleatoria · ${SESSION_SIZE} preguntas`, description: 'Una selección distinta cada sesión', group: 'quick', items: QUESTIONS, countLabel: `${SESSION_SIZE} preguntas al azar`, icon: '🎲', searchableItems: false },
-      { id: 'all-main', name: 'Todo el vocabulario principal', description: 'Practica la colección principal completa', group: 'quick', items: QUESTIONS, countLabel: `${QUESTIONS.length} preguntas`, icon: '📚', searchableItems: false },
-      { id: 'all-vocab', name: 'Principal + bloques especiales', description: 'Incluye la colección y los bloques especiales', group: 'quick', items: ALL_QUESTIONS, countLabel: `${ALL_QUESTIONS.length} preguntas`, icon: '🗂️', searchableItems: false }
+      { id: 'random', name: `Aleatoria · ${SESSION_SIZE} preguntas`, description: `Una selección distinta cada sesión${exclusionDetail}`, group: 'quick', items: mainPool, countLabel: `${SESSION_SIZE} preguntas al azar`, icon: '🎲', searchableItems: false },
+      { id: 'all-main', name: 'Todo el vocabulario principal', description: `Practica la colección principal${exclusionDetail}`, group: 'quick', items: mainPool, countLabel: `${mainPool.length} preguntas`, icon: '📚', searchableItems: false },
+      { id: 'all-vocab', name: 'Principal + bloques especiales', description: `Incluye la colección y los bloques especiales${exclusionDetail}`, group: 'quick', items: fullPool, countLabel: `${fullPool.length} preguntas`, icon: '🗂️', searchableItems: false }
     ];
     const normal = BLOCKS.map(block => ({ ...block, group: 'main', icon: '▦', description: `Dificultad ${DIFF_LABEL[block.difficulty]?.toLowerCase() || 'intermedia'}`, countLabel: `${block.items.length} tarjetas`, searchableItems: true }));
     const similar = SIMILAR_BLOCKS.map(block => ({ ...block, group: 'similar', icon: block.isTargetedConfusion ? '⚠' : '⇄', description: block.isTargetedConfusion ? 'Confusión dirigida: tarjetas con traducciones solapadas o expresiones muy parecidas' : 'Bloque general para distinguir expresiones cercanas', countLabel: `${block.items.length} tarjetas`, searchableItems: true }));
@@ -7692,8 +7770,8 @@
     if (currentCount) {
       const value = select?.value || 'random';
       if (value === 'random') currentCount.textContent = `${SESSION_SIZE} preguntas aleatorias por sesión`;
-      else if (value === 'all-main') currentCount.textContent = `${QUESTIONS.length} preguntas del vocabulario principal`;
-      else if (value === 'all-vocab') currentCount.textContent = `${ALL_QUESTIONS.length} tarjetas contando bloques especiales`;
+      else if (value === 'all-main') currentCount.textContent = `${generalItems(QUESTIONS).length} preguntas del vocabulario principal`; 
+      else if (value === 'all-vocab') currentCount.textContent = `${generalItems(ALL_QUESTIONS).length} tarjetas contando bloques especiales`; 
       else {
         const block = findStudyBlock(value);
         currentCount.textContent = block ? `${block.items.length} tarjetas · ${block.isConfusion ? 'expresiones similares' : block.isSpecial ? 'bloque especial' : DIFF_LABEL[block.difficulty] || 'bloque de vocabulario'}` : 'Contenido de estudio';
@@ -7927,18 +8005,28 @@
   function selectedStudyBlock() {
     const value = el.blockSelect.value;
     if (value === 'random') {
-      return { id: 'random', name: `Aleatoria · ${SESSION_SIZE} preguntas`, items: shuffle(QUESTIONS).slice(0, SESSION_SIZE), accent: 'var(--primary)' };
+      return { id: 'random', name: `Aleatoria · ${SESSION_SIZE} preguntas`, items: shuffle(generalItems(QUESTIONS)).slice(0, SESSION_SIZE), accent: 'var(--primary)' };
     }
     if (value === 'all-main') {
-      return { id: 'all-main', name: 'Todo el vocabulario principal', items: QUESTIONS.slice(), accent: 'var(--primary)' };
+      return { id: 'all-main', name: 'Todo el vocabulario principal', items: generalItems(QUESTIONS), accent: 'var(--primary)' };
     }
     if (value === 'all-vocab') {
-      return { id: 'all-vocab', name: 'Vocabulario principal + bloques especiales', items: ALL_QUESTIONS.slice(), accent: 'var(--primary)' };
+      return { id: 'all-vocab', name: 'Vocabulario principal + bloques especiales', items: generalItems(ALL_QUESTIONS), accent: 'var(--primary)' };
     }
     return findStudyBlock(value);
   }
 
   $('#btn-choose-block').addEventListener('click', buildBlockChooserModal);
+
+  $('#btn-exclude-easy').addEventListener('click', () => {
+    db.settings.excludeEasy = db.settings.excludeEasy === false;
+    saveDB();
+    updateEasyExclusionButton();
+    refreshBroadOptionCounts();
+    updateVocabSelectionSummary();
+    renderVocabularyPicker();
+    toast(db.settings.excludeEasy ? 'Las regaladas se omitirán en sesiones generales' : 'Las regaladas volverán a aparecer en sesiones generales', 'info');
+  });
 
   // Navegación principal entre páginas; cada área tiene su propio espacio.
   $('#main-navigation').addEventListener('click', event => {
@@ -7969,8 +8057,6 @@
     vocabPickerState.page += 1;
     renderVocabularyPicker();
   });
-  $('#vocab-back-home').addEventListener('click', () => showView('setup'));
-  $('#vocab-choose-mode').addEventListener('click', () => { state.allowCurrentScope = false; buildAdvancedModesModal(); });
   $('#vocab-start').addEventListener('click', () => {
     const block = selectedStudyBlock();
     if (block) startSession(block.items, 'practice');
@@ -7981,8 +8067,8 @@
   });
 
   $('#btn-start').addEventListener('click', () => {
-    state.allowCurrentScope = false;
-    buildAdvancedModesModal();
+    const block = selectedStudyBlock();
+    if (block) startSession(block.items, 'practice');
   });
 
   $('#btn-start-flashcards').addEventListener('click', () => {
@@ -8041,9 +8127,7 @@
   el.btnCopyImage.addEventListener('click', () => copyMistakesImage('copy'));
   el.btnShareImage.addEventListener('click', () => copyMistakesImage('share'));
   $('#btn-manage').addEventListener('click', buildManageModal);
-  $('#btn-advanced-modes').addEventListener('click', buildAdvancedModesModal);
   el.btnManagePinned.addEventListener('click', buildPinnedBlocksModal);
-  $('#btn-explore').addEventListener('click', () => { renderVocabularyPicker(); showView('vocabulary'); $('#vocab-search').focus(); });
 
   el.resetBtn.addEventListener('click', () => {
     if (!confirm('¿Borrar TODO el progreso guardado? Esto incluye errores, revisar y estadísticas.')) return;
@@ -8157,6 +8241,7 @@
     updateStreakSoundButton();
     populateBlocks();
     syncBlockPickerLabel();
+    updateEasyExclusionButton();
     updateVocabSelectionSummary();
     renderVocabularyPicker();
     showView('setup');
