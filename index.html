@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Practicador de vocabulario inglés-español con categorías de dificultad, errores, repaso y estadísticas.">
 <meta name="theme-color" content="#4f46e5">
-<title>Practicador de Vocabulario · Versión 2.3.3</title>
+<title>Practicador de Vocabulario · Versión 2.4.0</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; }
 
@@ -2619,6 +2619,48 @@
     .easy-filter-strip .easy-filter-btn { min-height:34px; padding:4px 7px; }
     .easy-filter-strip .easy-filter-copy small { display:none; }
   }
+
+/* ===== v2.4.0 · DOMINIO, OPCIÓN MÚLTIPLE, FLASHCARDS CON AUTOEVALUACIÓN ===== */
+#view-setup.is-active { overflow-y: auto !important; }
+#view-setup .home-dashboard { flex: 0 0 auto; grid-template-rows: none; }
+#view-setup .setup-panel { max-height: none; overflow: visible; }
+.mastery-panel { display: grid; gap: 10px; padding: 14px 16px; border: 1px solid var(--border); border-radius: 18px; background: var(--surface-solid); box-shadow: 0 10px 30px rgba(64,55,130,.07); }
+.mp-top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.mp-who { display: grid; gap: 2px; min-width: 0; margin-right: auto; }
+.mp-who strong { font-size: 1.05rem; letter-spacing: -.02em; }
+.mp-who small { color: var(--muted); font-size: .68rem; }
+.mp-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.mp-chip { padding: 6px 10px; border-radius: 999px; background: var(--surface-3); border: 1px solid var(--border); font-size: .72rem; font-weight: 850; white-space: nowrap; }
+.mp-bar { display: flex; height: 14px; border-radius: 999px; overflow: hidden; background: rgba(127,127,127,.14); border: 1px solid var(--border); }
+.mp-bar i { display: block; height: 100%; width: 0; transition: width .5s cubic-bezier(.2,.8,.2,1); }
+#mp-seg-mastered { background: #10b981; } #mp-seg-almost { background: #38bdf8; }
+#mp-seg-learning { background: #f59e0b; } #mp-seg-new { background: #94a3b8; }
+.mp-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+.mp-l { display: inline-flex; align-items: center; gap: 6px; padding: 5px 9px; border-radius: 9px; border: 1px solid var(--border); background: var(--surface-2); font-size: .7rem; font-weight: 800; color: var(--text-2); }
+.mp-l::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--dot); }
+.mp-l:hover { border-color: var(--border-2); background: var(--surface-3); }
+.mp-l.mastered { --dot: #10b981; } .mp-l.almost { --dot: #38bdf8; } .mp-l.learning { --dot: #f59e0b; } .mp-l.new { --dot: #94a3b8; }
+.mp-pct { margin-left: auto; color: var(--muted); font-size: .72rem; font-weight: 850; }
+.mp-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.mp-actions .btn-primary { flex: 1 1 220px; }
+.mastery-tag { letter-spacing: .05em; }
+.mastery-new { background: rgba(148,163,184,.16); color: #64748b; }
+.mastery-learning { background: var(--warn-soft); color: var(--warn); }
+.mastery-almost { background: rgba(56,189,248,.16); color: #0284c7; }
+.mastery-mastered { background: var(--success-soft); color: var(--success); }
+.mc-box { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.mc-opt { display: flex; align-items: center; gap: 10px; padding: 14px 12px; text-align: left; border: 2px solid var(--border); border-radius: 14px; background: var(--surface-solid); font-weight: 750; font-size: .95rem; transition: border-color .15s, transform .15s, background .15s; }
+.mc-opt kbd { flex: 0 0 auto; }
+.mc-opt:hover:not(:disabled) { border-color: var(--primary); transform: translateY(-2px); }
+.mc-opt:disabled { cursor: default; }
+.mc-opt.ok { border-color: var(--success); background: var(--success-soft); color: var(--success); }
+.mc-opt.bad { border-color: var(--danger); background: var(--danger-soft); color: var(--danger); }
+.mc-toggle { grid-column: 1 / -1; padding: 6px; color: var(--muted); font-size: .76rem; font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
+.fc-rate { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 700px; margin: 0 auto 12px; }
+.fc-rate .btn { min-height: 54px; font-size: 1rem; }
+.fc-no { background: var(--danger-soft); color: var(--danger); border: 1px solid color-mix(in srgb, var(--danger), transparent 65%); }
+.fc-yes { background: var(--success-soft); color: var(--success); border: 1px solid color-mix(in srgb, var(--success), transparent 65%); }
+@media (max-width: 520px) { .mc-box { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -2626,7 +2668,7 @@
 <div class="app">
   <header class="topbar">
     <div class="topbar-left">
-      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v2.3.3</span>
+      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v2.4.0</span>
       <div class="brand">
         <div class="brand-mark">V</div>
         <div>
@@ -2674,7 +2716,7 @@
       <div class="home-dashboard">
         <header class="home-intro">
           <div class="home-intro-copy">
-            <p class="home-eyebrow">TU ESPACIO DE ESTUDIO <span>·</span> VERSIÓN 2.3.3</p>
+            <p class="home-eyebrow">TU ESPACIO DE ESTUDIO <span>·</span> VERSIÓN 2.4.0</p>
             <h2 id="setup-title">¿Qué vas a practicar hoy?</h2>
             <p>Elige el vocabulario, selecciona la dirección y empieza. Las opciones avanzadas están aparte para que no estorben.</p>
           </div>
@@ -2684,6 +2726,25 @@
             <div class="home-metric"><strong id="stat-streak">0</strong><span>mejor racha</span></div>
           </div>
         </header>
+
+        <section class="mastery-panel" id="mastery-panel" aria-label="Tu dominio del vocabulario">
+          <div class="mp-top">
+            <div class="mp-who"><strong id="mp-level">Nivel 1</strong><small id="mp-xp">0 XP</small></div>
+            <div class="mp-chips"><span id="mp-daystreak" class="mp-chip">🔥 0 días</span><span id="mp-goal" class="mp-chip">🎯 0/30 hoy</span></div>
+          </div>
+          <div id="mp-bar" class="mp-bar" role="img"><i id="mp-seg-mastered"></i><i id="mp-seg-almost"></i><i id="mp-seg-learning"></i><i id="mp-seg-new"></i></div>
+          <div class="mp-legend">
+            <button type="button" class="mp-l mastered" data-k="mastered"><b id="mp-n-mastered">0</b> Dominadas</button>
+            <button type="button" class="mp-l almost" data-k="almost"><b id="mp-n-almost">0</b> Casi listas</button>
+            <button type="button" class="mp-l learning" data-k="learning"><b id="mp-n-learning">0</b> No las sé</button>
+            <button type="button" class="mp-l new" data-k="new"><b id="mp-n-new">0</b> Nuevas</button>
+            <span id="mp-pct" class="mp-pct"></span>
+          </div>
+          <div class="mp-actions">
+            <button id="btn-smart" class="btn btn-primary" type="button">⚡ Estudiar ahora (sesión inteligente)</button>
+            <button id="btn-unknown" class="btn btn-secondary" type="button">Practicar las que no sé</button>
+          </div>
+        </section>
 
         <div class="home-grid">
           <section class="setup-panel" aria-labelledby="choose-content-title">
@@ -2759,7 +2820,7 @@
           </section>
         </details>
 
-        <div class="home-footer"><span>Practicador de Vocabulario <strong>v2.3.3</strong></span><span>El avance se guarda localmente.</span><button id="btn-reset" class="link-danger hidden" type="button" title="Borrar todo el progreso guardado">Borrar progreso</button><span id="total-progress" class="hidden"></span></div>
+        <div class="home-footer"><span>Practicador de Vocabulario <strong>v2.4.0</strong></span><span>El avance se guarda localmente.</span><button id="btn-reset" class="link-danger hidden" type="button" title="Borrar todo el progreso guardado">Borrar progreso</button><span id="total-progress" class="hidden"></span></div>
       </div>
     </section>
 
@@ -2840,6 +2901,7 @@
             <span id="flag-mode" class="tag tag-primary">PRÁCTICA</span>
             <span id="flag-repeat" class="tag tag-repeated hidden">REPETIDA</span>
             <span id="flag-history" class="tag tag-repeated hidden"></span>
+            <span id="flag-mastery" class="tag hidden"></span>
           </div>
 
           <section id="streak-hud" class="streak-hud" aria-label="Racha de aciertos">
@@ -2868,6 +2930,7 @@
           <div id="hint-box" class="hint-box" hidden></div>
 
           <form id="answer-form" class="answer-form" autocomplete="off" novalidate>
+            <div id="mc-box" class="mc-box hidden"></div>
             <input
               id="answer-input"
               class="answer-input"
@@ -2935,6 +2998,10 @@
           </article>
         </div>
 
+        <div id="fc-rate" class="fc-rate hidden">
+          <button id="btn-fc-no" class="btn fc-no" type="button">✗ Aún no la sé (1)</button>
+          <button id="btn-fc-yes" class="btn fc-yes" type="button">✓ Ya la sé (2)</button>
+        </div>
         <div class="flashcards-actions">
           <button id="btn-flashcards-prev" class="btn btn-secondary" type="button">&larr; Anterior</button>
           <button id="btn-flashcards-flip" class="btn btn-primary btn-lg" type="button">Voltear tarjeta</button>
@@ -3009,7 +3076,7 @@
 
   // VERSIÓN DE LA APP: 2.3
   // IMPORTANTE: CAMBIA APP_VERSION SIEMPRE QUE AGREGUES O MODIFIQUES FUNCIONALIDAD.
-  const APP_VERSION = '2.3.3';
+  const APP_VERSION = '2.4.0';
 
   /* ======================================================================
      DATOS · vocabData con las 504 entradas originales
@@ -5223,6 +5290,7 @@
     el.statTotal.textContent = answered;
     el.statAccuracy.textContent = answered ? `${Math.round((correct / answered) * 100)}%` : '—';
     el.statStreak.textContent = bestStreak;
+    renderDashboard();
   }
 
   function populateBlocks() {
@@ -5478,6 +5546,7 @@
     state.allowCurrentScope = false;
     state.flashcards.index = 0;
     state.flashcards.blockName = blockName;
+    state.fcMarks = new Map();
     state.flashcards.directions = shuffled.map(() =>
       mode === 'MIX' ? (Math.random() < 0.5 ? 'EN-ES' : 'ES-EN') : mode
     );
@@ -5501,6 +5570,7 @@
       : (item.englishVariants || [item.english]);
 
     el.flashcards.classList.remove('is-flipped');
+    $('#fc-rate').classList.add('hidden');
     el.flashcardsSubtitle.textContent = `${state.flashcards.blockName} · ${item.section || 'General'} · ${difficultyLabel(item.difficulty)}`;
     el.flashcardsFrontKicker.textContent = direction === 'EN-ES' ? 'EN → ES' : 'ES → EN';
     el.flashcardsFrontText.textContent = frontText;
@@ -5517,12 +5587,13 @@
 
   function flipFlashcard() {
     el.flashcards.classList.toggle('is-flipped');
+    $('#fc-rate').classList.toggle('hidden', !el.flashcards.classList.contains('is-flipped'));
   }
 
   function nextFlashcard() {
     if (state.flashcards.index >= state.flashcards.items.length - 1) {
       showView('setup');
-      toast('Estudio terminado', 'success');
+      finishFlashcards();
       return;
     }
     state.flashcards.index += 1;
@@ -5786,6 +5857,7 @@
     state.usedHint = false;
     state.streak = 0;
     state.startedAt = Date.now();
+    state.sm = { up: 0, down: 0, newMastered: 0 };
     state.categoryMode = categoryMode;
     state.lastCategory = categoryMode;
 
@@ -5815,6 +5887,7 @@
     updateStreakHUD();
 
     el.flagRepeat.classList.toggle('hidden', !item.repeated);
+    renderMasteryTag(item);
 
     const savedMistake = db.mistakes[item.uid];
     const savedReview = db.review[item.uid];
@@ -5922,7 +5995,8 @@
     updateLiveChips();
     startCardTimer();
 
-    requestAnimationFrame(() => el.input.focus());
+    setupMC(entry);
+    requestAnimationFrame(() => { if (!state.mc.active) el.input.focus(); });
   }
 
   function appendKbdHint(container, options = {}) {
@@ -6234,6 +6308,7 @@
       attempts: 0, correct: 0, wrong: 0, hinted: 0, lastSeenAt: null,
       lastResult: null, lastAnswer: '', streak: 0, mastery: 0
     };
+    const mBefore = Number(stat.mastery) || 0;
     stat.attempts += 1;
     if (resultStatus === 'correct') {
       stat.correct += 1;
@@ -6249,6 +6324,7 @@
     stat.lastResult = resultStatus;
     stat.lastAnswer = String(userAnswer || '').slice(0, 160);
     db.itemStats[item.uid] = stat;
+    afterAttempt(item, resultStatus === 'correct', !usedHint, mBefore, Number(stat.mastery) || 0);
     saveDB();
   }
 
@@ -6294,7 +6370,8 @@
       return;
     }
 
-    const result = checkAnswer(userAnswer, entry);
+    const forcedWrong = state.mc.forceWrong; state.mc.forceWrong = false;
+    const result = forcedWrong ? { correct: false, validOther: false, near: false, accepted: [], slot: null, alreadyUsed: false, otherBlock: null, otherBlocks: [] } : checkAnswer(userAnswer, entry);
     const isBlind = state.studyMode?.feedback === 'blind';
 
     // Respuesta válida, pero de otra tarjeta/bloque: NO termina la tarjeta.
@@ -6504,6 +6581,7 @@
       const totalSelected = state.sessionContentItems.length;
       summary += ` Memorización: ${masteredNow}/${totalSelected} tarjetas de esta sesión tienen cinco aciertos sin pistas; las restantes siguen en aprendizaje.`;
     }
+    if (state.sm && (state.sm.up || state.sm.down || state.sm.newMastered)) summary += ` Dominio: ▲ ${state.sm.up} subieron · ▼ ${state.sm.down} bajaron · ★ ${state.sm.newMastered} nuevas dominadas.`;
     el.resSummary.textContent = summary;
 
     const failed = unresolvedFailedResults();
@@ -7775,6 +7853,7 @@
   }
 
   function refreshBroadOptionCounts() {
+    renderDashboard();
     const mainOption = el.blockSelect.querySelector('option[value="all-main"]');
     const allOption = el.blockSelect.querySelector('option[value="all-vocab"]');
     if (mainOption) mainOption.textContent = `Todo el vocabulario principal (${generalItems(QUESTIONS).length})`;
@@ -7859,7 +7938,8 @@
   }
 
   function vocabularyCandidateDetails(candidate) {
-    const count = candidate.countLabel || `${(candidate.items || []).length} tarjetas`;
+    const mp = candidate.group !== 'quick' && (candidate.items || []).length ? ` · ${Math.round(candidate.items.filter(i => masteryInfo(i).key === 'mastered').length / candidate.items.length * 100)}% dominado` : '';
+    const count = (candidate.countLabel || `${(candidate.items || []).length} tarjetas`) + mp;
     if (candidate.group === 'quick') {
       const descriptions = {
         random: 'Selección nueva en cada sesión',
@@ -8312,6 +8392,7 @@
       if (event.key === 'Escape') { event.preventDefault(); exitFlashcards(); return; }
       if (event.key === 'ArrowRight') { event.preventDefault(); nextFlashcard(); return; }
       if (event.key === 'ArrowLeft') { event.preventDefault(); previousFlashcard(); return; }
+      if ((event.key === '1' || event.key === '2') && !$('#fc-rate').classList.contains('hidden')) { event.preventDefault(); rateCard(event.key === '2'); return; }
       if (event.key === 'Enter' || event.key === ' ') {
         if (document.activeElement !== el.flashcards) { event.preventDefault(); flipFlashcard(); return; }
       }
@@ -8336,6 +8417,10 @@
     const inPractice = views.practice.classList.contains('is-active');
     if (!inPractice) return;
 
+    if (state.mc.active && !state.answered && /^[1-4]$/.test(event.key) && !event.altKey && !event.ctrlKey) {
+      const opt = $$('#mc-box .mc-opt')[Number(event.key) - 1];
+      if (opt) { event.preventDefault(); opt.click(); return; }
+    }
     if (state.answered && event.key === 'Enter') {
       event.preventDefault();
       goNext();
@@ -8352,6 +8437,227 @@
   /* ======================================================================
      INIT
      ====================================================================== */
+  /* ===== v2.4.0 · DOMINIO, SESIÓN INTELIGENTE, OPCIÓN MÚLTIPLE, XP ===== */
+  state.mc = { active: false, correct: '', chosen: null, forceWrong: false };
+  state.sm = { up: 0, down: 0, newMastered: 0 };
+  state.fcMarks = new Map();
+  let mcOff = false;
+  const DAILY_GOAL = 30;
+  const dayKey = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const levelFor = xp => Math.floor(Math.sqrt((xp || 0) / 40)) + 1;
+
+  // Estado de dominio por tarjeta (usa itemStats.mastery 0-5, ya existente).
+  // Dominada = 5 aciertos seguidos sin pista; si pasan >30 días sin verla, vuelve a "repasar".
+  function masteryInfo(item) {
+    const s = db.itemStats?.[item?.uid];
+    if (!s || !(s.attempts || s.seen)) return { key: 'new', label: 'NUEVA', level: 0 };
+    const m = Math.min(5, Number(s.mastery) || 0);
+    const age = s.lastSeenAt ? (Date.now() - Date.parse(s.lastSeenAt)) / 864e5 : 0;
+    if (m >= 5 && age > 30) return { key: 'almost', label: 'REPASAR', level: 4 };
+    if (m >= 5) return { key: 'mastered', label: 'DOMINADA', level: 5 };
+    if (m >= 3) return { key: 'almost', label: 'CASI LISTA', level: m };
+    return { key: 'learning', label: 'APRENDIENDO', level: m };
+  }
+
+  function renderMasteryTag(item, delta = 0) {
+    const tag = $('#flag-mastery');
+    if (!tag) return;
+    if (state.studyMode?.feedback === 'blind') { tag.classList.add('hidden'); return; }
+    const m = masteryInfo(item);
+    tag.className = `tag mastery-tag mastery-${m.key}`;
+    tag.textContent = `${m.label} ${'●'.repeat(m.level)}${'○'.repeat(5 - m.level)}${delta > 0 ? ' ▲' : delta < 0 ? ' ▼' : ''}`;
+    tag.title = 'Nivel de dominio: 5 aciertos sin pista = dominada';
+  }
+
+  // ---- Opción múltiple para tarjetas nuevas o flojas (menos teclear, más ritmo) ----
+  function buildMC(entry) {
+    const { item, direction } = entry;
+    const correct = ownOf(item, direction);
+    const seen = new Set(formsOf(allOf(item, direction)));
+    const pool = ALL_QUESTIONS.filter(q => q.uid !== item.uid);
+    const same = pool.filter(q => q.section === item.section);
+    const picked = [];
+    for (const q of shuffle(same.length >= 6 ? same : pool)) {
+      const v = ownOf(q, direction), k = normalize(v);
+      if (!k || seen.has(k)) continue;
+      seen.add(k); picked.push(v);
+      if (picked.length === 3) break;
+    }
+    return picked.length === 3 ? shuffle([...picked, correct]) : null;
+  }
+
+  function setupMC(entry) {
+    const box = $('#mc-box');
+    state.mc = { active: false, correct: '', chosen: null, forceWrong: false };
+    box.replaceChildren();
+    box.classList.add('hidden');
+    el.input.classList.remove('hidden');
+    const sm = state.studyMode;
+    const allowed = (!sm || sm.smart) && state.categoryMode !== 'review' && !mcOff;
+    const alone = (state.groups.get(entry.groupKey) || []).length < 2;
+    if (!allowed || !alone || masteryInfo(entry.item).level >= 2) return;
+    const options = buildMC(entry);
+    if (!options) return;
+    state.mc.active = true;
+    state.mc.correct = ownOf(entry.item, entry.direction);
+    options.forEach((value, i) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'mc-opt'; b.dataset.v = value;
+      const k = document.createElement('kbd'); k.textContent = String(i + 1);
+      const t = document.createElement('span'); t.textContent = value;
+      b.append(k, t);
+      b.addEventListener('click', () => {
+        if (state.answered) return;
+        state.mc.chosen = value;
+        state.mc.forceWrong = normalize(value) !== normalize(state.mc.correct);
+        el.input.value = value;
+        submitAnswer();
+      });
+      box.appendChild(b);
+    });
+    const toggle = document.createElement('button');
+    toggle.type = 'button'; toggle.className = 'mc-toggle'; toggle.textContent = 'Prefiero escribir la respuesta';
+    toggle.addEventListener('click', () => {
+      mcOff = true; state.mc.active = false;
+      box.classList.add('hidden'); el.input.classList.remove('hidden');
+      el.btnSubmit.classList.remove('hidden'); el.input.focus();
+    });
+    box.appendChild(toggle);
+    box.classList.remove('hidden');
+    el.input.classList.add('hidden');
+    el.btnSubmit.classList.add('hidden');
+  }
+
+  function lockMC() {
+    $$('#mc-box .mc-opt').forEach(b => {
+      b.disabled = true;
+      if (normalize(b.dataset.v) === normalize(state.mc.correct)) b.classList.add('ok');
+      else if (b.dataset.v === state.mc.chosen) b.classList.add('bad');
+    });
+  }
+
+  // ---- XP, meta diaria y racha de días ----
+  function trackProgress(ok, clean) {
+    const s = db.settings, t = dayKey(new Date());
+    if (!s.today || s.today.date !== t) {
+      const y = new Date(); y.setDate(y.getDate() - 1);
+      s.dayStreak = s.lastActive === dayKey(y) ? (s.dayStreak || 0) + 1 : 1;
+      s.today = { date: t, count: 0 };
+    }
+    s.lastActive = t;
+    s.today.count += 1;
+    const before = levelFor(s.xp || 0);
+    s.xp = (s.xp || 0) + (ok ? (clean ? 10 : 5) : 1);
+    if (state.studyMode?.feedback === 'blind') return;
+    if (levelFor(s.xp) > before) { toast(`¡Subiste al nivel ${levelFor(s.xp)}!`, 'success'); launchConfetti({ count: 80 }); }
+    if (s.today.count === DAILY_GOAL) { toast('🎯 ¡Meta diaria cumplida!', 'success'); launchConfetti({ count: 100 }); }
+  }
+
+  function afterAttempt(item, ok, clean, before, after) {
+    if (after > before) state.sm.up += 1;
+    if (after < before) state.sm.down += 1;
+    if (before < 5 && after >= 5) state.sm.newMastered += 1;
+    trackProgress(ok, clean);
+    if (state.mc.active) lockMC();
+    if (views.practice.classList.contains('is-active')) renderMasteryTag(item, after - before);
+  }
+
+  // ---- Panel de dominio ----
+  function renderDashboard() {
+    if (!$('#mp-level')) return;
+    const items = generalItems(ALL_QUESTIONS);
+    const c = { new: 0, learning: 0, almost: 0, mastered: 0 };
+    items.forEach(i => { c[masteryInfo(i).key] += 1; });
+    const n = Math.max(1, items.length);
+    Object.keys(c).forEach(k => { $('#mp-seg-' + k).style.width = `${c[k] / n * 100}%`; $('#mp-n-' + k).textContent = c[k]; });
+    const s = db.settings, xp = s.xp || 0, lv = levelFor(xp), next = 40 * lv * lv;
+    $('#mp-level').textContent = `Nivel ${lv}`;
+    $('#mp-xp').textContent = `${xp} XP · faltan ${next - xp} para el nivel ${lv + 1}`;
+    const now = new Date(), y = new Date(); y.setDate(y.getDate() - 1);
+    const today = s.today && s.today.date === dayKey(now) ? s.today.count : 0;
+    let ds = s.dayStreak || 0;
+    if (s.lastActive && s.lastActive !== dayKey(now) && s.lastActive !== dayKey(y)) ds = 0;
+    $('#mp-goal').textContent = `🎯 ${Math.min(today, DAILY_GOAL)}/${DAILY_GOAL} hoy`;
+    $('#mp-daystreak').textContent = `🔥 ${ds} ${ds === 1 ? 'día' : 'días'}`;
+    $('#mp-pct').textContent = `${Math.round(c.mastered / n * 100)}% dominado`;
+    $('#mp-bar').setAttribute('aria-label', `${c.mastered} dominadas, ${c.almost} casi listas, ${c.learning} que no sé, ${c.new} nuevas`);
+    const unk = $('#btn-unknown');
+    unk.textContent = `Practicar las que no sé (${c.learning})`;
+    unk.disabled = !c.learning;
+  }
+
+  const SMART_MODE = () => ({ name: 'Sesión inteligente', allowHints: true, feedback: 'instant', smart: true, repeatFailures: true, direction: getMode(), preserveOrder: true });
+
+  function startSmartSession() {
+    const info = generalItems(ALL_QUESTIONS).map(i => ({ i, k: masteryInfo(i).key, p: itemPerformance(i) }));
+    const weak = prioritizeItems(info.filter(x => x.k === 'learning' || x.k === 'almost').map(x => x.i), 'adaptive');
+    const fresh = shuffle(info.filter(x => x.k === 'new').map(x => x.i));
+    const old = shuffle(info.filter(x => x.k === 'mastered' && x.p.ageDays >= 14).map(x => x.i));
+    let items = [...weak.slice(0, 14), ...fresh.slice(0, 6), ...old.slice(0, 4)];
+    if (items.length < 16) {
+      const used = new Set(items.map(i => i.uid));
+      items = items.concat([...weak.slice(14), ...fresh.slice(6), ...old.slice(4)].filter(i => !used.has(i.uid)).slice(0, 16 - items.length));
+    }
+    if (!items.length) { toast('🎉 Lo tienes todo dominado. Vuelve mañana a repasar.', 'success'); return; }
+    startSession(shuffle(items), 'practice', SMART_MODE());
+  }
+
+  function startUnknownSession() {
+    const items = generalItems(ALL_QUESTIONS).filter(i => masteryInfo(i).key === 'learning');
+    if (!items.length) { toast('No tienes tarjetas marcadas como "no las sé".', 'info'); return; }
+    startSession(shuffle(items).slice(0, 30), 'practice', { ...SMART_MODE(), name: 'Las que no sé' });
+  }
+
+  function showMasteryList(key) {
+    const names = { mastered: 'Dominadas', almost: 'Casi listas / por repasar', learning: 'Las que no sé', new: 'Nuevas' };
+    const items = generalItems(ALL_QUESTIONS).filter(i => masteryInfo(i).key === key);
+    const list = document.createElement('ul');
+    list.className = 'item-list';
+    items.slice(0, 200).forEach(i => {
+      const li = document.createElement('li'); li.className = 'item-row';
+      const box = document.createElement('div'); box.className = 'item-text';
+      const en = document.createElement('span'); en.className = 'item-en'; en.textContent = i.english;
+      const es = document.createElement('span'); es.className = 'item-es'; es.textContent = i.spanish;
+      box.append(en, es);
+      const m = masteryInfo(i), tag = document.createElement('span');
+      tag.className = `tag mastery-tag mastery-${m.key}`; tag.textContent = '●'.repeat(m.level) + '○'.repeat(5 - m.level);
+      li.append(box, tag); list.appendChild(li);
+    });
+    openModal({ title: `${names[key]} · ${items.length}`, body: [items.length ? list : Object.assign(document.createElement('div'), { className: 'empty-state', textContent: 'Nada aquí todavía.' })] });
+  }
+
+  // ---- Flashcards con autoevaluación ("Ya la sé" / "Aún no") ----
+  function rateCard(known) {
+    const item = state.flashcards.items[state.flashcards.index];
+    if (!item) return;
+    if (!db.itemStats) db.itemStats = {};
+    const s = db.itemStats[item.uid] || (db.itemStats[item.uid] = { attempts: 0, correct: 0, wrong: 0, hinted: 0, lastSeenAt: null, lastResult: null, lastAnswer: '', streak: 0, mastery: 0 });
+    s.seen = 1; s.lastSeenAt = new Date().toISOString();
+    if (known) { s.mastery = Math.min(4, (Number(s.mastery) || 0) + 1); removeFromReview(item.uid); }
+    else { s.mastery = 0; saveForReview(item, 'flashcard'); }
+    state.fcMarks.set(item.uid, { item, known });
+    saveDB(); updateCounters(); nextFlashcard();
+  }
+
+  function finishFlashcards() {
+    const marks = [...state.fcMarks.values()];
+    if (!marks.length) { toast('Estudio terminado', 'success'); return; }
+    const unknown = marks.filter(m => !m.known).map(m => m.item);
+    const opts = unknown.length
+      ? { action: 'Practicar las que no sé', duration: 9000, onAction: () => startSession(unknown, 'practice', { ...SMART_MODE(), name: 'Las que no sé', preserveOrder: false }, true) }
+      : { duration: 3500 };
+    toast(`Sabías ${marks.length - unknown.length} · Te faltan ${unknown.length}`, 'success', opts);
+  }
+
+  $('#btn-smart').addEventListener('click', startSmartSession);
+  $('#btn-unknown').addEventListener('click', startUnknownSession);
+  $('#btn-fc-yes').addEventListener('click', () => rateCard(true));
+  $('#btn-fc-no').addEventListener('click', () => rateCard(false));
+  $('#mastery-panel').addEventListener('click', event => {
+    const b = event.target.closest('[data-k]');
+    if (b) showMasteryList(b.dataset.k);
+  });
+
   function init() {
     initTheme();
     updateStreakSoundButton();
