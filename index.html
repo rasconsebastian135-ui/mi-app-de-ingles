@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Practicador de vocabulario inglés-español con categorías de dificultad, errores, repaso y estadísticas.">
 <meta name="theme-color" content="#4f46e5">
-<title>Practicador de Vocabulario · Versión 2.4.0</title>
+<title>Practicador de Vocabulario · Versión 2.6.1</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; }
 
@@ -2620,7 +2620,7 @@
     .easy-filter-strip .easy-filter-copy small { display:none; }
   }
 
-/* ===== v2.4.0 · DOMINIO, OPCIÓN MÚLTIPLE, FLASHCARDS CON AUTOEVALUACIÓN ===== */
+/* ===== v2.6.1 · DOMINIO, OPCIÓN MÚLTIPLE, FLASHCARDS CON AUTOEVALUACIÓN ===== */
 #view-setup.is-active { overflow-y: auto !important; }
 #view-setup .home-dashboard { flex: 0 0 auto; grid-template-rows: none; }
 #view-setup .setup-panel { max-height: none; overflow: visible; }
@@ -2661,6 +2661,15 @@
 .fc-no { background: var(--danger-soft); color: var(--danger); border: 1px solid color-mix(in srgb, var(--danger), transparent 65%); }
 .fc-yes { background: var(--success-soft); color: var(--success); border: 1px solid color-mix(in srgb, var(--success), transparent 65%); }
 @media (max-width: 520px) { .mc-box { grid-template-columns: 1fr; } }
+
+
+/* ===== v2.6.1 · REPASO RÁPIDO COMO OTRA PANTALLA ===== */
+body.is-retype .topbar { background: radial-gradient(circle at 8% 0%, rgba(255,255,255,.30), transparent 26%), linear-gradient(112deg, #b45309 0%, #f59e0b 45%, #ec4899 122%); box-shadow: 0 8px 30px rgba(180,83,9,.28), 0 0 34px rgba(245,158,11,.18); }
+body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(245,158,11,.16); }
+#view-retype .word-card { border-color: color-mix(in srgb, var(--warn) 45%, var(--border)); background: linear-gradient(145deg, var(--surface-solid), var(--warn-soft)); }
+#view-retype .hint-box { font-size: 1.15rem; border-color: color-mix(in srgb, var(--warn) 60%, transparent); background: var(--warn-soft); color: var(--warn); }
+#view-retype.is-active.is-entering { animation: rtIn .5s cubic-bezier(.16,1,.3,1) both; }
+@keyframes rtIn { from { opacity: 0; transform: translateX(46px) scale(.98); } to { opacity: 1; transform: none; } }
 </style>
 </head>
 <body>
@@ -2668,7 +2677,7 @@
 <div class="app">
   <header class="topbar">
     <div class="topbar-left">
-      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v2.4.0</span>
+      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v2.6.1</span>
       <div class="brand">
         <div class="brand-mark">V</div>
         <div>
@@ -2716,7 +2725,7 @@
       <div class="home-dashboard">
         <header class="home-intro">
           <div class="home-intro-copy">
-            <p class="home-eyebrow">TU ESPACIO DE ESTUDIO <span>·</span> VERSIÓN 2.4.0</p>
+            <p class="home-eyebrow">TU ESPACIO DE ESTUDIO <span>·</span> VERSIÓN 2.6.1</p>
             <h2 id="setup-title">¿Qué vas a practicar hoy?</h2>
             <p>Elige el vocabulario, selecciona la dirección y empieza. Las opciones avanzadas están aparte para que no estorben.</p>
           </div>
@@ -2820,7 +2829,7 @@
           </section>
         </details>
 
-        <div class="home-footer"><span>Practicador de Vocabulario <strong>v2.4.0</strong></span><span>El avance se guarda localmente.</span><button id="btn-reset" class="link-danger hidden" type="button" title="Borrar todo el progreso guardado">Borrar progreso</button><span id="total-progress" class="hidden"></span></div>
+        <div class="home-footer"><span>Practicador de Vocabulario <strong>v2.6.1</strong></span><span>El avance se guarda localmente.</span><button id="btn-reset" class="link-danger hidden" type="button" title="Borrar todo el progreso guardado">Borrar progreso</button><span id="total-progress" class="hidden"></span></div>
       </div>
     </section>
 
@@ -2944,6 +2953,7 @@
             >
 
             <div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div>
+            <div id="retype-note" class="feedback info hidden"></div>
 
             <div id="answer-idle" class="answer-grid">
               <button id="btn-hint" class="btn btn-secondary" type="button">Pista</button>
@@ -2958,6 +2968,33 @@
         <div class="answer-actions-outside" aria-label="Acciones de respuesta">
           <button id="btn-submit" class="btn btn-primary btn-lg" type="button">Comprobar</button>
           <button id="btn-next" class="btn btn-primary btn-lg hidden" type="button">Siguiente &rarr;</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================= REPASO RÁPIDO (otra pantalla) ========================= -->
+    <section id="view-retype" class="view" aria-labelledby="rt-prompt">
+      <div class="practice-top">
+        <div class="session-nav-cluster"><span class="tag tag-review">⚡ REPASO RÁPIDO</span></div>
+        <div class="progress">
+          <div class="progress-track" aria-hidden="true"><div id="rt-fill" class="progress-fill"></div></div>
+          <span id="rt-count" class="progress-text">0 / 2</span>
+        </div>
+      </div>
+      <div class="practice-stage">
+        <article class="word-card">
+          <div class="flag-row"><span class="tag tag-review">REPASO RÁPIDO</span><span id="rt-mastery" class="tag"></span></div>
+          <div class="word-meta"><p id="rt-section" class="eyebrow"></p><span id="rt-diff" class="tag"></span></div>
+          <h2 id="rt-prompt" class="prompt">—</h2>
+          <div class="hint-box" id="rt-answer"></div>
+          <div class="answer-form">
+            <input id="rt-input" class="answer-input" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="Escríbela aquí" aria-label="Escribe la respuesta correcta">
+            <div id="rt-feedback" class="feedback info"></div>
+          </div>
+        </article>
+        <div class="answer-actions-outside">
+          <button id="rt-submit" class="btn btn-primary btn-lg" type="button">Comprobar</button>
+          <button id="rt-done" class="btn btn-primary btn-lg hidden" type="button">Continuar →</button>
         </div>
       </div>
     </section>
@@ -3076,7 +3113,7 @@
 
   // VERSIÓN DE LA APP: 2.3
   // IMPORTANTE: CAMBIA APP_VERSION SIEMPRE QUE AGREGUES O MODIFIQUES FUNCIONALIDAD.
-  const APP_VERSION = '2.4.0';
+  const APP_VERSION = '2.6.1';
 
   /* ======================================================================
      DATOS · vocabData con las 504 entradas originales
@@ -4543,10 +4580,104 @@
     }
   ];
 
+  SIMILAR_BLOCK_DEFS.push(
+    {"id": "dup-v-as-0", "name": "Mismo inicio · «as»", "accent": "#e11d48", "expressions": ["As well as", "As a result", "As soon as", "As a matter of fact", "As long as"], "targeted": true, "source": "all"},
+    {"id": "dup-v-ask-1", "name": "Mismo inicio · «ask»", "accent": "#e11d48", "expressions": ["Ask for", "Ask out"], "targeted": true, "source": "all"},
+    {"id": "dup-v-at-2", "name": "Mismo inicio · «at»", "accent": "#e11d48", "expressions": ["At the end of the street", "At the beginning of the street", "At the same time"], "targeted": true, "source": "all"},
+    {"id": "dup-v-break-3", "name": "Mismo inicio · «break»", "accent": "#e11d48", "expressions": ["Break down", "Break in", "Break off", "Break out", "Break up"], "targeted": true, "source": "all"},
+    {"id": "dup-v-bring-4", "name": "Mismo inicio · «bring»", "accent": "#e11d48", "expressions": ["Bring up", "Bring back"], "targeted": true, "source": "all"},
+    {"id": "dup-v-bus-5", "name": "Mismo inicio · «bus»", "accent": "#e11d48", "expressions": ["Bus lane", "Bus stop", "Bus station"], "targeted": true, "source": "all"},
+    {"id": "dup-v-call-6", "name": "Mismo inicio · «call»", "accent": "#e11d48", "expressions": ["Call back", "Call off"], "targeted": true, "source": "all"},
+    {"id": "dup-v-carry-7", "name": "Mismo inicio · «carry»", "accent": "#e11d48", "expressions": ["Carry on", "Carry out"], "targeted": true, "source": "all"},
+    {"id": "dup-v-check-8", "name": "Mismo inicio · «check»", "accent": "#e11d48", "expressions": ["Check-in counter", "Check (bill)", "Check in", "Check out"], "targeted": true, "source": "all"},
+    {"id": "dup-v-come-9", "name": "Mismo inicio · «come»", "accent": "#e11d48", "expressions": ["Come across", "Come back", "Come in", "Come out", "Come up", "Come along"], "targeted": true, "source": "all"},
+    {"id": "dup-v-customs-10", "name": "Mismo inicio · «customs»", "accent": "#e11d48", "expressions": ["Customs inspection area", "Customs office"], "targeted": true, "source": "all"},
+    {"id": "dup-v-cut-11", "name": "Mismo inicio · «cut»", "accent": "#e11d48", "expressions": ["Cut down", "Cut off", "Cut back"], "targeted": true, "source": "all"},
+    {"id": "dup-v-drop-12", "name": "Mismo inicio · «drop»", "accent": "#e11d48", "expressions": ["Drop off", "Drop by"], "targeted": true, "source": "all"},
+    {"id": "dup-v-even-13", "name": "Mismo inicio · «even»", "accent": "#e11d48", "expressions": ["Even though", "Even so", "Even if"], "targeted": true, "source": "all"},
+    {"id": "dup-v-fall-14", "name": "Mismo inicio · «fall»", "accent": "#e11d48", "expressions": ["Fall apart", "Fall behind", "Fall down"], "targeted": true, "source": "all"},
+    {"id": "dup-v-fill-15", "name": "Mismo inicio · «fill»", "accent": "#e11d48", "expressions": ["Fill out", "Fill in"], "targeted": true, "source": "all"},
+    {"id": "dup-v-fire-16", "name": "Mismo inicio · «fire»", "accent": "#e11d48", "expressions": ["Fire hydrant", "Fire station"], "targeted": true, "source": "all"},
+    {"id": "dup-v-for-17", "name": "Mismo inicio · «for»", "accent": "#e11d48", "expressions": ["For this reason", "For example", "For instance"], "targeted": true, "source": "all"},
+    {"id": "dup-v-funeral-18", "name": "Mismo inicio · «funeral»", "accent": "#e11d48", "expressions": ["Funeral home", "Funeral parlor"], "targeted": true, "source": "all"},
+    {"id": "dup-v-get-19", "name": "Mismo inicio · «get»", "accent": "#e11d48", "expressions": ["Get along", "Get away", "Get back", "Get by", "Get in", "Get off", "Get on", "Get out", "Get over", "Get up"], "targeted": true, "source": "all"},
+    {"id": "dup-v-give-20", "name": "Mismo inicio · «give»", "accent": "#e11d48", "expressions": ["Give away", "Give back", "Give in", "Give up"], "targeted": true, "source": "all"},
+    {"id": "dup-v-go-21", "name": "Mismo inicio · «go»", "accent": "#e11d48", "expressions": ["Go straight", "Go back", "Go past", "Go across", "Go down this street", "Go up this street", "Go ahead", "Go away", "Go on", "Go out"], "targeted": true, "source": "all"},
+    {"id": "dup-v-hand-22", "name": "Mismo inicio · «hand»", "accent": "#e11d48", "expressions": ["Hand in", "Hand out"], "targeted": true, "source": "all"},
+    {"id": "dup-v-hang-23", "name": "Mismo inicio · «hang»", "accent": "#e11d48", "expressions": ["Hang on", "Hang out"], "targeted": true, "source": "all"},
+    {"id": "dup-v-hold-24", "name": "Mismo inicio · «hold»", "accent": "#e11d48", "expressions": ["Hold on", "Hold back"], "targeted": true, "source": "all"},
+    {"id": "dup-v-in-25", "name": "Mismo inicio · «in» (1/2)", "accent": "#e11d48", "expressions": ["In front of", "In an airport", "In addition", "In spite of", "In the meantime", "In the end", "In fact"], "targeted": true, "source": "all"},
+    {"id": "dup-v-in-26", "name": "Mismo inicio · «in» (2/2)", "accent": "#e11d48", "expressions": ["In case", "In case of", "In conclusion", "In summary", "In short", "In other words"], "targeted": true, "source": "all"},
+    {"id": "dup-v-its-27", "name": "Mismo inicio · «It’s»", "accent": "#e11d48", "expressions": ["It's here.", "It's there.", "It's over there.", "It's on your left.", "It's on your right.", "It's nearby.", "It's far away."], "targeted": true, "source": "all"},
+    {"id": "dup-v-keep-28", "name": "Mismo inicio · «keep»", "accent": "#e11d48", "expressions": ["Keep going", "Keep away", "Keep on", "Keep up", "Keep off"], "targeted": true, "source": "all"},
+    {"id": "dup-v-log-29", "name": "Mismo inicio · «log»", "accent": "#e11d48", "expressions": ["Log in", "Log out"], "targeted": true, "source": "all"},
+    {"id": "dup-v-look-30", "name": "Mismo inicio · «look»", "accent": "#e11d48", "expressions": ["Look after", "Look around", "Look at", "Look for", "Look forward to", "Look into", "Look out", "Look up"], "targeted": true, "source": "all"},
+    {"id": "dup-v-movie-31", "name": "Mismo inicio · «movie»", "accent": "#e11d48", "expressions": ["Movie theater", "Movie screen"], "targeted": true, "source": "all"},
+    {"id": "dup-v-on-32", "name": "Mismo inicio · «on»", "accent": "#e11d48", "expressions": ["On the corner of", "On the left", "On the right", "On the other hand", "On the contrary", "On the whole"], "targeted": true, "source": "all"},
+    {"id": "dup-v-parking-33", "name": "Mismo inicio · «parking»", "accent": "#e11d48", "expressions": ["Parking lot", "Parking meter", "Parking control booth"], "targeted": true, "source": "all"},
+    {"id": "dup-v-pass-34", "name": "Mismo inicio · «pass»", "accent": "#e11d48", "expressions": ["Pass away", "Pass out"], "targeted": true, "source": "all"},
+    {"id": "dup-v-pay-35", "name": "Mismo inicio · «pay»", "accent": "#e11d48", "expressions": ["Pay back", "Pay off"], "targeted": true, "source": "all"},
+    {"id": "dup-v-pedestrian-36", "name": "Mismo inicio · «pedestrian»", "accent": "#e11d48", "expressions": ["Pedestrian crossing", "Pedestrian bridge"], "targeted": true, "source": "all"},
+    {"id": "dup-v-pick-37", "name": "Mismo inicio · «pick»", "accent": "#e11d48", "expressions": ["Pick out", "Pick up"], "targeted": true, "source": "all"},
+    {"id": "dup-v-put-38", "name": "Mismo inicio · «put»", "accent": "#e11d48", "expressions": ["Put away", "Put off", "Put on", "Put out", "Put up with"], "targeted": true, "source": "all"},
+    {"id": "dup-v-run-39", "name": "Mismo inicio · «run»", "accent": "#e11d48", "expressions": ["Run away", "Run into", "Run out"], "targeted": true, "source": "all"},
+    {"id": "dup-v-set-40", "name": "Mismo inicio · «set»", "accent": "#e11d48", "expressions": ["Set up", "Set off"], "targeted": true, "source": "all"},
+    {"id": "dup-v-shopping-41", "name": "Mismo inicio · «shopping»", "accent": "#e11d48", "expressions": ["Shopping center", "Shopping cart"], "targeted": true, "source": "all"},
+    {"id": "dup-v-show-42", "name": "Mismo inicio · «show»", "accent": "#e11d48", "expressions": ["Show off", "Show up"], "targeted": true, "source": "all"},
+    {"id": "dup-v-speed-43", "name": "Mismo inicio · «speed»", "accent": "#e11d48", "expressions": ["Speed bump", "Speed limit sign"], "targeted": true, "source": "all"},
+    {"id": "dup-v-street-44", "name": "Mismo inicio · «street»", "accent": "#e11d48", "expressions": ["Street sign", "Street name sign"], "targeted": true, "source": "all"},
+    {"id": "dup-v-take-45", "name": "Mismo inicio · «take» (1/2)", "accent": "#e11d48", "expressions": ["Take the first left", "Take the first right", "Take the second left", "Take the second right", "Take a shower", "Take after", "Take away"], "targeted": true, "source": "all"},
+    {"id": "dup-v-take-46", "name": "Mismo inicio · «take» (2/2)", "accent": "#e11d48", "expressions": ["Take back", "Take off", "Take on", "Take out", "Take over", "Take up"], "targeted": true, "source": "all"},
+    {"id": "dup-v-talk-47", "name": "Mismo inicio · «talk»", "accent": "#e11d48", "expressions": ["Talk about", "Talk over"], "targeted": true, "source": "all"},
+    {"id": "dup-v-that-48", "name": "Mismo inicio · «that»", "accent": "#e11d48", "expressions": ["That is why", "That is to say"], "targeted": true, "source": "all"},
+    {"id": "dup-v-ticket-49", "name": "Mismo inicio · «ticket»", "accent": "#e11d48", "expressions": ["Ticket counter", "Ticket gate"], "targeted": true, "source": "all"},
+    {"id": "dup-v-traffic-50", "name": "Mismo inicio · «traffic»", "accent": "#e11d48", "expressions": ["Traffic light", "Traffic sign"], "targeted": true, "source": "all"},
+    {"id": "dup-v-turn-51", "name": "Mismo inicio · «turn»", "accent": "#e11d48", "expressions": ["Turn left", "Turn right", "Turn on", "Turn off", "Turn signal", "Turn around", "Turn down", "Turn up", "Turn into"], "targeted": true, "source": "all"},
+    {"id": "dup-v-walk-52", "name": "Mismo inicio · «walk»", "accent": "#e11d48", "expressions": ["Walk past", "Walk away"], "targeted": true, "source": "all"},
+    {"id": "dup-v-water-53", "name": "Mismo inicio · «water»", "accent": "#e11d48", "expressions": ["Water fountain", "Water park"], "targeted": true, "source": "all"},
+    {"id": "dup-v-zoom-54", "name": "Mismo inicio · «zoom»", "accent": "#e11d48", "expressions": ["Zoom in", "Zoom out"], "targeted": true, "source": "all"},
+    {"id": "dup-l-all-55", "name": "Misma palabra final · «all»", "accent": "#0e7490", "expressions": ["First of all", "Above all", "All in all"], "targeted": true, "source": "all"},
+    {"id": "dup-l-area-56", "name": "Misma palabra final · «area»", "accent": "#0e7490", "expressions": ["Customs inspection area", "Luggage claim area", "Secondary inspection area", "Waiting area", "Wheelchair seating area"], "targeted": true, "source": "all"},
+    {"id": "dup-p-away-57", "name": "Misma partícula · «away»", "accent": "#7c3aed", "expressions": ["It's far away.", "Get away", "Give away", "Go away", "Keep away", "Pass away", "Put away", "Run away", "Take away", "Throw away", "Walk away"], "targeted": true, "source": "all"},
+    {"id": "dup-p-back-58", "name": "Misma partícula · «back»", "accent": "#7c3aed", "expressions": ["Go back", "Call back", "Come back", "Get back", "Give back", "Pay back", "Take back", "Bring back", "Cut back", "Hold back"], "targeted": true, "source": "all"},
+    {"id": "dup-p-down-59", "name": "Misma partícula · «down»", "accent": "#7c3aed", "expressions": ["Break down", "Calm down", "Cut down", "Fall down", "Knock down", "Let down", "Shut down", "Sit down", "Tear down", "Turn down", "Write down"], "targeted": true, "source": "all"},
+    {"id": "dup-l-hall-60", "name": "Misma palabra final · «hall»", "accent": "#0e7490", "expressions": ["City hall", "Concert hall", "Immigration hall"], "targeted": true, "source": "all"},
+    {"id": "dup-p-in-61", "name": "Misma partícula · «in»", "accent": "#7c3aed", "expressions": ["Break in", "Check in", "Come in", "Fill in", "Get in", "Give in", "Zoom in", "Hand in", "Join in", "Log in"], "targeted": true, "source": "all"},
+    {"id": "dup-p-into-62", "name": "Misma partícula · «into»", "accent": "#7c3aed", "expressions": ["Look into", "Run into", "Turn into"], "targeted": true, "source": "all"},
+    {"id": "dup-l-left-63", "name": "Misma palabra final · «left»", "accent": "#0e7490", "expressions": ["On the left", "To your left", "Turn left", "Take the first left", "Take the second left", "It's on your left."], "targeted": true, "source": "all"},
+    {"id": "dup-p-off-64", "name": "Misma partícula · «off» (1/2)", "accent": "#7c3aed", "expressions": ["Turn off", "Break off", "Call off", "Cut off", "Drop off", "Get off", "Put off"], "targeted": true, "source": "all"},
+    {"id": "dup-p-off-65", "name": "Misma partícula · «off» (2/2)", "accent": "#7c3aed", "expressions": ["Show off", "Take off", "Keep off", "Lay off", "Pay off", "Set off"], "targeted": true, "source": "all"},
+    {"id": "dup-l-office-66", "name": "Misma palabra final · «office»", "accent": "#0e7490", "expressions": ["Box office", "Currency exchange office", "Customs office", "Lost and found office", "Post office", "Tourist office"], "targeted": true, "source": "all"},
+    {"id": "dup-p-on-67", "name": "Misma partícula · «on»", "accent": "#7c3aed", "expressions": ["Turn on", "Carry on", "Count on", "Get on", "Go on", "Hang on", "Hold on", "Keep on", "Move on", "Put on", "Take on", "Try on"], "targeted": true, "source": "all"},
+    {"id": "dup-p-out-68", "name": "Misma partícula · «out» (1/3)", "accent": "#7c3aed", "expressions": ["Fill out", "Ask out", "Break out", "Carry out", "Check out", "Come out", "Eat out", "Find out", "Get out"], "targeted": true, "source": "all"},
+    {"id": "dup-p-out-69", "name": "Misma partícula · «out» (2/3)", "accent": "#7c3aed", "expressions": ["Go out", "Hang out", "Leave out", "Look out", "Pass out", "Pick out", "Point out", "Put out", "Run out"], "targeted": true, "source": "all"},
+    {"id": "dup-p-out-70", "name": "Misma partícula · «out» (3/3)", "accent": "#7c3aed", "expressions": ["Take out", "Watch out", "Wear out", "Work out", "Zoom out", "Figure out", "Hand out", "Log out", "Rule out"], "targeted": true, "source": "all"},
+    {"id": "dup-p-over-71", "name": "Misma partícula · «over»", "accent": "#7c3aed", "expressions": ["Do over", "Get over", "Take over", "Talk over", "Think over", "Pull over"], "targeted": true, "source": "all"},
+    {"id": "dup-l-park-72", "name": "Misma palabra final · «park»", "accent": "#0e7490", "expressions": ["Amusement park", "Safari park", "Water park", "Car park"], "targeted": true, "source": "all"},
+    {"id": "dup-l-right-73", "name": "Misma palabra final · «right»", "accent": "#0e7490", "expressions": ["On the right", "To your right", "Turn right", "Take the first right", "Take the second right", "It's on your right."], "targeted": true, "source": "all"},
+    {"id": "dup-l-shop-74", "name": "Misma palabra final · «shop»", "accent": "#0e7490", "expressions": ["Butcher shop", "Coffee shop", "Duty-free shop", "Flower shop", "Pet shop"], "targeted": true, "source": "all"},
+    {"id": "dup-l-sign-75", "name": "Misma palabra final · «sign»", "accent": "#0e7490", "expressions": ["Stop sign", "Yield sign", "Street sign", "Street name sign", "Direction sign", "Traffic sign", "Speed limit sign"], "targeted": true, "source": "all"},
+    {"id": "dup-l-station-76", "name": "Misma palabra final · «station»", "accent": "#0e7490", "expressions": ["Gas station", "Bus station", "Fire station", "Police station", "Subway station", "Train station"], "targeted": true, "source": "all"},
+    {"id": "dup-l-store-77", "name": "Misma palabra final · «store»", "accent": "#0e7490", "expressions": ["Hardware store", "Jewelry store", "Shoe store"], "targeted": true, "source": "all"},
+    {"id": "dup-l-street-78", "name": "Misma palabra final · «street»", "accent": "#0e7490", "expressions": ["At the end of the street", "At the beginning of the street", "Cross the street", "Go down this street", "Go up this street", "One-way street", "Two-way street", "Dead-end street"], "targeted": true, "source": "all"},
+    {"id": "dup-l-there-79", "name": "Misma palabra final · «there»", "accent": "#0e7490", "expressions": ["It's there.", "It's over there.", "How do I get there?", "You're almost there."], "targeted": true, "source": "all"},
+    {"id": "dup-p-up-80", "name": "Misma partícula · «up» (1/3)", "accent": "#7c3aed", "expressions": ["Back up", "Blow up", "Break up", "Bring up", "Catch up", "Cheer up", "Clean up", "Come up", "Dress up", "End up"], "targeted": true, "source": "all"},
+    {"id": "dup-p-up-81", "name": "Misma partícula · «up» (2/3)", "accent": "#7c3aed", "expressions": ["Get up", "Give up", "Grow up", "Hurry up", "Keep up", "Look up", "Make up", "Pick up", "Set up", "Show up"], "targeted": true, "source": "all"},
+    {"id": "dup-p-up-82", "name": "Misma partícula · «up» (3/3)", "accent": "#7c3aed", "expressions": ["Stand up", "Stay up", "Turn up", "Use up", "Wake up", "Warm up", "Speak up", "Take up", "To sum up"], "targeted": true, "source": "all"}
+  );
+
+  SIMILAR_BLOCK_DEFS.push(
+    { id: 'similar-all-phrasals', name: 'TODOS los phrasal verbs', accent: '#15803d', expressions: [], fromBlocks: ['special-robin-phrasal-'] },
+    { id: 'similar-all-places', name: 'TODOS los lugares (places)', accent: '#0369a1', expressions: [], fromSections: ['LUGARES Y EDIFICIOS'] },
+    { id: 'similar-all-directions', name: 'TODAS las direcciones (directions)', accent: '#2563eb', expressions: [], fromSections: ['GIVING DIRECTIONS & LOCATION WORDS'] },
+    { id: 'similar-all-street', name: 'TODO lo de la calle (street)', accent: '#0f766e', expressions: [], fromSections: ['THINGS YOU FIND ON THE STREET'] },
+    { id: 'similar-all-connectors', name: 'TODOS los conectores', accent: '#0f766e', expressions: [], fromBlocks: ['special-robin-connectors-'] }
+  );
+
   const SIMILAR_BLOCKS = SIMILAR_BLOCK_DEFS.map(def => {
-    const sourceItems = def.source === 'special' ? SPECIAL_QUESTIONS : QUESTIONS;
+    const sourceItems = def.fromSections ? QUESTIONS.filter(q => def.fromSections.includes(q.section)) : def.fromBlocks ? SPECIAL_BLOCKS.filter(b => def.fromBlocks.some(pre => b.id.startsWith(pre))).flatMap(b => b.items) : def.source === 'special' ? SPECIAL_QUESTIONS : def.source === 'all' ? ALL_QUESTIONS : QUESTIONS;
     const wanted = new Set((def.expressions || []).map(normalize));
-    const matches = q => def.cards
+    const matches = q => (def.fromBlocks || def.fromSections) ? true : def.cards
       ? def.cards.some(card => String(card.sourceId) === String(q.sourceId) && normalize(card.english) === normalize(q.english))
       : wanted.has(normalize(q.english));
     const seen = new Set();
@@ -4803,7 +4934,8 @@
     tools: $('#view-tools'),
     practice: $('#view-practice'),
     results: $('#view-results'),
-    flashcards: $('#view-flashcards')
+    flashcards: $('#view-flashcards'),
+    retype: $('#view-retype')
   };
   const main = document.querySelector('main');
   // Mantiene las pantallas de navegación contenidas en el viewport.
@@ -4938,7 +5070,7 @@
       enteringView.classList.add('is-entering');
     }
     const mainNav = $('#main-navigation');
-    const immersive = ['practice', 'results', 'flashcards'].includes(name);
+    const immersive = ['practice', 'results', 'flashcards', 'retype'].includes(name);
     const easyFilterStrip = $('#easy-filter-strip');
     if (easyFilterStrip) easyFilterStrip.hidden = immersive;
     main.classList.toggle('is-menu-page', !immersive);
@@ -6386,7 +6518,7 @@
         line('Es correcto, pero no es la respuesta que estoy buscando.'),
         line(
           result.otherBlocks?.length > 1
-            ? `Esa respuesta también aparece en estos bloques: ${result.otherBlocks.join(' · ')}.`
+            ? `Esa respuesta también aparece en estos bloques: ${result.otherBlocks.slice(0, 3).join(' · ')}${result.otherBlocks.length > 3 ? ` · +${result.otherBlocks.length - 3} más` : ''}.`
             : `Esa respuesta corresponde a este bloque: ${result.otherBlock}.`,
           'fb-line fb-dim'
         )
@@ -7861,7 +7993,7 @@
     syncBlockPickerLabel();
   }
 
-  const vocabPickerState = { category: 'quick', difficulty: 'all', page: 0, query: '' };
+  const vocabPickerState = { category: 'quick', difficulty: 'all', page: 0, query: '', folder: null };
   let explicitEasyBlockSelection = false;
 
   const VOCAB_CATEGORY_DEFS = [
@@ -8005,6 +8137,7 @@
         button.setAttribute('aria-label', `${category.label}: ${category.id === 'difficulty' ? 'tres niveles' : `${countMap[category.id] ?? 0} opciones`}`);
         button.addEventListener('click', () => {
           vocabPickerState.category = category.id;
+          vocabPickerState.folder = null;
           vocabPickerState.page = 0;
           vocabPickerState.difficulty = 'all';
           search.value = '';
@@ -8071,7 +8204,7 @@
         case 'difficulty':
           filtered = candidates.filter(candidate => candidate.group === 'main' && (vocabPickerState.difficulty === 'all' || candidate.difficulty === vocabPickerState.difficulty));
           break;
-        case 'similar': filtered = candidates.filter(candidate => candidate.group === 'similar'); break;
+        case 'similar': filtered = similarFolderView(candidates); break;
         case 'special': filtered = candidates.filter(candidate => candidate.group === 'special'); break;
         default: filtered = candidates;
       }
@@ -8144,6 +8277,7 @@
         if (candidateBlock) stateIcon.style.visibility = 'hidden'; // deja libre la columna para la estrella manual
         option.append(icon, copy, stateIcon);
         option.addEventListener('click', () => {
+          if (candidate.folderId) { vocabPickerState.folder = candidate.folderId === 'ROOT' ? null : candidate.folderId; vocabPickerState.page = 0; renderVocabularyPicker(); return; }
           el.blockSelect.value = candidate.id;
           explicitEasyBlockSelection = Boolean(candidateBlock && candidateBlock.difficulty === 'easy' && db.settings.excludeEasy !== false && allowExplicitEasy);
           syncBlockPickerLabel();
@@ -8421,7 +8555,8 @@
       const opt = $$('#mc-box .mc-opt')[Number(event.key) - 1];
       if (opt) { event.preventDefault(); opt.click(); return; }
     }
-    if (state.answered && event.key === 'Enter') {
+    if (state.retype.pending && event.key === 'Enter') { event.preventDefault(); startRetype(); return; }
+    if (state.answered && !state.retype.active && event.key === 'Enter') {
       event.preventDefault();
       goNext();
       return;
@@ -8437,7 +8572,103 @@
   /* ======================================================================
      INIT
      ====================================================================== */
-  /* ===== v2.4.0 · DOMINIO, SESIÓN INTELIGENTE, OPCIÓN MÚLTIPLE, XP ===== */
+  /* ===== v2.6.1 · CARPETAS Y REPASO INMEDIATO ===== */
+  state.retype = { active: false };
+  const RETYPE_TIMES = 2;
+  function startRetype() {
+    const r = state.results[state.results.length - 1];
+    if (!r || r.status === 'correct' || r.status === 'valid-other' || !views.practice.classList.contains('is-active')) {
+      state.retype = { active: false }; el.btnNext.classList.remove('hidden'); return;
+    }
+    state.retype = { active: true, pending: false, done: 0, expected: r.expectedAnswer, item: r.item, direction: r.direction };
+    const item = r.item, m = masteryInfo(item);
+    $('#rt-prompt').textContent = r.direction === 'EN-ES' ? item.english : item.spanish;
+    $('#rt-answer').textContent = r.expectedAnswer;
+    $('#rt-section').textContent = item.section;
+    $('#rt-diff').textContent = difficultyLabel(item.difficulty); $('#rt-diff').className = difficultyTagClass(item.difficulty);
+    $('#rt-mastery').textContent = m.label; $('#rt-mastery').className = `tag mastery-tag mastery-${m.key}`;
+    const inp = $('#rt-input');
+    inp.disabled = false; inp.value = ''; inp.className = 'answer-input';
+    $('#rt-submit').classList.remove('hidden'); $('#rt-done').classList.add('hidden');
+    rtUpdate();
+    document.body.classList.add('is-retype');
+    showView('retype');
+    requestAnimationFrame(() => inp.focus());
+  }
+  function rtUpdate(msg) {
+    const rt = state.retype;
+    $('#rt-count').textContent = `${rt.done} / ${RETYPE_TIMES}`;
+    $('#rt-fill').style.width = `${rt.done / RETYPE_TIMES * 100}%`;
+    $('#rt-feedback').textContent = msg || (rt.done === 0 ? `Escríbela ${RETYPE_TIMES} veces para fijarla.` : 'Otra vez, una más.');
+    $('#rt-input').placeholder = `Escríbela aquí (${Math.min(rt.done + 1, RETYPE_TIMES)} de ${RETYPE_TIMES})`;
+  }
+  function rtCheck() {
+    const rt = state.retype;
+    if (!rt.active || rt.pending) return;
+    const inp = $('#rt-input'), v = inp.value;
+    if (!normalize(v)) { inp.focus(); return; }
+    const ok = [rt.expected, ...allOf(rt.item, rt.direction)].some(a => answersEqual(a, v));
+    const card = $('#view-retype .word-card');
+    if (!ok) {
+      inp.classList.add('wrong'); card.classList.add('shake');
+      setTimeout(() => { card.classList.remove('shake'); inp.classList.remove('wrong'); }, 400);
+      inp.select(); return;
+    }
+    rt.done += 1; inp.value = '';
+    if (rt.done < RETYPE_TIMES) { rtUpdate(); inp.focus(); return; }
+    inp.disabled = true; inp.classList.add('correct'); inp.placeholder = '¡Listo!';
+    rtUpdate('✓ Listo. Ya la tienes más fresca.');
+    $('#rt-submit').classList.add('hidden'); $('#rt-done').classList.remove('hidden'); $('#rt-done').focus();
+    launchConfetti({ count: 24 });
+  }
+  function endRetype() {
+    state.retype = { active: false };
+    document.body.classList.remove('is-retype');
+    showView('practice');
+    el.btnNext.classList.remove('hidden'); el.btnSubmit.classList.add('hidden'); el.btnNext.focus();
+  }
+  $('#rt-submit').addEventListener('click', rtCheck);
+  $('#rt-done').addEventListener('click', endRetype);
+  $('#rt-input').addEventListener('keydown', event => {
+    if (event.key !== 'Enter' || event.isComposing) return;
+    event.preventDefault(); event.stopPropagation(); rtCheck();
+  });
+
+  const FOLDER_DEFS = [
+    { id: 'all', name: 'Todo en uno', icon: '⭐', desc: 'Todos los phrasal verbs y todos los conectores' },
+    { id: 'verb', name: 'Mismo verbo', icon: '🔁', desc: 'break, come, get, go, take, turn…' },
+    { id: 'particle', name: 'Misma partícula', icon: '🧩', desc: 'out, up, off, on, in, down…' },
+    { id: 'ending', name: 'Misma palabra final', icon: '🏁', desc: 'left / right, street, sign, station…' },
+    { id: 'directions', name: 'Direcciones y calle', icon: '🧭', desc: 'Orientación, giros, señales y vías' },
+    { id: 'places', name: 'Lugares y transporte', icon: '📍', desc: 'Aeropuerto, comercios, agua y paisaje' },
+    { id: 'adjectives', name: 'Adjetivos y personalidad', icon: '🙂', desc: 'Carácter, apariencia, sabores, estados' },
+    { id: 'confusions', name: 'Confusiones dirigidas', icon: '⚠', desc: 'Pares que se parecen mucho' }
+  ];
+  function folderIdOf(id) {
+    if (id.startsWith('similar-all-')) return 'all';
+    if (id.startsWith('dup-v-')) return 'verb';
+    if (id.startsWith('dup-p-')) return 'particle';
+    if (id.startsWith('dup-l-')) return 'ending';
+    if (id.startsWith('confusion-')) return 'confusions';
+    if (/^similar-(proximity|position|between-among|passing-crossing|straight|left-right|turn-order|road-types|road-signs|crossings|road-infrastructure)$/.test(id)) return 'directions';
+    if (/^similar-(airport-process|transport-hubs|shops|health-facilities|water-features|landforms)$/.test(id)) return 'places';
+    return 'adjectives';
+  }
+  function similarFolderView(cands) {
+    const sims = cands.filter(c => c.group === 'similar');
+    const f = vocabPickerState.folder;
+    if (!f) {
+      return FOLDER_DEFS.map(d => {
+        const n = sims.filter(c => folderIdOf(c.id) === d.id).length;
+        return { id: 'folder:' + d.id, folderId: d.id, name: d.name, description: d.desc, group: 'folderitem', icon: d.icon, items: [], countLabel: `${n} ${n === 1 ? 'bloque' : 'bloques'} · ${d.desc}`, searchableItems: false, _n: n };
+      }).filter(x => x._n > 0);
+    }
+    const def = FOLDER_DEFS.find(d => d.id === f);
+    return [{ id: 'folder:root', folderId: 'ROOT', name: '← Volver a carpetas', description: '', group: 'folderitem', icon: '📁', items: [], countLabel: def ? def.name : '', searchableItems: false },
+      ...sims.filter(c => folderIdOf(c.id) === f)];
+  }
+
+  /* ===== v2.6.1 · DOMINIO, SESIÓN INTELIGENTE, OPCIÓN MÚLTIPLE, XP ===== */
   state.mc = { active: false, correct: '', chosen: null, forceWrong: false };
   state.sm = { up: 0, down: 0, newMastered: 0 };
   state.fcMarks = new Map();
@@ -8490,6 +8721,7 @@
     const box = $('#mc-box');
     state.mc = { active: false, correct: '', chosen: null, forceWrong: false };
     box.replaceChildren();
+    state.retype = { active: false }; document.body.classList.remove('is-retype');
     box.classList.add('hidden');
     el.input.classList.remove('hidden');
     const sm = state.studyMode;
@@ -8560,6 +8792,11 @@
     trackProgress(ok, clean);
     if (state.mc.active) lockMC();
     if (views.practice.classList.contains('is-active')) renderMasteryTag(item, after - before);
+    if (!ok && state.studyMode?.feedback !== 'blind') {
+      state.retype = { active: true, pending: true };
+      setTimeout(() => el.btnNext.classList.add('hidden'), 0);
+      setTimeout(() => { if (state.retype.pending) startRetype(); }, 1100);
+    }
   }
 
   // ---- Panel de dominio ----
