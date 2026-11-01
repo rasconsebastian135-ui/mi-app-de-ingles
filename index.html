@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Practicador de vocabulario inglés-español con categorías de dificultad, errores, repaso y estadísticas.">
 <meta name="theme-color" content="#4f46e5">
-<title>Practicador de Vocabulario · Versión 2.6.1</title>
+<title>Practicador de Vocabulario · Versión 2.9.2</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; }
 
@@ -2620,7 +2620,7 @@
     .easy-filter-strip .easy-filter-copy small { display:none; }
   }
 
-/* ===== v2.6.1 · DOMINIO, OPCIÓN MÚLTIPLE, FLASHCARDS CON AUTOEVALUACIÓN ===== */
+/* ===== v2.9.2 · DOMINIO, OPCIÓN MÚLTIPLE, FLASHCARDS CON AUTOEVALUACIÓN ===== */
 #view-setup.is-active { overflow-y: auto !important; }
 #view-setup .home-dashboard { flex: 0 0 auto; grid-template-rows: none; }
 #view-setup .setup-panel { max-height: none; overflow: visible; }
@@ -2663,13 +2663,28 @@
 @media (max-width: 520px) { .mc-box { grid-template-columns: 1fr; } }
 
 
-/* ===== v2.6.1 · REPASO RÁPIDO COMO OTRA PANTALLA ===== */
+/* ===== v2.9.2 · REPASO RÁPIDO COMO OTRA PANTALLA ===== */
 body.is-retype .topbar { background: radial-gradient(circle at 8% 0%, rgba(255,255,255,.30), transparent 26%), linear-gradient(112deg, #b45309 0%, #f59e0b 45%, #ec4899 122%); box-shadow: 0 8px 30px rgba(180,83,9,.28), 0 0 34px rgba(245,158,11,.18); }
 body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(245,158,11,.16); }
 #view-retype .word-card { border-color: color-mix(in srgb, var(--warn) 45%, var(--border)); background: linear-gradient(145deg, var(--surface-solid), var(--warn-soft)); }
 #view-retype .hint-box { font-size: 1.15rem; border-color: color-mix(in srgb, var(--warn) 60%, transparent); background: var(--warn-soft); color: var(--warn); }
 #view-retype.is-active.is-entering { animation: rtIn .5s cubic-bezier(.16,1,.3,1) both; }
 @keyframes rtIn { from { opacity: 0; transform: translateX(46px) scale(.98); } to { opacity: 1; transform: none; } }
+
+/* ===== v2.9.2 · CARPETAS CON FORMA DE CARPETA ===== */
+.vocab-card.folder-card { position: relative; border-top: 4px solid var(--fc, var(--primary)); border-radius: 4px 14px 14px 14px; background: linear-gradient(160deg, color-mix(in srgb, var(--fc, #6858ff) 13%, var(--surface-solid)), var(--surface-solid) 70%); }
+.vocab-card.folder-card::before { content: ""; position: absolute; top: -4px; left: 14px; width: 44px; height: 9px; background: var(--fc, var(--primary)); border-radius: 0 0 8px 8px; }
+.vocab-card.folder-card .vocab-card-icon { background: color-mix(in srgb, var(--fc, #6858ff) 22%, var(--surface-solid)); font-size: 1.15rem; }
+.vocab-card.folder-card .vocab-card-copy strong { font-size: .8rem; }
+.vocab-card.folder-card .vocab-card-state { color: var(--fc, var(--primary)); font-size: 1.1rem; }
+.vocab-card.folder-card:hover { border-color: var(--fc, var(--primary)); box-shadow: 0 8px 20px color-mix(in srgb, var(--fc, #6858ff) 22%, transparent); }
+
+/* ===== v2.9.2 · SESIÓN SIN TERMINAR ===== */
+.resume-box { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 12px 16px; border-radius: 16px; border: 1px solid color-mix(in srgb, var(--warn) 55%, var(--border)); background: linear-gradient(120deg, var(--warn-soft), var(--surface-solid)); box-shadow: 0 8px 24px rgba(245,158,11,.12); }
+.resume-copy { display: grid; gap: 2px; min-width: 0; }
+.resume-copy strong { font-size: .92rem; }
+.resume-copy small { color: var(--muted); font-size: .72rem; }
+.resume-actions { display: flex; gap: 8px; }
 </style>
 </head>
 <body>
@@ -2677,7 +2692,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
 <div class="app">
   <header class="topbar">
     <div class="topbar-left">
-      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v2.6.1</span>
+      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v2.9.2</span>
       <div class="brand">
         <div class="brand-mark">V</div>
         <div>
@@ -2725,7 +2740,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
       <div class="home-dashboard">
         <header class="home-intro">
           <div class="home-intro-copy">
-            <p class="home-eyebrow">TU ESPACIO DE ESTUDIO <span>·</span> VERSIÓN 2.6.1</p>
+            <p class="home-eyebrow">TU ESPACIO DE ESTUDIO <span>·</span> VERSIÓN 2.9.2</p>
             <h2 id="setup-title">¿Qué vas a practicar hoy?</h2>
             <p>Elige el vocabulario, selecciona la dirección y empieza. Las opciones avanzadas están aparte para que no estorben.</p>
           </div>
@@ -2736,6 +2751,10 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
           </div>
         </header>
 
+        <div id="resume-box" class="resume-box hidden" role="status">
+          <div class="resume-copy"><strong>Sesión sin terminar</strong><small id="resume-detail"></small></div>
+          <div class="resume-actions"><button id="btn-resume" class="btn btn-primary btn-sm" type="button">Continuar</button><button id="btn-discard" class="btn btn-ghost btn-sm" type="button">Descartar</button></div>
+        </div>
         <section class="mastery-panel" id="mastery-panel" aria-label="Tu dominio del vocabulario">
           <div class="mp-top">
             <div class="mp-who"><strong id="mp-level">Nivel 1</strong><small id="mp-xp">0 XP</small></div>
@@ -2829,7 +2848,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
           </section>
         </details>
 
-        <div class="home-footer"><span>Practicador de Vocabulario <strong>v2.6.1</strong></span><span>El avance se guarda localmente.</span><button id="btn-reset" class="link-danger hidden" type="button" title="Borrar todo el progreso guardado">Borrar progreso</button><span id="total-progress" class="hidden"></span></div>
+        <div class="home-footer"><span>Practicador de Vocabulario <strong>v2.9.2</strong></span><span>El avance se guarda localmente.</span><button id="btn-reset" class="link-danger hidden" type="button" title="Borrar todo el progreso guardado">Borrar progreso</button><span id="total-progress" class="hidden"></span></div>
       </div>
     </section>
 
@@ -2987,6 +3006,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
           <div class="word-meta"><p id="rt-section" class="eyebrow"></p><span id="rt-diff" class="tag"></span></div>
           <h2 id="rt-prompt" class="prompt">—</h2>
           <div class="hint-box" id="rt-answer"></div>
+          <div id="rt-contrast" class="feedback warning hidden"></div>
           <div class="answer-form">
             <input id="rt-input" class="answer-input" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="Escríbela aquí" aria-label="Escribe la respuesta correcta">
             <div id="rt-feedback" class="feedback info"></div>
@@ -2995,6 +3015,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
         <div class="answer-actions-outside">
           <button id="rt-submit" class="btn btn-primary btn-lg" type="button">Comprobar</button>
           <button id="rt-done" class="btn btn-primary btn-lg hidden" type="button">Continuar →</button>
+          <button id="rt-skip" class="btn btn-ghost" type="button">Omitir repaso (Esc)</button>
         </div>
       </div>
     </section>
@@ -3113,7 +3134,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
 
   // VERSIÓN DE LA APP: 2.3
   // IMPORTANTE: CAMBIA APP_VERSION SIEMPRE QUE AGREGUES O MODIFIQUES FUNCIONALIDAD.
-  const APP_VERSION = '2.6.1';
+  const APP_VERSION = '2.9.2';
 
   /* ======================================================================
      DATOS · vocabData con las 504 entradas originales
@@ -4581,89 +4602,163 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
   ];
 
   SIMILAR_BLOCK_DEFS.push(
-    {"id": "dup-v-as-0", "name": "Mismo inicio · «as»", "accent": "#e11d48", "expressions": ["As well as", "As a result", "As soon as", "As a matter of fact", "As long as"], "targeted": true, "source": "all"},
-    {"id": "dup-v-ask-1", "name": "Mismo inicio · «ask»", "accent": "#e11d48", "expressions": ["Ask for", "Ask out"], "targeted": true, "source": "all"},
-    {"id": "dup-v-at-2", "name": "Mismo inicio · «at»", "accent": "#e11d48", "expressions": ["At the end of the street", "At the beginning of the street", "At the same time"], "targeted": true, "source": "all"},
-    {"id": "dup-v-break-3", "name": "Mismo inicio · «break»", "accent": "#e11d48", "expressions": ["Break down", "Break in", "Break off", "Break out", "Break up"], "targeted": true, "source": "all"},
-    {"id": "dup-v-bring-4", "name": "Mismo inicio · «bring»", "accent": "#e11d48", "expressions": ["Bring up", "Bring back"], "targeted": true, "source": "all"},
-    {"id": "dup-v-bus-5", "name": "Mismo inicio · «bus»", "accent": "#e11d48", "expressions": ["Bus lane", "Bus stop", "Bus station"], "targeted": true, "source": "all"},
-    {"id": "dup-v-call-6", "name": "Mismo inicio · «call»", "accent": "#e11d48", "expressions": ["Call back", "Call off"], "targeted": true, "source": "all"},
-    {"id": "dup-v-carry-7", "name": "Mismo inicio · «carry»", "accent": "#e11d48", "expressions": ["Carry on", "Carry out"], "targeted": true, "source": "all"},
-    {"id": "dup-v-check-8", "name": "Mismo inicio · «check»", "accent": "#e11d48", "expressions": ["Check-in counter", "Check (bill)", "Check in", "Check out"], "targeted": true, "source": "all"},
-    {"id": "dup-v-come-9", "name": "Mismo inicio · «come»", "accent": "#e11d48", "expressions": ["Come across", "Come back", "Come in", "Come out", "Come up", "Come along"], "targeted": true, "source": "all"},
-    {"id": "dup-v-customs-10", "name": "Mismo inicio · «customs»", "accent": "#e11d48", "expressions": ["Customs inspection area", "Customs office"], "targeted": true, "source": "all"},
-    {"id": "dup-v-cut-11", "name": "Mismo inicio · «cut»", "accent": "#e11d48", "expressions": ["Cut down", "Cut off", "Cut back"], "targeted": true, "source": "all"},
-    {"id": "dup-v-drop-12", "name": "Mismo inicio · «drop»", "accent": "#e11d48", "expressions": ["Drop off", "Drop by"], "targeted": true, "source": "all"},
-    {"id": "dup-v-even-13", "name": "Mismo inicio · «even»", "accent": "#e11d48", "expressions": ["Even though", "Even so", "Even if"], "targeted": true, "source": "all"},
-    {"id": "dup-v-fall-14", "name": "Mismo inicio · «fall»", "accent": "#e11d48", "expressions": ["Fall apart", "Fall behind", "Fall down"], "targeted": true, "source": "all"},
-    {"id": "dup-v-fill-15", "name": "Mismo inicio · «fill»", "accent": "#e11d48", "expressions": ["Fill out", "Fill in"], "targeted": true, "source": "all"},
-    {"id": "dup-v-fire-16", "name": "Mismo inicio · «fire»", "accent": "#e11d48", "expressions": ["Fire hydrant", "Fire station"], "targeted": true, "source": "all"},
-    {"id": "dup-v-for-17", "name": "Mismo inicio · «for»", "accent": "#e11d48", "expressions": ["For this reason", "For example", "For instance"], "targeted": true, "source": "all"},
-    {"id": "dup-v-funeral-18", "name": "Mismo inicio · «funeral»", "accent": "#e11d48", "expressions": ["Funeral home", "Funeral parlor"], "targeted": true, "source": "all"},
-    {"id": "dup-v-get-19", "name": "Mismo inicio · «get»", "accent": "#e11d48", "expressions": ["Get along", "Get away", "Get back", "Get by", "Get in", "Get off", "Get on", "Get out", "Get over", "Get up"], "targeted": true, "source": "all"},
-    {"id": "dup-v-give-20", "name": "Mismo inicio · «give»", "accent": "#e11d48", "expressions": ["Give away", "Give back", "Give in", "Give up"], "targeted": true, "source": "all"},
-    {"id": "dup-v-go-21", "name": "Mismo inicio · «go»", "accent": "#e11d48", "expressions": ["Go straight", "Go back", "Go past", "Go across", "Go down this street", "Go up this street", "Go ahead", "Go away", "Go on", "Go out"], "targeted": true, "source": "all"},
-    {"id": "dup-v-hand-22", "name": "Mismo inicio · «hand»", "accent": "#e11d48", "expressions": ["Hand in", "Hand out"], "targeted": true, "source": "all"},
-    {"id": "dup-v-hang-23", "name": "Mismo inicio · «hang»", "accent": "#e11d48", "expressions": ["Hang on", "Hang out"], "targeted": true, "source": "all"},
-    {"id": "dup-v-hold-24", "name": "Mismo inicio · «hold»", "accent": "#e11d48", "expressions": ["Hold on", "Hold back"], "targeted": true, "source": "all"},
-    {"id": "dup-v-in-25", "name": "Mismo inicio · «in» (1/2)", "accent": "#e11d48", "expressions": ["In front of", "In an airport", "In addition", "In spite of", "In the meantime", "In the end", "In fact"], "targeted": true, "source": "all"},
-    {"id": "dup-v-in-26", "name": "Mismo inicio · «in» (2/2)", "accent": "#e11d48", "expressions": ["In case", "In case of", "In conclusion", "In summary", "In short", "In other words"], "targeted": true, "source": "all"},
-    {"id": "dup-v-its-27", "name": "Mismo inicio · «It’s»", "accent": "#e11d48", "expressions": ["It's here.", "It's there.", "It's over there.", "It's on your left.", "It's on your right.", "It's nearby.", "It's far away."], "targeted": true, "source": "all"},
-    {"id": "dup-v-keep-28", "name": "Mismo inicio · «keep»", "accent": "#e11d48", "expressions": ["Keep going", "Keep away", "Keep on", "Keep up", "Keep off"], "targeted": true, "source": "all"},
-    {"id": "dup-v-log-29", "name": "Mismo inicio · «log»", "accent": "#e11d48", "expressions": ["Log in", "Log out"], "targeted": true, "source": "all"},
-    {"id": "dup-v-look-30", "name": "Mismo inicio · «look»", "accent": "#e11d48", "expressions": ["Look after", "Look around", "Look at", "Look for", "Look forward to", "Look into", "Look out", "Look up"], "targeted": true, "source": "all"},
-    {"id": "dup-v-movie-31", "name": "Mismo inicio · «movie»", "accent": "#e11d48", "expressions": ["Movie theater", "Movie screen"], "targeted": true, "source": "all"},
-    {"id": "dup-v-on-32", "name": "Mismo inicio · «on»", "accent": "#e11d48", "expressions": ["On the corner of", "On the left", "On the right", "On the other hand", "On the contrary", "On the whole"], "targeted": true, "source": "all"},
-    {"id": "dup-v-parking-33", "name": "Mismo inicio · «parking»", "accent": "#e11d48", "expressions": ["Parking lot", "Parking meter", "Parking control booth"], "targeted": true, "source": "all"},
-    {"id": "dup-v-pass-34", "name": "Mismo inicio · «pass»", "accent": "#e11d48", "expressions": ["Pass away", "Pass out"], "targeted": true, "source": "all"},
-    {"id": "dup-v-pay-35", "name": "Mismo inicio · «pay»", "accent": "#e11d48", "expressions": ["Pay back", "Pay off"], "targeted": true, "source": "all"},
-    {"id": "dup-v-pedestrian-36", "name": "Mismo inicio · «pedestrian»", "accent": "#e11d48", "expressions": ["Pedestrian crossing", "Pedestrian bridge"], "targeted": true, "source": "all"},
-    {"id": "dup-v-pick-37", "name": "Mismo inicio · «pick»", "accent": "#e11d48", "expressions": ["Pick out", "Pick up"], "targeted": true, "source": "all"},
-    {"id": "dup-v-put-38", "name": "Mismo inicio · «put»", "accent": "#e11d48", "expressions": ["Put away", "Put off", "Put on", "Put out", "Put up with"], "targeted": true, "source": "all"},
-    {"id": "dup-v-run-39", "name": "Mismo inicio · «run»", "accent": "#e11d48", "expressions": ["Run away", "Run into", "Run out"], "targeted": true, "source": "all"},
-    {"id": "dup-v-set-40", "name": "Mismo inicio · «set»", "accent": "#e11d48", "expressions": ["Set up", "Set off"], "targeted": true, "source": "all"},
-    {"id": "dup-v-shopping-41", "name": "Mismo inicio · «shopping»", "accent": "#e11d48", "expressions": ["Shopping center", "Shopping cart"], "targeted": true, "source": "all"},
-    {"id": "dup-v-show-42", "name": "Mismo inicio · «show»", "accent": "#e11d48", "expressions": ["Show off", "Show up"], "targeted": true, "source": "all"},
-    {"id": "dup-v-speed-43", "name": "Mismo inicio · «speed»", "accent": "#e11d48", "expressions": ["Speed bump", "Speed limit sign"], "targeted": true, "source": "all"},
-    {"id": "dup-v-street-44", "name": "Mismo inicio · «street»", "accent": "#e11d48", "expressions": ["Street sign", "Street name sign"], "targeted": true, "source": "all"},
-    {"id": "dup-v-take-45", "name": "Mismo inicio · «take» (1/2)", "accent": "#e11d48", "expressions": ["Take the first left", "Take the first right", "Take the second left", "Take the second right", "Take a shower", "Take after", "Take away"], "targeted": true, "source": "all"},
-    {"id": "dup-v-take-46", "name": "Mismo inicio · «take» (2/2)", "accent": "#e11d48", "expressions": ["Take back", "Take off", "Take on", "Take out", "Take over", "Take up"], "targeted": true, "source": "all"},
-    {"id": "dup-v-talk-47", "name": "Mismo inicio · «talk»", "accent": "#e11d48", "expressions": ["Talk about", "Talk over"], "targeted": true, "source": "all"},
-    {"id": "dup-v-that-48", "name": "Mismo inicio · «that»", "accent": "#e11d48", "expressions": ["That is why", "That is to say"], "targeted": true, "source": "all"},
-    {"id": "dup-v-ticket-49", "name": "Mismo inicio · «ticket»", "accent": "#e11d48", "expressions": ["Ticket counter", "Ticket gate"], "targeted": true, "source": "all"},
-    {"id": "dup-v-traffic-50", "name": "Mismo inicio · «traffic»", "accent": "#e11d48", "expressions": ["Traffic light", "Traffic sign"], "targeted": true, "source": "all"},
-    {"id": "dup-v-turn-51", "name": "Mismo inicio · «turn»", "accent": "#e11d48", "expressions": ["Turn left", "Turn right", "Turn on", "Turn off", "Turn signal", "Turn around", "Turn down", "Turn up", "Turn into"], "targeted": true, "source": "all"},
-    {"id": "dup-v-walk-52", "name": "Mismo inicio · «walk»", "accent": "#e11d48", "expressions": ["Walk past", "Walk away"], "targeted": true, "source": "all"},
-    {"id": "dup-v-water-53", "name": "Mismo inicio · «water»", "accent": "#e11d48", "expressions": ["Water fountain", "Water park"], "targeted": true, "source": "all"},
-    {"id": "dup-v-zoom-54", "name": "Mismo inicio · «zoom»", "accent": "#e11d48", "expressions": ["Zoom in", "Zoom out"], "targeted": true, "source": "all"},
-    {"id": "dup-l-all-55", "name": "Misma palabra final · «all»", "accent": "#0e7490", "expressions": ["First of all", "Above all", "All in all"], "targeted": true, "source": "all"},
-    {"id": "dup-l-area-56", "name": "Misma palabra final · «area»", "accent": "#0e7490", "expressions": ["Customs inspection area", "Luggage claim area", "Secondary inspection area", "Waiting area", "Wheelchair seating area"], "targeted": true, "source": "all"},
-    {"id": "dup-p-away-57", "name": "Misma partícula · «away»", "accent": "#7c3aed", "expressions": ["It's far away.", "Get away", "Give away", "Go away", "Keep away", "Pass away", "Put away", "Run away", "Take away", "Throw away", "Walk away"], "targeted": true, "source": "all"},
-    {"id": "dup-p-back-58", "name": "Misma partícula · «back»", "accent": "#7c3aed", "expressions": ["Go back", "Call back", "Come back", "Get back", "Give back", "Pay back", "Take back", "Bring back", "Cut back", "Hold back"], "targeted": true, "source": "all"},
-    {"id": "dup-p-down-59", "name": "Misma partícula · «down»", "accent": "#7c3aed", "expressions": ["Break down", "Calm down", "Cut down", "Fall down", "Knock down", "Let down", "Shut down", "Sit down", "Tear down", "Turn down", "Write down"], "targeted": true, "source": "all"},
-    {"id": "dup-l-hall-60", "name": "Misma palabra final · «hall»", "accent": "#0e7490", "expressions": ["City hall", "Concert hall", "Immigration hall"], "targeted": true, "source": "all"},
-    {"id": "dup-p-in-61", "name": "Misma partícula · «in»", "accent": "#7c3aed", "expressions": ["Break in", "Check in", "Come in", "Fill in", "Get in", "Give in", "Zoom in", "Hand in", "Join in", "Log in"], "targeted": true, "source": "all"},
-    {"id": "dup-p-into-62", "name": "Misma partícula · «into»", "accent": "#7c3aed", "expressions": ["Look into", "Run into", "Turn into"], "targeted": true, "source": "all"},
-    {"id": "dup-l-left-63", "name": "Misma palabra final · «left»", "accent": "#0e7490", "expressions": ["On the left", "To your left", "Turn left", "Take the first left", "Take the second left", "It's on your left."], "targeted": true, "source": "all"},
-    {"id": "dup-p-off-64", "name": "Misma partícula · «off» (1/2)", "accent": "#7c3aed", "expressions": ["Turn off", "Break off", "Call off", "Cut off", "Drop off", "Get off", "Put off"], "targeted": true, "source": "all"},
-    {"id": "dup-p-off-65", "name": "Misma partícula · «off» (2/2)", "accent": "#7c3aed", "expressions": ["Show off", "Take off", "Keep off", "Lay off", "Pay off", "Set off"], "targeted": true, "source": "all"},
-    {"id": "dup-l-office-66", "name": "Misma palabra final · «office»", "accent": "#0e7490", "expressions": ["Box office", "Currency exchange office", "Customs office", "Lost and found office", "Post office", "Tourist office"], "targeted": true, "source": "all"},
-    {"id": "dup-p-on-67", "name": "Misma partícula · «on»", "accent": "#7c3aed", "expressions": ["Turn on", "Carry on", "Count on", "Get on", "Go on", "Hang on", "Hold on", "Keep on", "Move on", "Put on", "Take on", "Try on"], "targeted": true, "source": "all"},
-    {"id": "dup-p-out-68", "name": "Misma partícula · «out» (1/3)", "accent": "#7c3aed", "expressions": ["Fill out", "Ask out", "Break out", "Carry out", "Check out", "Come out", "Eat out", "Find out", "Get out"], "targeted": true, "source": "all"},
-    {"id": "dup-p-out-69", "name": "Misma partícula · «out» (2/3)", "accent": "#7c3aed", "expressions": ["Go out", "Hang out", "Leave out", "Look out", "Pass out", "Pick out", "Point out", "Put out", "Run out"], "targeted": true, "source": "all"},
-    {"id": "dup-p-out-70", "name": "Misma partícula · «out» (3/3)", "accent": "#7c3aed", "expressions": ["Take out", "Watch out", "Wear out", "Work out", "Zoom out", "Figure out", "Hand out", "Log out", "Rule out"], "targeted": true, "source": "all"},
-    {"id": "dup-p-over-71", "name": "Misma partícula · «over»", "accent": "#7c3aed", "expressions": ["Do over", "Get over", "Take over", "Talk over", "Think over", "Pull over"], "targeted": true, "source": "all"},
-    {"id": "dup-l-park-72", "name": "Misma palabra final · «park»", "accent": "#0e7490", "expressions": ["Amusement park", "Safari park", "Water park", "Car park"], "targeted": true, "source": "all"},
-    {"id": "dup-l-right-73", "name": "Misma palabra final · «right»", "accent": "#0e7490", "expressions": ["On the right", "To your right", "Turn right", "Take the first right", "Take the second right", "It's on your right."], "targeted": true, "source": "all"},
-    {"id": "dup-l-shop-74", "name": "Misma palabra final · «shop»", "accent": "#0e7490", "expressions": ["Butcher shop", "Coffee shop", "Duty-free shop", "Flower shop", "Pet shop"], "targeted": true, "source": "all"},
-    {"id": "dup-l-sign-75", "name": "Misma palabra final · «sign»", "accent": "#0e7490", "expressions": ["Stop sign", "Yield sign", "Street sign", "Street name sign", "Direction sign", "Traffic sign", "Speed limit sign"], "targeted": true, "source": "all"},
-    {"id": "dup-l-station-76", "name": "Misma palabra final · «station»", "accent": "#0e7490", "expressions": ["Gas station", "Bus station", "Fire station", "Police station", "Subway station", "Train station"], "targeted": true, "source": "all"},
-    {"id": "dup-l-store-77", "name": "Misma palabra final · «store»", "accent": "#0e7490", "expressions": ["Hardware store", "Jewelry store", "Shoe store"], "targeted": true, "source": "all"},
-    {"id": "dup-l-street-78", "name": "Misma palabra final · «street»", "accent": "#0e7490", "expressions": ["At the end of the street", "At the beginning of the street", "Cross the street", "Go down this street", "Go up this street", "One-way street", "Two-way street", "Dead-end street"], "targeted": true, "source": "all"},
-    {"id": "dup-l-there-79", "name": "Misma palabra final · «there»", "accent": "#0e7490", "expressions": ["It's there.", "It's over there.", "How do I get there?", "You're almost there."], "targeted": true, "source": "all"},
-    {"id": "dup-p-up-80", "name": "Misma partícula · «up» (1/3)", "accent": "#7c3aed", "expressions": ["Back up", "Blow up", "Break up", "Bring up", "Catch up", "Cheer up", "Clean up", "Come up", "Dress up", "End up"], "targeted": true, "source": "all"},
-    {"id": "dup-p-up-81", "name": "Misma partícula · «up» (2/3)", "accent": "#7c3aed", "expressions": ["Get up", "Give up", "Grow up", "Hurry up", "Keep up", "Look up", "Make up", "Pick up", "Set up", "Show up"], "targeted": true, "source": "all"},
-    {"id": "dup-p-up-82", "name": "Misma partícula · «up» (3/3)", "accent": "#7c3aed", "expressions": ["Stand up", "Stay up", "Turn up", "Use up", "Wake up", "Warm up", "Speak up", "Take up", "To sum up"], "targeted": true, "source": "all"}
+    {"id": "mean-conn-1", "name": "Razón · porque / ya que / como / debido a", "accent": "#0f766e", "expressions": [], "uids": ["special-robin-connectors-3::1", "special-robin-connectors-3::2", "special-robin-connectors-3::3", "special-robin-connectors-3::4", "special-robin-connectors-5::4", "special-robin-connectors-3::5", "special-robin-connectors-3::6"], "meaning": true},
+    {"id": "mean-conn-2", "name": "Resultado · por lo tanto / así que / por consiguiente", "accent": "#0f766e", "expressions": [], "uids": ["special-robin-connectors-3::7", "special-robin-connectors-3::8", "special-robin-connectors-3::11", "special-robin-connectors-3::12", "special-robin-connectors-3::10", "special-robin-connectors-3::9", "special-robin-connectors-3::13", "special-robin-connectors-3::14"], "meaning": true},
+    {"id": "mean-conn-3", "name": "Contraste fuerte · pero / sin embargo / aunque / a pesar de", "accent": "#0f766e", "expressions": [], "uids": ["special-robin-connectors-2::1", "special-robin-connectors-2::2", "special-robin-connectors-2::3", "special-robin-connectors-2::4", "special-robin-connectors-2::5", "special-robin-connectors-2::6", "special-robin-connectors-2::7"], "meaning": true},
+    {"id": "mean-conn-4", "name": "Contraste comparativo · mientras que / por otro lado / en lugar de", "accent": "#0f766e", "expressions": [], "uids": ["special-robin-connectors-2::9", "special-robin-connectors-2::10", "special-robin-connectors-2::11", "special-robin-connectors-2::8", "special-robin-connectors-2::15", "special-robin-connectors-2::12", "special-robin-connectors-2::14", "special-robin-connectors-2::13", "special-robin-connectors-8::3"], "meaning": true},
+    {"id": "mean-conn-5", "name": "Adición · además / también / así como", "accent": "#0f766e", "expressions": [], "uids": ["special-robin-connectors-1::1", "special-robin-connectors-1::2", "special-robin-connectors-1::3", "special-robin-connectors-1::4", "special-robin-connectors-1::5", "special-robin-connectors-1::6", "special-robin-connectors-1::7", "special-robin-connectors-1::8", "special-robin-connectors-1::10", "special-robin-connectors-1::9"], "meaning": true},
+    {"id": "mean-conn-6", "name": "Orden y tiempo · primero / luego / después / al final", "accent": "#0f766e", "expressions": [], "uids": ["special-robin-connectors-4::1", "special-robin-connectors-4::2", "special-robin-connectors-4::3", "special-robin-connectors-4::4", "special-robin-connectors-4::5", "special-robin-connectors-4::6", "special-robin-connectors-4::7", "special-robin-connectors-4::9", "special-robin-connectors-4::8", "special-robin-connectors-4::14", "special-robin-connectors-4::15", "special-robin-connectors-4::16", "special-robin-connectors-4::17"], "meaning": true},
+    {"id": "mean-conn-7", "name": "Mientras tanto y duración · mientras tanto / hasta que / tan pronto como", "accent": "#0f766e", "expressions": [], "uids": ["special-robin-connectors-4::10", "special-robin-connectors-4::11", "special-robin-connectors-4::12", "special-robin-connectors-4::13", "special-robin-connectors-4::18", "special-robin-connectors-4::19", "special-robin-connectors-4::20"], "meaning": true},
+    {"id": "mean-conn-8", "name": "Condición · si / a menos que / siempre que / en caso de", "accent": "#0f766e", "expressions": [], "uids": ["special-robin-connectors-6::1", "special-robin-connectors-6::2", "special-robin-connectors-6::3", "special-robin-connectors-6::4", "special-robin-connectors-6::5", "special-robin-connectors-6::6", "special-robin-connectors-6::7", "special-robin-connectors-6::8", "special-robin-connectors-6::9", "special-robin-connectors-6::10"], "meaning": true},
+    {"id": "mean-conn-9", "name": "Resumen · en conclusión / en resumen / en general", "accent": "#0f766e", "expressions": [], "uids": ["special-robin-connectors-7::1", "special-robin-connectors-7::2", "special-robin-connectors-7::3", "special-robin-connectors-7::4", "special-robin-connectors-7::5", "special-robin-connectors-7::6", "special-robin-connectors-7::7", "special-robin-connectors-7::8", "special-robin-connectors-7::9", "special-robin-connectors-7::10"], "meaning": true},
+    {"id": "mean-conn-10", "name": "Ejemplo y énfasis · por ejemplo / de hecho / especialmente", "accent": "#0f766e", "expressions": [], "uids": ["special-robin-connectors-5::1", "special-robin-connectors-5::2", "special-robin-connectors-5::3", "special-robin-connectors-5::5", "special-robin-connectors-5::6", "special-robin-connectors-5::7", "special-robin-connectors-5::8", "special-robin-connectors-5::9", "special-robin-connectors-5::10", "special-robin-connectors-5::11", "special-robin-connectors-5::12"], "meaning": true},
+    {"id": "mean-conn-11", "name": "Alternativa y aclaración · o / ni / en otras palabras", "accent": "#0f766e", "expressions": [], "uids": ["special-robin-connectors-8::4", "special-robin-connectors-8::5", "special-robin-connectors-8::6", "special-robin-connectors-8::7", "special-robin-connectors-8::1", "special-robin-connectors-8::2"], "meaning": true},
+    {"id": "mean-auto-1", "name": "«Banqueta» · Sidewalk, Sidewalk, Curb, Sidewalk…", "accent": "#7c3aed", "expressions": [], "uids": ["51::0", "51::1", "76::0", "special-american-english::3", "special-british-english::3"], "meaning": true},
+    {"id": "mean-auto-2", "name": "«Estacionamiento» · Parking lot, Parking lot, Parking lot, Car park", "accent": "#7c3aed", "expressions": [], "uids": ["88::0", "446::0", "special-american-english::7", "special-british-english::7"], "meaning": true},
+    {"id": "mean-auto-3", "name": "«Cine» · Cinema, Movie theater, Movie theater, Cinema", "accent": "#7c3aed", "expressions": [], "uids": ["358::0", "358::1", "special-american-english::16", "special-british-english::16"], "meaning": true},
+    {"id": "mean-auto-4", "name": "«Continuar» · Continue, Carry on, Go ahead, Go on", "accent": "#7c3aed", "expressions": [], "uids": ["special-actions-verbs::15", "special-robin-phrasal-1::14", "special-robin-phrasal-2::25", "special-robin-phrasal-2::28"], "meaning": true},
+    {"id": "mean-auto-5", "name": "«Autopista» · Highway, Highway, Freeway", "accent": "#7c3aed", "expressions": [], "uids": ["61::0", "401::0", "401::1"], "meaning": true},
+    {"id": "mean-auto-6", "name": "«Buzón» · Mailbox, Mailbox, Postbox", "accent": "#7c3aed", "expressions": [], "uids": ["97::0", "special-american-english::25", "special-british-english::25"], "meaning": true},
+    {"id": "mean-auto-7", "name": "«Bote de basura» · Trash can, Trash can, Rubbish bin", "accent": "#7c3aed", "expressions": [], "uids": ["99::0", "special-american-english::4", "special-british-english::4"], "meaning": true},
+    {"id": "mean-auto-8", "name": "«Hacer» · Do, Make, Create", "accent": "#7c3aed", "expressions": [], "uids": ["special-actions-verbs::1", "special-actions-verbs::2", "special-actions-verbs::46"], "meaning": true},
+    {"id": "mean-auto-9", "name": "«Resolver» · Solve, Work out, Figure out", "accent": "#7c3aed", "expressions": [], "uids": ["special-actions-verbs::51", "special-robin-phrasal-5::6", "special-robin-phrasal-5::14"], "meaning": true},
+    {"id": "mean-auto-10", "name": "«Cortar» · Cut, Break off, Cut off", "accent": "#7c3aed", "expressions": [], "uids": ["special-actions-verbs::55", "special-robin-phrasal-1::7", "special-robin-phrasal-1::28"], "meaning": true},
+    {"id": "mean-auto-11", "name": "«Apagar» · Turn off, Put out, Turn off", "accent": "#7c3aed", "expressions": [], "uids": ["special-actions-verbs::66", "special-robin-phrasal-3::30", "special-robin-phrasal-4::27"], "meaning": true},
+    {"id": "mean-auto-12", "name": "«Esperar» · Wait, Hang on, Hold on", "accent": "#7c3aed", "expressions": [], "uids": ["special-actions-verbs::67", "special-robin-phrasal-3::1", "special-robin-phrasal-3::3"], "meaning": true},
+    {"id": "mean-auto-13", "name": "«Regresar» · Come back, Get back, Go back", "accent": "#7c3aed", "expressions": [], "uids": ["special-robin-phrasal-1::22", "special-robin-phrasal-2::13", "special-robin-phrasal-2::27"], "meaning": true},
+    {"id": "mean-auto-14", "name": "«Salir» · Come out, Get out, Go out", "accent": "#7c3aed", "expressions": [], "uids": ["special-robin-phrasal-1::24", "special-robin-phrasal-2::18", "special-robin-phrasal-2::29"], "meaning": true},
+    {"id": "mean-auto-15", "name": "«Cerca de» · Near, Close to", "accent": "#7c3aed", "expressions": [], "uids": ["7::0", "8::0"], "meaning": true},
+    {"id": "mean-auto-16", "name": "«Registro» · Manhole, Check-in counter", "accent": "#7c3aed", "expressions": [], "uids": ["79::0", "356::1"], "meaning": true},
+    {"id": "mean-auto-17", "name": "«Ruidoso» · Loud, Noisy", "accent": "#7c3aed", "expressions": [], "uids": ["129::0", "226::0"], "meaning": true},
+    {"id": "mean-auto-18", "name": "«Fresco» · Cool, Fresh", "accent": "#7c3aed", "expressions": [], "uids": ["172::0", "183::0"], "meaning": true},
+    {"id": "mean-auto-19", "name": "«Falso» · False, Fake", "accent": "#7c3aed", "expressions": [], "uids": ["209::0", "211::0"], "meaning": true},
+    {"id": "mean-auto-20", "name": "«Lleno» · Crowded, Full", "accent": "#7c3aed", "expressions": [], "uids": ["227::0", "229::0"], "meaning": true},
+    {"id": "mean-auto-21", "name": "«Ático» · Attic, Penthouse", "accent": "#7c3aed", "expressions": [], "uids": ["321::0", "448::0"], "meaning": true},
+    {"id": "mean-auto-22", "name": "«Taquilla» · Box office, Ticket counter", "accent": "#7c3aed", "expressions": [], "uids": ["338::0", "338::1"], "meaning": true},
+    {"id": "mean-auto-23", "name": "«Cafetería» · Café, Coffee shop", "accent": "#7c3aed", "expressions": [], "uids": ["344::0", "344::1"], "meaning": true},
+    {"id": "mean-auto-24", "name": "«Cementerio» · Cemetery, Graveyard", "accent": "#7c3aed", "expressions": [], "uids": ["354::0", "354::1"], "meaning": true},
+    {"id": "mean-auto-25", "name": "«Tribunal» · Court, Courthouse", "accent": "#7c3aed", "expressions": [], "uids": ["366::1", "367::0"], "meaning": true},
+    {"id": "mean-auto-26", "name": "«Arroyo» · Creek, Stream", "accent": "#7c3aed", "expressions": [], "uids": ["368::0", "368::1"], "meaning": true},
+    {"id": "mean-auto-27", "name": "«Muelle» · Docks, Dock", "accent": "#7c3aed", "expressions": [], "uids": ["376::0", "377::0"], "meaning": true},
+    {"id": "mean-auto-28", "name": "«Residencia estudiantil» · Dormitory, Dorm", "accent": "#7c3aed", "expressions": [], "uids": ["378::0", "378::1"], "meaning": true},
+    {"id": "mean-auto-29", "name": "«Floristería» · Flower shop, Florist", "accent": "#7c3aed", "expressions": [], "uids": ["388::0", "388::1"], "meaning": true},
+    {"id": "mean-auto-30", "name": "«Funeraria» · Funeral home, Funeral parlor", "accent": "#7c3aed", "expressions": [], "uids": ["392::0", "392::1"], "meaning": true},
+    {"id": "mean-auto-31", "name": "«Puerto marítimo» · Harbor, Port", "accent": "#7c3aed", "expressions": [], "uids": ["398::0", "398::1"], "meaning": true},
+    {"id": "mean-auto-32", "name": "«Escuela» · High school, School", "accent": "#7c3aed", "expressions": [], "uids": ["400::0", "400::1"], "meaning": true},
+    {"id": "mean-auto-33", "name": "«Dentro de un aeropuerto» · In an airport, Inside an airport", "accent": "#7c3aed", "expressions": [], "uids": ["407::0", "407::1"], "meaning": true},
+    {"id": "mean-auto-34", "name": "«Enfermería» · Infirmary, Nursing", "accent": "#7c3aed", "expressions": [], "uids": ["408::0", "special-home-kitchen-office-university::49"], "meaning": true},
+    {"id": "mean-auto-35", "name": "«Laboratorio» · Laboratory, Lab", "accent": "#7c3aed", "expressions": [], "uids": ["416::0", "416::1"], "meaning": true},
+    {"id": "mean-auto-36", "name": "«Centro comercial» · Mall, Shopping center", "accent": "#7c3aed", "expressions": [], "uids": ["424::0", "424::1"], "meaning": true},
+    {"id": "mean-auto-37", "name": "«Farmacia» · Pharmacy, Drugstore", "accent": "#7c3aed", "expressions": [], "uids": ["450::0", "450::1"], "meaning": true},
+    {"id": "mean-auto-38", "name": "«Sala de proyección» · Screening room, Auditorium", "accent": "#7c3aed", "expressions": [], "uids": ["470::0", "470::1"], "meaning": true},
+    {"id": "mean-auto-39", "name": "«Plaza» · Square, Plaza", "accent": "#7c3aed", "expressions": [], "uids": ["476::0", "476::1"], "meaning": true},
+    {"id": "mean-auto-40", "name": "«Pantano» · Swamp, Marsh", "accent": "#7c3aed", "expressions": [], "uids": ["481::0", "481::1"], "meaning": true},
+    {"id": "mean-auto-41", "name": "«Plataforma de estacionamiento de aviones» · Tarmac, Apron", "accent": "#7c3aed", "expressions": [], "uids": ["483::0", "483::1"], "meaning": true},
+    {"id": "mean-auto-42", "name": "«Cerrar» · Close, Shut down", "accent": "#7c3aed", "expressions": [], "uids": ["special-actions-verbs::12", "special-robin-phrasal-4::8"], "meaning": true},
+    {"id": "mean-auto-43", "name": "«Mirar» · Look, Look at", "accent": "#7c3aed", "expressions": [], "uids": ["special-actions-verbs::27", "special-robin-phrasal-3::13"], "meaning": true},
+    {"id": "mean-auto-44", "name": "«Revisar» · Check, Check out", "accent": "#7c3aed", "expressions": [], "uids": ["special-actions-verbs::28", "special-robin-phrasal-1::18"], "meaning": true},
+    {"id": "mean-auto-45", "name": "«Completar» · Complete, Fill in", "accent": "#7c3aed", "expressions": [], "uids": ["special-actions-verbs::37", "special-robin-phrasal-2::8"], "meaning": true},
+    {"id": "mean-auto-46", "name": "«Terminar» · Finish, End up", "accent": "#7c3aed", "expressions": [], "uids": ["special-actions-verbs::38", "special-robin-phrasal-2::4"], "meaning": true},
+    {"id": "mean-auto-47", "name": "«Entregar» · Submit, Hand in", "accent": "#7c3aed", "expressions": [], "uids": ["special-actions-verbs::39", "special-robin-phrasal-5::15"], "meaning": true},
+    {"id": "mean-auto-48", "name": "«Discutir» · Discuss, Talk over", "accent": "#7c3aed", "expressions": [], "uids": ["special-actions-verbs::50", "special-robin-phrasal-4::20"], "meaning": true},
+    {"id": "mean-auto-49", "name": "«Guardar» · Save, Put away", "accent": "#7c3aed", "expressions": [], "uids": ["special-actions-verbs::61", "special-robin-phrasal-3::27"], "meaning": true},
+    {"id": "mean-auto-50", "name": "«Pantalla» · Screen, Screen / Monitor", "accent": "#7c3aed", "expressions": [], "uids": ["special-essential-nouns::27", "special-home-kitchen-office-university::30"], "meaning": true},
+    {"id": "mean-auto-51", "name": "«Apartamento» · Apartment, Flat", "accent": "#7c3aed", "expressions": [], "uids": ["special-american-english::1", "special-british-english::1"], "meaning": true},
+    {"id": "mean-auto-52", "name": "«Ascensor» · Elevator, Lift", "accent": "#7c3aed", "expressions": [], "uids": ["special-american-english::2", "special-british-english::2"], "meaning": true},
+    {"id": "mean-auto-53", "name": "«Gasolina» · Gasoline, Petrol", "accent": "#7c3aed", "expressions": [], "uids": ["special-american-english::5", "special-british-english::5"], "meaning": true},
+    {"id": "mean-auto-54", "name": "«Camión» · Truck, Lorry", "accent": "#7c3aed", "expressions": [], "uids": ["special-american-english::6", "special-british-english::6"], "meaning": true},
+    {"id": "mean-auto-55", "name": "«Pañal» · Diaper, Nappy", "accent": "#7c3aed", "expressions": [], "uids": ["special-american-english::8", "special-british-english::8"], "meaning": true},
+    {"id": "mean-auto-56", "name": "«Galleta» · Cookie, Biscuit", "accent": "#7c3aed", "expressions": [], "uids": ["special-american-english::9", "special-british-english::9"], "meaning": true},
+    {"id": "mean-auto-57", "name": "«Papas fritas» · Fries, Chips", "accent": "#7c3aed", "expressions": [], "uids": ["special-american-english::10", "special-british-english::10"], "meaning": true},
+    {"id": "mean-auto-58", "name": "«Carrito de compras» · Shopping cart, Trolley", "accent": "#7c3aed", "expressions": [], "uids": ["special-american-english::11", "special-british-english::11"], "meaning": true},
+    {"id": "mean-auto-59", "name": "«Bebedero» · Water fountain, Drinking fountain", "accent": "#7c3aed", "expressions": [], "uids": ["special-american-english::12", "special-british-english::12"], "meaning": true},
+    {"id": "mean-auto-60", "name": "«Zapatillas» · Sneakers, Trainers", "accent": "#7c3aed", "expressions": [], "uids": ["special-american-english::13", "special-british-english::13"], "meaning": true},
+    {"id": "mean-auto-61", "name": "«Vacaciones» · Vacation, Holiday", "accent": "#7c3aed", "expressions": [], "uids": ["special-american-english::14", "special-british-english::14"], "meaning": true},
+    {"id": "mean-auto-62", "name": "«Otoño» · Fall, Autumn", "accent": "#7c3aed", "expressions": [], "uids": ["special-american-english::15", "special-british-english::15"], "meaning": true},
+    {"id": "mean-auto-63", "name": "«Cuenta (en restaurante)» · Check (bill), Bill", "accent": "#7c3aed", "expressions": [], "uids": ["special-american-english::18", "special-british-english::18"], "meaning": true},
+    {"id": "mean-auto-64", "name": "«Ducharse» · Take a shower, To have a shower", "accent": "#7c3aed", "expressions": [], "uids": ["special-american-english::19", "special-british-english::19"], "meaning": true},
+    {"id": "mean-auto-65", "name": "«Para llevar» · To go, Takeaway", "accent": "#7c3aed", "expressions": [], "uids": ["special-american-english::20", "special-british-english::20"], "meaning": true},
+    {"id": "mean-auto-66", "name": "«Pijamas» · Pajamas, Pyjamas", "accent": "#7c3aed", "expressions": [], "uids": ["special-american-english::21", "special-british-english::21"], "meaning": true},
+    {"id": "mean-auto-67", "name": "«Llanta» · Tire, Tyre", "accent": "#7c3aed", "expressions": [], "uids": ["special-american-english::22", "special-british-english::22"], "meaning": true},
+    {"id": "mean-auto-68", "name": "«Direccional» · Turn signal, Indicator", "accent": "#7c3aed", "expressions": [], "uids": ["special-american-english::23", "special-british-english::23"], "meaning": true},
+    {"id": "mean-auto-69", "name": "«Pantalones» · Pants, Trousers", "accent": "#7c3aed", "expressions": [], "uids": ["special-american-english::24", "special-british-english::24"], "meaning": true},
+    {"id": "mean-auto-70", "name": "«Gelatina» · Jello, Jelly", "accent": "#7c3aed", "expressions": [], "uids": ["special-american-english::26", "special-british-english::26"], "meaning": true},
+    {"id": "mean-auto-71", "name": "«Teléfono celular» · Cell phone, Mobile phone", "accent": "#7c3aed", "expressions": [], "uids": ["special-american-english::27", "special-british-english::27"], "meaning": true},
+    {"id": "mean-auto-72", "name": "«Maíz» · Corn, Maize", "accent": "#7c3aed", "expressions": [], "uids": ["special-american-english::28", "special-british-english::28"], "meaning": true},
+    {"id": "mean-auto-73", "name": "«Abogado» · Attorney, Solicitor", "accent": "#7c3aed", "expressions": [], "uids": ["special-american-english::29", "special-british-english::29"], "meaning": true},
+    {"id": "mean-auto-74", "name": "«Linterna» · Flashlight, Torch", "accent": "#7c3aed", "expressions": [], "uids": ["special-american-english::30", "special-british-english::30"], "meaning": true},
+    {"id": "mean-auto-75", "name": "«Entrar» · Come in, Get in", "accent": "#7c3aed", "expressions": [], "uids": ["special-robin-phrasal-1::23", "special-robin-phrasal-2::15"], "meaning": true},
+    {"id": "mean-auto-76", "name": "«Devolver» · Give back, Take back", "accent": "#7c3aed", "expressions": [], "uids": ["special-robin-phrasal-2::22", "special-robin-phrasal-4::14"], "meaning": true},
+    {"id": "mean-auto-77", "name": "«Tener cuidado» · Look out, Watch out", "accent": "#7c3aed", "expressions": [], "uids": ["special-robin-phrasal-3::17", "special-robin-phrasal-5::4"], "meaning": true},
+    {"id": "mean-auto-78", "name": "«Aparecer» · Show up, Turn up", "accent": "#7c3aed", "expressions": [], "uids": ["special-robin-phrasal-4::7", "special-robin-phrasal-4::29"], "meaning": true},
+    {"id": "dup-v-ask-0", "name": "Mismo verbo · «ask»", "accent": "#15803d", "expressions": ["Ask for", "Ask out"], "source": "all", "meaning": true},
+    {"id": "dup-v-at-1", "name": "Mismo verbo · «at»", "accent": "#15803d", "expressions": ["At the end of the street", "At the beginning of the street"], "source": "all", "meaning": true},
+    {"id": "dup-v-break-2", "name": "Mismo verbo · «break»", "accent": "#15803d", "expressions": ["Break down", "Break in", "Break off", "Break out", "Break up"], "source": "all", "meaning": true},
+    {"id": "dup-v-bring-3", "name": "Mismo verbo · «bring»", "accent": "#15803d", "expressions": ["Bring up", "Bring back"], "source": "all", "meaning": true},
+    {"id": "dup-v-call-4", "name": "Mismo verbo · «call»", "accent": "#15803d", "expressions": ["Call back", "Call off"], "source": "all", "meaning": true},
+    {"id": "dup-v-carry-5", "name": "Mismo verbo · «carry»", "accent": "#15803d", "expressions": ["Carry on", "Carry out"], "source": "all", "meaning": true},
+    {"id": "dup-v-check-6", "name": "Mismo verbo · «check»", "accent": "#15803d", "expressions": ["Check in", "Check out"], "source": "all", "meaning": true},
+    {"id": "dup-v-come-7", "name": "Mismo verbo · «come»", "accent": "#15803d", "expressions": ["Come across", "Come back", "Come in", "Come out", "Come up", "Come along"], "source": "all", "meaning": true},
+    {"id": "dup-v-cut-8", "name": "Mismo verbo · «cut»", "accent": "#15803d", "expressions": ["Cut down", "Cut off", "Cut back"], "source": "all", "meaning": true},
+    {"id": "dup-v-drop-9", "name": "Mismo verbo · «drop»", "accent": "#15803d", "expressions": ["Drop off", "Drop by"], "source": "all", "meaning": true},
+    {"id": "dup-v-fall-10", "name": "Mismo verbo · «fall»", "accent": "#15803d", "expressions": ["Fall apart", "Fall behind", "Fall down"], "source": "all", "meaning": true},
+    {"id": "dup-v-fill-11", "name": "Mismo verbo · «fill»", "accent": "#15803d", "expressions": ["Fill in", "Fill out"], "source": "all", "meaning": true},
+    {"id": "dup-v-get-12", "name": "Mismo verbo · «get»", "accent": "#15803d", "expressions": ["Get along", "Get away", "Get back", "Get by", "Get in", "Get off", "Get on", "Get out", "Get over", "Get up"], "source": "all", "meaning": true},
+    {"id": "dup-v-give-13", "name": "Mismo verbo · «give»", "accent": "#15803d", "expressions": ["Give away", "Give back", "Give in", "Give up"], "source": "all", "meaning": true},
+    {"id": "dup-v-go-14", "name": "Mismo verbo · «go»", "accent": "#15803d", "expressions": ["Go ahead", "Go away", "Go back", "Go on", "Go out", "Go straight", "Go past", "Go across", "Go down this street", "Go up this street"], "source": "all", "meaning": true},
+    {"id": "dup-v-hand-15", "name": "Mismo verbo · «hand»", "accent": "#15803d", "expressions": ["Hand in", "Hand out"], "source": "all", "meaning": true},
+    {"id": "dup-v-hang-16", "name": "Mismo verbo · «hang»", "accent": "#15803d", "expressions": ["Hang on", "Hang out"], "source": "all", "meaning": true},
+    {"id": "dup-v-hold-17", "name": "Mismo verbo · «hold»", "accent": "#15803d", "expressions": ["Hold on", "Hold back"], "source": "all", "meaning": true},
+    {"id": "dup-v-its-18", "name": "Mismo verbo · «It’s»", "accent": "#15803d", "expressions": ["It's here.", "It's there.", "It's over there.", "It's on your left.", "It's on your right.", "It's nearby.", "It's far away."], "source": "all", "meaning": true},
+    {"id": "dup-v-keep-19", "name": "Mismo verbo · «keep»", "accent": "#15803d", "expressions": ["Keep away", "Keep on", "Keep up", "Keep off", "Keep going"], "source": "all", "meaning": true},
+    {"id": "dup-v-log-20", "name": "Mismo verbo · «log»", "accent": "#15803d", "expressions": ["Log in", "Log out"], "source": "all", "meaning": true},
+    {"id": "dup-v-look-21", "name": "Mismo verbo · «look»", "accent": "#15803d", "expressions": ["Look after", "Look around", "Look at", "Look for", "Look forward to", "Look into", "Look out", "Look up"], "source": "all", "meaning": true},
+    {"id": "dup-v-on-22", "name": "Mismo verbo · «on»", "accent": "#15803d", "expressions": ["On the corner of", "On the left", "On the right"], "source": "all", "meaning": true},
+    {"id": "dup-v-pass-23", "name": "Mismo verbo · «pass»", "accent": "#15803d", "expressions": ["Pass away", "Pass out"], "source": "all", "meaning": true},
+    {"id": "dup-v-pay-24", "name": "Mismo verbo · «pay»", "accent": "#15803d", "expressions": ["Pay back", "Pay off"], "source": "all", "meaning": true},
+    {"id": "dup-v-pick-25", "name": "Mismo verbo · «pick»", "accent": "#15803d", "expressions": ["Pick out", "Pick up"], "source": "all", "meaning": true},
+    {"id": "dup-v-put-26", "name": "Mismo verbo · «put»", "accent": "#15803d", "expressions": ["Put away", "Put off", "Put on", "Put out", "Put up with"], "source": "all", "meaning": true},
+    {"id": "dup-v-run-27", "name": "Mismo verbo · «run»", "accent": "#15803d", "expressions": ["Run away", "Run into", "Run out"], "source": "all", "meaning": true},
+    {"id": "dup-v-set-28", "name": "Mismo verbo · «set»", "accent": "#15803d", "expressions": ["Set up", "Set off"], "source": "all", "meaning": true},
+    {"id": "dup-v-show-29", "name": "Mismo verbo · «show»", "accent": "#15803d", "expressions": ["Show off", "Show up"], "source": "all", "meaning": true},
+    {"id": "dup-v-take-30", "name": "Mismo verbo · «take»", "accent": "#15803d", "expressions": ["Take after", "Take away", "Take back", "Take off", "Take on", "Take out", "Take over", "Take up", "Take the first left", "Take the first right", "Take the second left", "Take the second right"], "source": "all", "meaning": true},
+    {"id": "dup-v-talk-31", "name": "Mismo verbo · «talk»", "accent": "#15803d", "expressions": ["Talk about", "Talk over"], "source": "all", "meaning": true},
+    {"id": "dup-v-turn-32", "name": "Mismo verbo · «turn»", "accent": "#15803d", "expressions": ["Turn around", "Turn down", "Turn off", "Turn on", "Turn up", "Turn into", "Turn left", "Turn right"], "source": "all", "meaning": true},
+    {"id": "dup-v-walk-33", "name": "Mismo verbo · «walk»", "accent": "#15803d", "expressions": ["Walk away", "Walk past"], "source": "all", "meaning": true},
+    {"id": "dup-v-zoom-34", "name": "Mismo verbo · «zoom»", "accent": "#15803d", "expressions": ["Zoom in", "Zoom out"], "source": "all", "meaning": true},
+    {"id": "dup-p-along-35", "name": "Misma partícula · «along»", "accent": "#0369a1", "expressions": ["Get along", "Come along"], "source": "all", "meaning": true},
+    {"id": "dup-p-around-36", "name": "Misma partícula · «around»", "accent": "#0369a1", "expressions": ["Look around", "Turn around"], "source": "all", "meaning": true},
+    {"id": "dup-p-away-37", "name": "Misma partícula · «away»", "accent": "#0369a1", "expressions": ["Get away", "Give away", "Go away", "Keep away", "Pass away", "Put away", "Run away", "Take away", "Throw away", "Walk away"], "source": "all", "meaning": true},
+    {"id": "dup-p-back-38", "name": "Misma partícula · «back»", "accent": "#0369a1", "expressions": ["Call back", "Come back", "Get back", "Give back", "Go back", "Pay back", "Take back", "Bring back", "Cut back", "Hold back"], "source": "all", "meaning": true},
+    {"id": "dup-p-by-39", "name": "Misma partícula · «by»", "accent": "#0369a1", "expressions": ["Get by", "Drop by"], "source": "all", "meaning": true},
+    {"id": "dup-p-down-40", "name": "Misma partícula · «down»", "accent": "#0369a1", "expressions": ["Break down", "Calm down", "Cut down", "Fall down", "Knock down", "Let down", "Shut down", "Sit down", "Tear down", "Turn down", "Write down"], "source": "all", "meaning": true},
+    {"id": "dup-p-for-41", "name": "Misma partícula · «for»", "accent": "#0369a1", "expressions": ["Ask for", "Look for"], "source": "all", "meaning": true},
+    {"id": "dup-p-in-42", "name": "Misma partícula · «in»", "accent": "#0369a1", "expressions": ["Break in", "Check in", "Come in", "Fill in", "Get in", "Give in", "Zoom in", "Hand in", "Join in", "Log in"], "source": "all", "meaning": true},
+    {"id": "dup-p-into-43", "name": "Misma partícula · «into»", "accent": "#0369a1", "expressions": ["Look into", "Run into", "Turn into"], "source": "all", "meaning": true},
+    {"id": "dup-p-off-44", "name": "Misma partícula · «off» (1/2)", "accent": "#0369a1", "expressions": ["Break off", "Call off", "Cut off", "Drop off", "Get off", "Put off", "Show off"], "source": "all", "meaning": true},
+    {"id": "dup-p-off-45", "name": "Misma partícula · «off» (2/2)", "accent": "#0369a1", "expressions": ["Take off", "Turn off", "Keep off", "Lay off", "Pay off", "Set off"], "source": "all", "meaning": true},
+    {"id": "dup-p-on-46", "name": "Misma partícula · «on»", "accent": "#0369a1", "expressions": ["Carry on", "Count on", "Get on", "Go on", "Hang on", "Hold on", "Keep on", "Move on", "Put on", "Take on", "Try on", "Turn on"], "source": "all", "meaning": true},
+    {"id": "dup-p-out-47", "name": "Misma partícula · «out» (1/3)", "accent": "#0369a1", "expressions": ["Ask out", "Break out", "Carry out", "Check out", "Come out", "Eat out", "Fill out", "Find out", "Get out"], "source": "all", "meaning": true},
+    {"id": "dup-p-out-48", "name": "Misma partícula · «out» (2/3)", "accent": "#0369a1", "expressions": ["Go out", "Hang out", "Leave out", "Look out", "Pass out", "Pick out", "Point out", "Put out", "Run out"], "source": "all", "meaning": true},
+    {"id": "dup-p-out-49", "name": "Misma partícula · «out» (3/3)", "accent": "#0369a1", "expressions": ["Take out", "Watch out", "Wear out", "Work out", "Zoom out", "Figure out", "Hand out", "Log out", "Rule out"], "source": "all", "meaning": true},
+    {"id": "dup-p-over-50", "name": "Misma partícula · «over»", "accent": "#0369a1", "expressions": ["Do over", "Get over", "Take over", "Talk over", "Think over", "Pull over"], "source": "all", "meaning": true},
+    {"id": "dup-p-up-51", "name": "Misma partícula · «up» (1/3)", "accent": "#0369a1", "expressions": ["Back up", "Blow up", "Break up", "Bring up", "Catch up", "Cheer up", "Clean up", "Come up", "Dress up", "End up"], "source": "all", "meaning": true},
+    {"id": "dup-p-up-52", "name": "Misma partícula · «up» (2/3)", "accent": "#0369a1", "expressions": ["Get up", "Give up", "Grow up", "Hurry up", "Keep up", "Look up", "Make up", "Pick up", "Set up", "Show up"], "source": "all", "meaning": true},
+    {"id": "dup-p-up-53", "name": "Misma partícula · «up» (3/3)", "accent": "#0369a1", "expressions": ["Stand up", "Stay up", "Turn up", "Use up", "Wake up", "Warm up", "Speak up", "Take up"], "source": "all", "meaning": true},
+    {"id": "dup-p-with-54", "name": "Misma partícula · «with»", "accent": "#0369a1", "expressions": ["Deal with", "Put up with"], "source": "all", "meaning": true},
+    {"id": "dup-l-left-55", "name": "Misma palabra final · «left»", "accent": "#2563eb", "expressions": ["On the left", "To your left", "Turn left", "Take the first left", "Take the second left", "It's on your left."], "source": "all", "meaning": true},
+    {"id": "dup-l-right-56", "name": "Misma palabra final · «right»", "accent": "#2563eb", "expressions": ["On the right", "To your right", "Turn right", "Take the first right", "Take the second right", "It's on your right."], "source": "all", "meaning": true},
+    {"id": "dup-l-street-57", "name": "Misma palabra final · «street»", "accent": "#2563eb", "expressions": ["At the end of the street", "At the beginning of the street", "Cross the street", "Go down this street", "Go up this street"], "source": "all", "meaning": true},
+    {"id": "dup-l-there-58", "name": "Misma palabra final · «there»", "accent": "#2563eb", "expressions": ["It's there.", "It's over there.", "How do I get there?", "You're almost there."], "source": "all", "meaning": true}
+  );
+
+  SIMILAR_BLOCK_DEFS.push(
+    {"id": "confusion-mine-1", "name": "Encontrar · encontrarse con / por casualidad / descubrir / buscar", "accent": "#e11d48", "expressions": [], "uids": ["special-robin-phrasal-4::3", "special-robin-phrasal-1::21", "special-robin-phrasal-2::10", "special-robin-phrasal-3::14", "special-robin-phrasal-3::16", "special-robin-phrasal-3::18"], "meaning": true},
+    {"id": "confusion-mine-2", "name": "Enfermería y guardería · carrera / lugar / vivero", "accent": "#e11d48", "expressions": [], "uids": ["special-home-kitchen-office-university::49", "408::0", "437::0", "437::1", "362::0", "403::0", "382::0"], "meaning": true}
+  );
+
+  SIMILAR_BLOCK_DEFS.push(
+    {"id": "confusion-mine-3", "name": "Delante, enfrente y frente · ¿cuál es cuál?", "accent": "#e11d48", "expressions": [], "uids": ["12::0", "10::0", "11::0", "13::0", "14::0", "15::0"], "meaning": true}
   );
 
   SIMILAR_BLOCK_DEFS.push(
@@ -4675,21 +4770,21 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
   );
 
   const SIMILAR_BLOCKS = SIMILAR_BLOCK_DEFS.map(def => {
-    const sourceItems = def.fromSections ? QUESTIONS.filter(q => def.fromSections.includes(q.section)) : def.fromBlocks ? SPECIAL_BLOCKS.filter(b => def.fromBlocks.some(pre => b.id.startsWith(pre))).flatMap(b => b.items) : def.source === 'special' ? SPECIAL_QUESTIONS : def.source === 'all' ? ALL_QUESTIONS : QUESTIONS;
+    const sourceItems = def.uids ? ALL_QUESTIONS : def.fromSections ? QUESTIONS.filter(q => def.fromSections.includes(q.section)) : def.fromBlocks ? SPECIAL_BLOCKS.filter(b => def.fromBlocks.some(pre => b.id.startsWith(pre))).flatMap(b => b.items) : def.source === 'special' ? SPECIAL_QUESTIONS : def.source === 'all' ? ALL_QUESTIONS : QUESTIONS;
     const wanted = new Set((def.expressions || []).map(normalize));
-    const matches = q => (def.fromBlocks || def.fromSections) ? true : def.cards
+    const matches = q => def.uids ? def.uids.includes(q.uid) : (def.fromBlocks || def.fromSections) ? true : def.cards
       ? def.cards.some(card => String(card.sourceId) === String(q.sourceId) && normalize(card.english) === normalize(q.english))
       : wanted.has(normalize(q.english));
     const seen = new Set();
-    const items = sourceItems.filter(q => matches(q) && !seen.has(q.uid) && seen.add(q.uid));
+    const items = sourceItems.filter(q => matches(q) && (!def.meaning || (!seen.has('e:' + normalize(q.english) + '|' + normalize(q.spanish)) && seen.add('e:' + normalize(q.english) + '|' + normalize(q.spanish)))) && !seen.has(q.uid) && seen.add(q.uid));
     items.forEach(q => {
       q.extraBlockIds = [...new Set([...(q.extraBlockIds || []), def.id])];
     });
     return {
-      id: def.id, name: def.name, difficulty: 'medium', items,
+      id: def.id, name: def.id.startsWith('mean-auto-') ? def.name.split(' · ')[0] : def.name, difficulty: 'medium', items,
       isConfusion: true, isTargetedConfusion: Boolean(def.targeted), isSpecial: false,
       accent: def.accent,
-      kind: 'practice', countLabel: `${items.length} tarjetas`
+      kind: 'practice', countLabel: `${items.length} tarjetas`, meaning: Boolean(def.meaning)
     };
   }).filter(block => block.items.length > 0);
 
@@ -4789,7 +4884,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
   const formsOf  = variants => [...new Set(variants.flatMap(answerForms))];
   const slotForms = m => formsOf([ownOf(m.item, m.direction)]);
   // Mismo bloque + misma dirección + mismo enunciado = mismo grupo
-  const makeGroupKey = (q, dir) => `${q.blockId}|${dir}|${normalize(promptOf(q, dir))}`;
+  const makeGroupKey = (q, dir) => `${state.studyMode?.meaning ? 'M' : q.blockId}|${dir}|${normalize(promptOf(q, dir))}`;
 
   // Índice global (para avisar "esa traducción es válida pero de otro bloque")
   const GLOBAL_PROMPTS = { 'EN-ES': new Map(), 'ES-EN': new Map() };
@@ -4882,6 +4977,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
     base.settings.pinnedBlocks = [...new Set(savedPinnedBlocks.map(id => blockIdMigration[id] || id))];
     if (!Array.isArray(base.settings.reviewedBlocks)) base.settings.reviewedBlocks = [];
     if (Array.isArray(saved.history)) base.history = saved.history.slice(-20);
+    if (saved.confusions && typeof saved.confusions === 'object') base.confusions = saved.confusions;
     return base;
   }
 
@@ -5783,7 +5879,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
     if (mode === 'flashcards') {
       startFlashcards(block.items, block.name);
     } else {
-      startSession(block.items, 'practice');
+      startSession(block.items, 'practice', block.meaning ? MEANING_MODE() : null, Boolean(block.meaning));
     }
   }
 
@@ -6020,6 +6116,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
 
     el.flagRepeat.classList.toggle('hidden', !item.repeated);
     renderMasteryTag(item);
+    saveSession(false);
 
     const savedMistake = db.mistakes[item.uid];
     const savedReview = db.review[item.uid];
@@ -6257,7 +6354,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
     if (pool && pool.length) {
       const slot = [entry, ...pool].find(m => pool.includes(m) && answersEqual(ownOf(m.item, m.direction), value));
       if (slot) return { ...miss, correct: true, slot };
-    } else if (rawAccepted.some(answer => answersEqual(answer, value))) {
+    } else if (rawAccepted.some(answer => answersEqual(answer, value)) || answersEqual(ownOf(item, direction), value)) {
       return { ...miss, correct: true };
     }
 
@@ -6509,7 +6606,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
     // Respuesta válida, pero de otra tarjeta/bloque: NO termina la tarjeta.
     // No revela la respuesta esperada, no cuenta como fallo ni como intento
     // respondido, y deja el input activo para que el usuario vuelva a intentarlo.
-    if (result.validOther) {
+    if (result.validOther && !state.studyMode?.meaning) {
       el.input.classList.remove('wrong', 'valid-other');
       el.input.classList.add('valid-other');
       el.feedback.hidden = false;
@@ -6676,6 +6773,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
   }
 
   function finishSession() {
+    clearSavedSession();
     clearCardTimers();
     const total = state.results.length;
     const correct = state.results.filter(r => r.status === 'correct').length;
@@ -8024,7 +8122,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
       })
       .filter(block => block.items.length);
     const similar = SIMILAR_BLOCKS.map(block => {
-      const items = visibleItems(block.items);
+      const items = block.meaning ? block.items.slice() : visibleItems(block.items);
       return { ...block, items, group: 'similar', icon: block.isTargetedConfusion ? '⚠' : '⇄', description: block.isTargetedConfusion ? 'Confusión dirigida: tarjetas con traducciones solapadas o expresiones muy parecidas' : 'Bloque general para distinguir expresiones cercanas', countLabel: `${items.length} tarjetas`, searchableItems: true };
     }).filter(block => block.items.length);
     const special = SPECIAL_BLOCKS.map(block => {
@@ -8219,7 +8317,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
     $$('.vocab-difficulty-btn', diffFilters).forEach(button => button.classList.toggle('is-active', button.dataset.difficulty === vocabPickerState.difficulty));
 
     const categoryTitle = searching ? `Resultados para «${vocabPickerState.query}»` : (VOCAB_CATEGORY_DEFS.find(x => x.id === vocabPickerState.category)?.label || 'Vocabulario');
-    $('#vocab-results-label').textContent = categoryTitle;
+    $('#vocab-results-label').textContent = (vocabPickerState.category === 'similar' && !searching) ? ('Expresiones similares › ' + (vocabPickerState.folder ? ((FOLDER_DEFS.find(d => d.id === vocabPickerState.folder) || {}).name || '') : 'Carpetas')) : categoryTitle;
     $('#vocab-results-count').textContent = `${filtered.length} ${filtered.length === 1 ? 'opción' : 'opciones'}`;
 
     const gridStyle = getComputedStyle(grid);
@@ -8259,6 +8357,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
       pageItems.forEach(candidate => {
         const option = document.createElement('button');
         option.type = 'button'; option.className = 'vocab-card';
+        if (candidate.folderId && candidate.folderId !== 'ROOT') { option.classList.add('folder-card'); option.style.setProperty('--fc', candidate.color || '#6858ff'); }
         option.classList.toggle('is-selected', activeValue === candidate.id);
         option.setAttribute('aria-pressed', String(activeValue === candidate.id));
         const icon = document.createElement('span'); icon.className = 'vocab-card-icon'; icon.textContent = candidate.icon || '▦'; icon.setAttribute('aria-hidden', 'true');
@@ -8277,6 +8376,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
         if (candidateBlock) stateIcon.style.visibility = 'hidden'; // deja libre la columna para la estrella manual
         option.append(icon, copy, stateIcon);
         option.addEventListener('click', () => {
+          if (candidate.onPick) { candidate.onPick(); return; }
           if (candidate.folderId) { vocabPickerState.folder = candidate.folderId === 'ROOT' ? null : candidate.folderId; vocabPickerState.page = 0; renderVocabularyPicker(); return; }
           el.blockSelect.value = candidate.id;
           explicitEasyBlockSelection = Boolean(candidateBlock && candidateBlock.difficulty === 'easy' && db.settings.excludeEasy !== false && allowExplicitEasy);
@@ -8330,7 +8430,8 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
     const explicitEasy = db.settings.excludeEasy !== false
       && explicitEasyBlockSelection
       && block.difficulty === 'easy';
-    return { ...block, items: explicitEasy ? block.items.slice() : generalItems(block.items), allowEasyOverride: explicitEasy };
+    const keep = explicitEasy || block.meaning;
+    return { ...block, items: keep ? block.items.slice() : generalItems(block.items), allowEasyOverride: keep, studyMode: block.meaning ? MEANING_MODE() : null };
   }
 
   $('#btn-choose-block').addEventListener('click', buildBlockChooserModal);
@@ -8389,7 +8490,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
   });
   $('#vocab-start').addEventListener('click', () => {
     const block = selectedStudyBlock();
-    if (block) startSession(block.items, 'practice', null, Boolean(block.allowEasyOverride));
+    if (block) startSession(block.items, 'practice', block.studyMode || null, Boolean(block.allowEasyOverride));
   });
   $('#vocab-flashcards').addEventListener('click', () => {
     const block = selectedStudyBlock();
@@ -8398,7 +8499,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
 
   $('#btn-start').addEventListener('click', () => {
     const block = selectedStudyBlock();
-    if (block) startSession(block.items, 'practice', null, Boolean(block.allowEasyOverride));
+    if (block) startSession(block.items, 'practice', block.studyMode || null, Boolean(block.allowEasyOverride));
   });
 
   $('#btn-start-flashcards').addEventListener('click', () => {
@@ -8466,6 +8567,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
     db.stats = { answered: 0, correct: 0, bestStreak: 0, currentStreak: 0, sessions: 0 };
     db.itemStats = {};
     db.history = [];
+    db.confusions = {};
     db.settings.reviewedBlocks = [];
     saveDB();
     updateCounters();
@@ -8533,6 +8635,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
       return;
     }
     if (event.key === 'Escape') {
+      if (views.retype.classList.contains('is-active') || state.retype.pending) { event.preventDefault(); skipRetype(); return; }
       if (!el.modal.hidden) { closeModal(); return; }
       if (views.practice.classList.contains('is-active')) {
         requestStudyNavigation('setup');
@@ -8572,7 +8675,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
   /* ======================================================================
      INIT
      ====================================================================== */
-  /* ===== v2.6.1 · CARPETAS Y REPASO INMEDIATO ===== */
+  /* ===== v2.9.2 · CARPETAS Y REPASO INMEDIATO ===== */
   state.retype = { active: false };
   const RETYPE_TIMES = 2;
   function startRetype() {
@@ -8584,6 +8687,14 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
     const item = r.item, m = masteryInfo(item);
     $('#rt-prompt').textContent = r.direction === 'EN-ES' ? item.english : item.spanish;
     $('#rt-answer').textContent = r.expectedAnswer;
+    const ct = $('#rt-contrast'), other = findOtherByAnswer(r);
+    if (other) {
+      const promptTxt = r.direction === 'EN-ES' ? item.english : item.spanish;
+      ct.replaceChildren(
+        line(r.direction === 'ES-EN' ? `Escribiste «${r.userAnswer.trim()}», que significa «${other.spanish}».` : `Escribiste «${r.userAnswer.trim()}», que es la traducción de «${other.english}».`),
+        line(r.direction === 'ES-EN' ? `«${promptTxt}» se escribe «${r.expectedAnswer}».` : `«${promptTxt}» se traduce «${r.expectedAnswer}».`, 'fb-line fb-dim'));
+      ct.classList.remove('hidden');
+    } else ct.classList.add('hidden');
     $('#rt-section').textContent = item.section;
     $('#rt-diff').textContent = difficultyLabel(item.difficulty); $('#rt-diff').className = difficultyTagClass(item.difficulty);
     $('#rt-mastery').textContent = m.label; $('#rt-mastery').className = `tag mastery-tag mastery-${m.key}`;
@@ -8621,6 +8732,11 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
     $('#rt-submit').classList.add('hidden'); $('#rt-done').classList.remove('hidden'); $('#rt-done').focus();
     launchConfetti({ count: 24 });
   }
+  function skipRetype() {
+    if (views.retype.classList.contains('is-active')) { endRetype(); return; }
+    state.retype = { active: false };
+    el.btnNext.classList.remove('hidden'); el.btnNext.focus();
+  }
   function endRetype() {
     state.retype = { active: false };
     document.body.classList.remove('is-retype');
@@ -8629,23 +8745,56 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
   }
   $('#rt-submit').addEventListener('click', rtCheck);
   $('#rt-done').addEventListener('click', endRetype);
+  $('#rt-skip').addEventListener('click', skipRetype);
   $('#rt-input').addEventListener('keydown', event => {
     if (event.key !== 'Enter' || event.isComposing) return;
     event.preventDefault(); event.stopPropagation(); rtCheck();
   });
 
+  const MEANING_MODE = () => ({ name: 'Por significado', allowHints: false, feedback: 'instant', direction: 'ES-EN', confusionPractice: true, meaning: true });
+
+  // Qué expresión escribiste en lugar de la pedida (para mostrar el contraste y registrar confusiones).
+  function findOtherByAnswer(r) {
+    const v = normalize(r.userAnswer || '');
+    if (!v) return null;
+    const side = r.direction === 'ES-EN' ? 'englishVariants' : 'spanishVariants';
+    return ALL_QUESTIONS.find(q => q.uid !== r.item.uid && (q[side] || []).some(x => normalize(x) === v)) || null;
+  }
+  function recordConfusion() {
+    const r = state.results[state.results.length - 1];
+    if (!r || r.status === 'correct' || r.status === 'valid-other') return;
+    const other = findOtherByAnswer(r);
+    if (!other) return;
+    db.confusions = db.confusions || {};
+    const k = [r.item.uid, other.uid].sort().join('|');
+    const e = db.confusions[k] || (db.confusions[k] = { n: 0 });
+    e.n += 1; e.at = Date.now();
+    saveDB();
+  }
+  function confusionPairs() {
+    return Object.entries(db.confusions || {}).filter(([, e]) => e && e.n).map(([k, e]) => {
+      const [a, b] = k.split('|').map(u => QUESTION_BY_UID.get(u));
+      return a && b ? { a, b, n: e.n, k } : null;
+    }).filter(Boolean).sort((x, y) => y.n - x.n);
+  }
+
   const FOLDER_DEFS = [
-    { id: 'all', name: 'Todo en uno', icon: '⭐', desc: 'Todos los phrasal verbs y todos los conectores' },
-    { id: 'verb', name: 'Mismo verbo', icon: '🔁', desc: 'break, come, get, go, take, turn…' },
-    { id: 'particle', name: 'Misma partícula', icon: '🧩', desc: 'out, up, off, on, in, down…' },
-    { id: 'ending', name: 'Misma palabra final', icon: '🏁', desc: 'left / right, street, sign, station…' },
-    { id: 'directions', name: 'Direcciones y calle', icon: '🧭', desc: 'Orientación, giros, señales y vías' },
-    { id: 'places', name: 'Lugares y transporte', icon: '📍', desc: 'Aeropuerto, comercios, agua y paisaje' },
-    { id: 'adjectives', name: 'Adjetivos y personalidad', icon: '🙂', desc: 'Carácter, apariencia, sabores, estados' },
-    { id: 'confusions', name: 'Confusiones dirigidas', icon: '⚠', desc: 'Pares que se parecen mucho' }
+    { id: 'mine', name: 'Mis confusiones', color: '#e11d48', desc: 'Las que tú confundes, detectadas solas' },
+    { id: 'all', name: 'Todo en uno', color: '#f59e0b', desc: 'Todos los phrasal verbs, conectores, lugares…' },
+    { id: 'conn', name: 'Conectores por significado', color: '#0f766e', desc: 'Razón, resultado, contraste, tiempo…' },
+    { id: 'mean', name: 'Mismo significado en español', color: '#7c3aed', desc: 'Varias expresiones inglesas para una misma palabra' },
+    { id: 'verb', name: 'Phrasal verbs · mismo verbo', color: '#15803d', desc: 'break out / break off / break up…' },
+    { id: 'particle', name: 'Phrasal verbs · misma partícula', color: '#0369a1', desc: 'get out / come out / go out…' },
+    { id: 'ending', name: 'Direcciones · misma palabra', color: '#2563eb', desc: 'left / right, street, sign…' },
+    { id: 'confusions', name: 'Confusiones dirigidas', color: '#ea580c', desc: 'Pares que se parecen mucho' },
+    { id: 'directions', name: 'Direcciones y calle', color: '#0891b2', desc: 'Orientación, giros, señales y vías' },
+    { id: 'places', name: 'Lugares y transporte', color: '#a16207', desc: 'Aeropuerto, comercios, agua y paisaje' },
+    { id: 'adjectives', name: 'Adjetivos y personalidad', color: '#db2777', desc: 'Carácter, apariencia, sabores, estados' }
   ];
   function folderIdOf(id) {
     if (id.startsWith('similar-all-')) return 'all';
+    if (id.startsWith('mean-conn-')) return 'conn';
+    if (id.startsWith('mean-auto-')) return 'mean';
     if (id.startsWith('dup-v-')) return 'verb';
     if (id.startsWith('dup-p-')) return 'particle';
     if (id.startsWith('dup-l-')) return 'ending';
@@ -8659,16 +8808,107 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
     const f = vocabPickerState.folder;
     if (!f) {
       return FOLDER_DEFS.map(d => {
-        const n = sims.filter(c => folderIdOf(c.id) === d.id).length;
-        return { id: 'folder:' + d.id, folderId: d.id, name: d.name, description: d.desc, group: 'folderitem', icon: d.icon, items: [], countLabel: `${n} ${n === 1 ? 'bloque' : 'bloques'} · ${d.desc}`, searchableItems: false, _n: n };
-      }).filter(x => x._n > 0);
+        const n = d.id === 'mine' ? confusionPairs().length : sims.filter(c => folderIdOf(c.id) === d.id).length;
+        const unit = d.id === 'mine' ? (n === 1 ? 'par' : 'pares') : (n === 1 ? 'grupo' : 'grupos');
+        return { id: 'folder:' + d.id, folderId: d.id, name: d.name, description: d.desc, group: 'folderitem', icon: '📁', color: d.color, items: [], countLabel: `${n} ${unit} · ${d.desc}`, searchableItems: false, _n: n, _keep: d.id === 'mine' };
+      }).filter(x => x._n > 0 || x._keep);
     }
     const def = FOLDER_DEFS.find(d => d.id === f);
-    return [{ id: 'folder:root', folderId: 'ROOT', name: '← Volver a carpetas', description: '', group: 'folderitem', icon: '📁', items: [], countLabel: def ? def.name : '', searchableItems: false },
-      ...sims.filter(c => folderIdOf(c.id) === f)];
+    const back = { id: 'folder:root', folderId: 'ROOT', name: '← Volver a carpetas', description: '', group: 'folderitem', icon: '📁', items: [], countLabel: def ? def.name : '', searchableItems: false };
+    if (f === 'mine') {
+      const pairs = confusionPairs().slice(0, 25);
+      if (!pairs.length) return [back, { id: 'pair:none', name: 'Aún no hay confusiones', description: '', group: 'folderitem', icon: '📭', items: [], countLabel: 'Cuando escribas otra expresión de tu vocabulario por error, se registrará aquí.', searchableItems: false, onPick: () => toast('Todavía no se ha registrado ninguna.', 'info') }];
+      const all = [...new Map(pairs.flatMap(p => [p.a, p.b]).map(i => [i.uid, i])).values()];
+      return [back,
+        { id: 'pair:all', name: 'Practicar todas mis confusiones', description: '', group: 'folderitem', icon: '🎯', items: [], countLabel: `${all.length} tarjetas · ${pairs.length} pares · español → inglés`, searchableItems: false, onPick: () => startSession(shuffle(all), 'practice', MEANING_MODE(), true) },
+        ...pairs.map(p => ({ id: 'pair:' + p.k, name: `${p.a.english} ↔ ${p.b.english}`, description: '', group: 'folderitem', icon: '⇄', items: [], countLabel: `${p.n} ${p.n === 1 ? 'vez' : 'veces'} · ${p.a.spanish} / ${p.b.spanish}`, searchableItems: false, onPick: () => startSession([p.a, p.b], 'practice', MEANING_MODE(), true) }))];
+    }
+    return [back, ...sims.filter(c => folderIdOf(c.id) === f)];
   }
 
-  /* ===== v2.6.1 · DOMINIO, SESIÓN INTELIGENTE, OPCIÓN MÚLTIPLE, XP ===== */
+  /* ===== v2.9.2 · GUARDADO AUTOMÁTICO DE LA SESIÓN ===== */
+  const SESSION_KEY = 'vocabPractice.session.v1';
+  function saveSession(answered) {
+    if (!state.queue.length || !views.practice.classList.contains('is-active')) return;
+    try {
+      localStorage.setItem(SESSION_KEY, JSON.stringify({
+        v: 1, at: Date.now(), answered: Boolean(answered), index: state.index, streak: state.streak,
+        startedAt: state.startedAt, categoryMode: state.categoryMode, studyMode: state.studyMode,
+        failuresRepeated: state.failuresRepeated, sm: state.sm,
+        queue: state.queue.map(e => ({ u: e.item.uid, d: e.direction, c: e.claimed ? 1 : 0, t: e.usedText || '' })),
+        results: state.results.map(r => ({ u: r.item.uid, d: r.direction, s: r.status, a: r.userAnswer || '', e: r.expectedAnswer || '', h: r.usedHint ? 1 : 0, o: r.otherBlock || '' })),
+        content: state.sessionContentItems.map(i => i.uid)
+      }));
+    } catch { /* sin espacio: la sesión simplemente no se guarda */ }
+  }
+  function clearSavedSession() { try { localStorage.removeItem(SESSION_KEY); } catch { /* nada */ } }
+  function loadSavedSession() {
+    try {
+      const r = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
+      if (r && r.v === 1 && Array.isArray(r.queue) && r.queue.length) return r;
+    } catch { /* corrupta */ }
+    return null;
+  }
+  function resumeSavedSession() {
+    const sv = loadSavedSession();
+    if (!sv) return;
+    const items = sv.queue.map(q => QUESTION_BY_UID.get(q.u));
+    if (items.some(i => !i)) { clearSavedSession(); renderResume(); toast('No se pudo restaurar la sesión (el vocabulario cambió).', 'error'); return; }
+    clearCardTimers();
+    state.studyMode = sv.studyMode || null;
+    state.queue = sv.queue.map((q, i) => ({ item: items[i], direction: q.d, claimed: Boolean(q.c), usedText: q.t || undefined, groupKey: '' }));
+    state.groups = new Map();
+    state.queue.forEach(e => {
+      e.groupKey = makeGroupKey(e.item, e.direction);
+      if (!state.groups.has(e.groupKey)) state.groups.set(e.groupKey, []);
+      state.groups.get(e.groupKey).push(e);
+    });
+    state.results = sv.results.map(r => ({ item: QUESTION_BY_UID.get(r.u), direction: r.d, status: r.s, userAnswer: r.a, expectedAnswer: r.e, usedHint: Boolean(r.h), otherBlock: r.o })).filter(r => r.item);
+    state.index = sv.answered ? sv.index + 1 : sv.index;
+    state.streak = sv.streak || 0;
+    state.startedAt = Date.now() - Math.max(0, (sv.at || Date.now()) - (sv.startedAt || Date.now()));
+    state.categoryMode = sv.categoryMode || 'practice';
+    state.lastCategory = state.categoryMode;
+    state.failuresRepeated = Boolean(sv.failuresRepeated);
+    state.sm = sv.sm || { up: 0, down: 0, newMastered: 0 };
+    state.sessionContentItems = (sv.content || []).map(u => QUESTION_BY_UID.get(u)).filter(Boolean);
+    state.allowCurrentScope = false; state.answered = false; state.usedHint = false;
+    showView('practice');
+    if (state.index >= state.queue.length) finishSession(); else renderCurrent();
+    toast(`Sesión recuperada: vas en la ${Math.min(state.index + 1, state.queue.length)} de ${state.queue.length}`, 'success');
+  }
+  function renderResume() {
+    const box = $('#resume-box');
+    if (!box) return;
+    const sv = loadSavedSession();
+    box.classList.toggle('hidden', !sv);
+    if (!sv) return;
+    const done = sv.answered ? sv.index + 1 : sv.index;
+    const mins = Math.max(1, Math.round((Date.now() - sv.at) / 60000));
+    const when = mins < 60 ? `hace ${mins} min` : mins < 1440 ? `hace ${Math.round(mins / 60)} h` : `hace ${Math.round(mins / 1440)} d`;
+    $('#resume-detail').textContent = `${(sv.studyMode && sv.studyMode.name) || 'Práctica'} · llevas ${Math.min(done, sv.queue.length)} de ${sv.queue.length} · guardada ${when}`;
+  }
+  $('#btn-resume').addEventListener('click', resumeSavedSession);
+  $('#btn-discard').addEventListener('click', () => {
+    if (!confirm('¿Descartar la sesión sin terminar? Tus errores y estadísticas ya guardados se conservan.')) return;
+    clearSavedSession(); renderResume();
+  });
+  // Guardar todo al instante si la app pasa a segundo plano o se cierra (el guardado normal espera 100 ms).
+  function flushNow() {
+    clearTimeout(saveTimer);
+    try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } catch { /* nada */ }
+    if (views.practice.classList.contains('is-active')) saveSession(state.answered);
+  }
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushNow(); });
+  window.addEventListener('pagehide', flushNow);
+  window.addEventListener('beforeunload', flushNow);
+  setTimeout(() => {
+    if (loadSavedSession() && !views.practice.classList.contains('is-active')) {
+      toast('Tienes una sesión sin terminar', 'info', { action: 'Continuar', duration: 10000, onAction: resumeSavedSession });
+    }
+  }, 700);
+
+  /* ===== v2.9.2 · DOMINIO, SESIÓN INTELIGENTE, OPCIÓN MÚLTIPLE, XP ===== */
   state.mc = { active: false, correct: '', chosen: null, forceWrong: false };
   state.sm = { up: 0, down: 0, newMastered: 0 };
   state.fcMarks = new Map();
@@ -8708,7 +8948,8 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
     const pool = ALL_QUESTIONS.filter(q => q.uid !== item.uid);
     const same = pool.filter(q => q.section === item.section);
     const picked = [];
-    for (const q of shuffle(same.length >= 6 ? same : pool)) {
+    const near = state.studyMode?.meaning ? state.queue.map(e => e.item).filter(q => q.uid !== item.uid) : [];
+    for (const q of [...shuffle(near), ...shuffle(same.length >= 6 ? same : pool)]) {
       const v = ownOf(q, direction), k = normalize(v);
       if (!k || seen.has(k)) continue;
       seen.add(k); picked.push(v);
@@ -8725,7 +8966,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
     box.classList.add('hidden');
     el.input.classList.remove('hidden');
     const sm = state.studyMode;
-    const allowed = (!sm || sm.smart) && state.categoryMode !== 'review' && !mcOff;
+    const allowed = (!sm || sm.smart || sm.meaning) && state.categoryMode !== 'review' && !mcOff;
     const alone = (state.groups.get(entry.groupKey) || []).length < 2;
     if (!allowed || !alone || masteryInfo(entry.item).level >= 2) return;
     const options = buildMC(entry);
@@ -8790,12 +9031,16 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
     if (after < before) state.sm.down += 1;
     if (before < 5 && after >= 5) state.sm.newMastered += 1;
     trackProgress(ok, clean);
+    setTimeout(() => saveSession(true), 0);
     if (state.mc.active) lockMC();
     if (views.practice.classList.contains('is-active')) renderMasteryTag(item, after - before);
     if (!ok && state.studyMode?.feedback !== 'blind') {
       state.retype = { active: true, pending: true };
-      setTimeout(() => el.btnNext.classList.add('hidden'), 0);
+      setTimeout(() => { if (state.retype.pending) el.btnNext.classList.add('hidden'); }, 0);
       setTimeout(() => { if (state.retype.pending) startRetype(); }, 1100);
+    }
+    if (!ok) {
+      setTimeout(recordConfusion, 0);
     }
   }
 
@@ -8821,6 +9066,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
     const unk = $('#btn-unknown');
     unk.textContent = `Practicar las que no sé (${c.learning})`;
     unk.disabled = !c.learning;
+    renderResume();
   }
 
   const SMART_MODE = () => ({ name: 'Sesión inteligente', allowHints: true, feedback: 'instant', smart: true, repeatFailures: true, direction: getMode(), preserveOrder: true });
@@ -8831,12 +9077,14 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
     const fresh = shuffle(info.filter(x => x.k === 'new').map(x => x.i));
     const old = shuffle(info.filter(x => x.k === 'mastered' && x.p.ageDays >= 14).map(x => x.i));
     let items = [...weak.slice(0, 14), ...fresh.slice(0, 6), ...old.slice(0, 4)];
+    const conf = confusionPairs().slice(0, 5).flatMap(p => [p.a, p.b]);
+    items = [...new Map([...conf, ...items].map(i => [i.uid, i])).values()];
     if (items.length < 16) {
       const used = new Set(items.map(i => i.uid));
       items = items.concat([...weak.slice(14), ...fresh.slice(6), ...old.slice(4)].filter(i => !used.has(i.uid)).slice(0, 16 - items.length));
     }
     if (!items.length) { toast('🎉 Lo tienes todo dominado. Vuelve mañana a repasar.', 'success'); return; }
-    startSession(shuffle(items), 'practice', SMART_MODE());
+    startSession(shuffle(items), 'practice', SMART_MODE(), true);
   }
 
   function startUnknownSession() {
