@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Practicador de vocabulario inglés-español con categorías de dificultad, errores, repaso y estadísticas.">
 <meta name="theme-color" content="#4f46e5">
-<title>Practicador de Vocabulario · Versión 2.9.2</title>
+<title>Practicador de Vocabulario · Versión 2.10.0</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; }
 
@@ -2620,7 +2620,7 @@
     .easy-filter-strip .easy-filter-copy small { display:none; }
   }
 
-/* ===== v2.9.2 · DOMINIO, OPCIÓN MÚLTIPLE, FLASHCARDS CON AUTOEVALUACIÓN ===== */
+/* ===== v2.10.0 · DOMINIO, OPCIÓN MÚLTIPLE, FLASHCARDS CON AUTOEVALUACIÓN ===== */
 #view-setup.is-active { overflow-y: auto !important; }
 #view-setup .home-dashboard { flex: 0 0 auto; grid-template-rows: none; }
 #view-setup .setup-panel { max-height: none; overflow: visible; }
@@ -2663,7 +2663,7 @@
 @media (max-width: 520px) { .mc-box { grid-template-columns: 1fr; } }
 
 
-/* ===== v2.9.2 · REPASO RÁPIDO COMO OTRA PANTALLA ===== */
+/* ===== v2.10.0 · REPASO RÁPIDO COMO OTRA PANTALLA ===== */
 body.is-retype .topbar { background: radial-gradient(circle at 8% 0%, rgba(255,255,255,.30), transparent 26%), linear-gradient(112deg, #b45309 0%, #f59e0b 45%, #ec4899 122%); box-shadow: 0 8px 30px rgba(180,83,9,.28), 0 0 34px rgba(245,158,11,.18); }
 body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(245,158,11,.16); }
 #view-retype .word-card { border-color: color-mix(in srgb, var(--warn) 45%, var(--border)); background: linear-gradient(145deg, var(--surface-solid), var(--warn-soft)); }
@@ -2671,7 +2671,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
 #view-retype.is-active.is-entering { animation: rtIn .5s cubic-bezier(.16,1,.3,1) both; }
 @keyframes rtIn { from { opacity: 0; transform: translateX(46px) scale(.98); } to { opacity: 1; transform: none; } }
 
-/* ===== v2.9.2 · CARPETAS CON FORMA DE CARPETA ===== */
+/* ===== v2.10.0 · CARPETAS CON FORMA DE CARPETA ===== */
 .vocab-card.folder-card { position: relative; border-top: 4px solid var(--fc, var(--primary)); border-radius: 4px 14px 14px 14px; background: linear-gradient(160deg, color-mix(in srgb, var(--fc, #6858ff) 13%, var(--surface-solid)), var(--surface-solid) 70%); }
 .vocab-card.folder-card::before { content: ""; position: absolute; top: -4px; left: 14px; width: 44px; height: 9px; background: var(--fc, var(--primary)); border-radius: 0 0 8px 8px; }
 .vocab-card.folder-card .vocab-card-icon { background: color-mix(in srgb, var(--fc, #6858ff) 22%, var(--surface-solid)); font-size: 1.15rem; }
@@ -2679,12 +2679,49 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
 .vocab-card.folder-card .vocab-card-state { color: var(--fc, var(--primary)); font-size: 1.1rem; }
 .vocab-card.folder-card:hover { border-color: var(--fc, var(--primary)); box-shadow: 0 8px 20px color-mix(in srgb, var(--fc, #6858ff) 22%, transparent); }
 
-/* ===== v2.9.2 · SESIÓN SIN TERMINAR ===== */
+/* ===== v2.10.0 · SESIÓN SIN TERMINAR ===== */
 .resume-box { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 12px 16px; border-radius: 16px; border: 1px solid color-mix(in srgb, var(--warn) 55%, var(--border)); background: linear-gradient(120deg, var(--warn-soft), var(--surface-solid)); box-shadow: 0 8px 24px rgba(245,158,11,.12); }
 .resume-copy { display: grid; gap: 2px; min-width: 0; }
 .resume-copy strong { font-size: .92rem; }
 .resume-copy small { color: var(--muted); font-size: .72rem; }
 .resume-actions { display: flex; gap: 8px; }
+
+/* ===== v2.10.0 · MODOS A LA VISTA + EXAMEN A CIEGAS ===== */
+#view-modes.is-active { overflow-y: auto !important; }
+#view-modes .page-frame, #view-modes #mode-page-content, #view-modes .mode-picker { height: auto; overflow: visible; flex: none; }
+.mode-picker-v3 { display: grid; gap: 14px; padding-bottom: 12px; }
+.mode-step { display: grid; gap: 10px; padding: 14px 16px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface-solid); }
+.mode-step-title { display: flex; align-items: center; gap: 9px; font-weight: 900; font-size: .92rem; }
+.mode-step-title small { color: var(--muted); font-weight: 650; font-size: .74rem; margin-left: 6px; }
+.mode-step-num { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 8px; background: linear-gradient(135deg, var(--primary), var(--primary-2)); color: #fff; font-size: .72rem; font-weight: 950; flex: 0 0 auto; }
+.mode-controls { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 10px; }
+.mode-controls label { display: grid; gap: 5px; min-width: 0; }
+.mode-controls label span { font-size: .64rem; font-weight: 900; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.mode-controls select { width: 100%; min-width: 0; padding: 10px; border-radius: 10px; border: 1px solid var(--border-2); background: var(--surface-solid); color: var(--text); font-size: .8rem; }
+.mode-step-head2 { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.mode-step-head2 .mode-search-wrap { width: min(260px, 100%); }
+.mode-groups { display: grid; gap: 16px; }
+.mode-group { display: grid; gap: 8px; }
+.mode-group-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.mode-group-head h3 { margin: 0; font-size: .95rem; letter-spacing: -.01em; }
+.mode-group-head p { margin: 0; color: var(--muted); font-size: .72rem; }
+.mode-card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.mode-card { display: grid; grid-template-columns: 42px minmax(0, 1fr); gap: 12px; align-items: start; text-align: left; padding: 14px; border: 1px solid var(--border); border-radius: 16px; background: linear-gradient(145deg, var(--surface-solid), color-mix(in srgb, var(--primary-soft) 10%, var(--surface-solid))); transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
+.mode-card:hover { transform: translateY(-2px); border-color: var(--primary); box-shadow: 0 10px 24px rgba(104,88,255,.14); }
+.mode-card:active { transform: scale(.99); }
+.mode-card-icon { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; background: var(--primary-soft); font-size: 1.3rem; }
+.mode-card-body { display: grid; gap: 4px; min-width: 0; }
+.mode-card-body h4 { margin: 0; font-size: .9rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.mode-card-body p { margin: 0; color: var(--muted); font-size: .74rem; line-height: 1.4; }
+.mode-card-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 2px; }
+.mode-badge { font-style: normal; font-size: .6rem; font-weight: 900; padding: 3px 7px; border-radius: 999px; background: var(--warn-soft); color: var(--warn); }
+@media (max-width: 760px) { .mode-card-grid { grid-template-columns: 1fr; } .mode-controls { grid-template-columns: 1fr; } }
+#view-practice.is-blind .word-meta, #view-practice.is-blind #flag-repeat, #view-practice.is-blind #flag-history, #view-practice.is-blind #shortcuts { display: none !important; }
+.blind-actions { display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; }
+.blind-strip { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; }
+.bl-dot { min-width: 30px; height: 30px; padding: 0 6px; border-radius: 9px; border: 1px solid var(--border); background: var(--surface-2); color: var(--muted); font-size: .72rem; font-weight: 850; font-variant-numeric: tabular-nums; }
+.bl-dot.is-done { background: var(--primary-soft); color: var(--primary); border-color: color-mix(in srgb, var(--primary) 35%, var(--border)); }
+.bl-dot.is-current { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
 </style>
 </head>
 <body>
@@ -2692,7 +2729,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
 <div class="app">
   <header class="topbar">
     <div class="topbar-left">
-      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v2.9.2</span>
+      <span id="app-version" class="app-version" aria-label="Versión de la aplicación">v2.10.0</span>
       <div class="brand">
         <div class="brand-mark">V</div>
         <div>
@@ -2740,7 +2777,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
       <div class="home-dashboard">
         <header class="home-intro">
           <div class="home-intro-copy">
-            <p class="home-eyebrow">TU ESPACIO DE ESTUDIO <span>·</span> VERSIÓN 2.9.2</p>
+            <p class="home-eyebrow">TU ESPACIO DE ESTUDIO <span>·</span> VERSIÓN 2.10.0</p>
             <h2 id="setup-title">¿Qué vas a practicar hoy?</h2>
             <p>Elige el vocabulario, selecciona la dirección y empieza. Las opciones avanzadas están aparte para que no estorben.</p>
           </div>
@@ -2848,7 +2885,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
           </section>
         </details>
 
-        <div class="home-footer"><span>Practicador de Vocabulario <strong>v2.9.2</strong></span><span>El avance se guarda localmente.</span><button id="btn-reset" class="link-danger hidden" type="button" title="Borrar todo el progreso guardado">Borrar progreso</button><span id="total-progress" class="hidden"></span></div>
+        <div class="home-footer"><span>Practicador de Vocabulario <strong>v2.10.0</strong></span><span>El avance se guarda localmente.</span><button id="btn-reset" class="link-danger hidden" type="button" title="Borrar todo el progreso guardado">Borrar progreso</button><span id="total-progress" class="hidden"></span></div>
       </div>
     </section>
 
@@ -2879,7 +2916,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
     <section id="view-modes" class="view" aria-labelledby="modes-page-title">
       <div class="page-frame modes-page">
         <header class="page-heading">
-          <div><p class="page-eyebrow">FORMAS DE APRENDER</p><h2 id="modes-page-title">Elige cómo estudiar</h2><p>Filtra los modos por objetivo. Solo aparecen unos cuantos por página; no necesitas recorrer una lista larga.</p></div>
+          <div><p class="page-eyebrow">FORMAS DE APRENDER</p><h2 id="modes-page-title">Elige cómo estudiar</h2><p>Primero elige qué estudiar y luego toca el modo. Todos están a la vista.</p></div>
         </header>
         <div id="mode-page-content"></div>
       </div>
@@ -2987,6 +3024,11 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
         <div class="answer-actions-outside" aria-label="Acciones de respuesta">
           <button id="btn-submit" class="btn btn-primary btn-lg" type="button">Comprobar</button>
           <button id="btn-next" class="btn btn-primary btn-lg hidden" type="button">Siguiente &rarr;</button>
+          <div id="blind-strip" class="blind-strip hidden" aria-label="Preguntas del examen"></div>
+          <div id="blind-actions" class="blind-actions hidden">
+            <button id="bl-prev" class="btn btn-secondary btn-lg" type="button">← Anterior</button>
+            <button id="bl-next" class="btn btn-primary btn-lg" type="button">Siguiente →</button>
+          </div>
         </div>
       </div>
     </section>
@@ -3134,7 +3176,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
 
   // VERSIÓN DE LA APP: 2.3
   // IMPORTANTE: CAMBIA APP_VERSION SIEMPRE QUE AGREGUES O MODIFIQUES FUNCIONALIDAD.
-  const APP_VERSION = '2.9.2';
+  const APP_VERSION = '2.10.0';
 
   /* ======================================================================
      DATOS · vocabData con las 504 entradas originales
@@ -6086,6 +6128,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
     state.streak = 0;
     state.startedAt = Date.now();
     state.sm = { up: 0, down: 0, newMastered: 0 };
+    state.blind = { active: studyMode?.feedback === 'blind', answers: state.queue.map(() => ''), evaluating: false };
     state.categoryMode = categoryMode;
     state.lastCategory = categoryMode;
 
@@ -6187,7 +6230,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
     el.hintBox.hidden = true;
     el.hintBox.textContent = '';
 
-    el.input.value = '';
+    el.input.value = state.blind && state.blind.active ? (state.blind.answers[state.index] || '') : '';
     el.input.disabled = false;
     el.input.className = 'answer-input';
     el.input.setAttribute('aria-label', direction === 'EN-ES' ? 'Respuesta en español' : 'Respuesta en inglés');
@@ -6225,6 +6268,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
     startCardTimer();
 
     setupMC(entry);
+    setupBlindUI();
     requestAnimationFrame(() => { if (!state.mc.active) el.input.focus(); });
   }
 
@@ -6586,6 +6630,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
   }
 
   function submitAnswer(isTimeout = false) {
+    if (state.blind && state.blind.active && !state.blind.evaluating) { blindStep(1); return; }
     if (state.answered) return;
 
     const entry = currentEntry();
@@ -6606,7 +6651,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
     // Respuesta válida, pero de otra tarjeta/bloque: NO termina la tarjeta.
     // No revela la respuesta esperada, no cuenta como fallo ni como intento
     // respondido, y deja el input activo para que el usuario vuelva a intentarlo.
-    if (result.validOther && !state.studyMode?.meaning) {
+    if (result.validOther && !state.studyMode?.meaning && !state.blind?.evaluating) {
       el.input.classList.remove('wrong', 'valid-other');
       el.input.classList.add('valid-other');
       el.feedback.hidden = false;
@@ -7760,7 +7805,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
   ];
 
   const ADVANCED_MODES = [
-    { id: 'blind', name: 'Examen a ciegas', icon: '🙈', group: 'exam', description: 'No muestra aciertos, fallos, colores, pistas ni respuestas hasta el final. Conserva el aviso de respuesta válida de otro bloque.', tags: ['Sin feedback', 'Sin pistas'], config: { feedback: 'blind', allowHints: false } },
+    { id: 'blind', name: 'Examen a ciegas', icon: '🙈', group: 'exam', description: 'Examen de verdad: sin aciertos, fallos, dificultad ni pistas. Puedes volver a tarjetas anteriores y cambiar respuestas; todo se corrige al terminar.', tags: ['Sin feedback', 'Sin pistas'], config: { feedback: 'blind', allowHints: false } },
     { id: 'strict-spelling', name: 'Ortografía estricta', icon: '✍️', group: 'exam', description: 'Exige escribir la respuesta completa correctamente; ignora mayúsculas, pero no signos ni errores ortográficos.', tags: ['Escritura exacta'], config: { feedback: 'instant', strict: true, allowHints: false } },
     { id: 'cumulative', name: 'Examen acumulativo', icon: '🎯', group: 'exam', description: 'Incluye todas las tarjetas del vocabulario principal y de los bloques especiales.', tags: ['Todo el vocabulario'], config: { feedback: 'blind', allowHints: false, scopeOverride: 'all', sizeOverride: 'all' } },
     { id: 'mastery', name: 'Examen de dominio', icon: '🏆', group: 'exam', description: 'Examen a ciegas y con ortografía estricta. Al final indica si alcanzaste al menos el 85%.', tags: ['85% para aprobar'], config: { feedback: 'blind', strict: true, allowHints: false, scopeOverride: 'all', sizeOverride: 'all', mastery: true, threshold: .85 } },
@@ -7874,184 +7919,122 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
   function buildAdvancedModesModal(options = {}) {
     const preserveCurrent = Boolean(options.preserveCurrent && state.sessionContentItems.length);
     const wrapper = document.createElement('div');
-    wrapper.className = 'mode-picker';
+    wrapper.className = 'mode-picker mode-picker-v3';
+    const excludeEasy = db.settings.excludeEasy !== false;
 
-    const top = document.createElement('div');
-    top.className = 'mode-picker-top';
-    const intro = document.createElement('div');
-    intro.className = 'mode-picker-intro';
-    intro.innerHTML = '<p class="picker-eyebrow">ELIGE CÓMO ESTUDIAR</p><h3>Encuentra el modo adecuado</h3><p>Empieza con una recomendación o filtra por objetivo.</p>';
-    const searchWrap = document.createElement('label');
-    searchWrap.className = 'mode-search-wrap';
-    searchWrap.innerHTML = '<span aria-hidden="true">⌕</span>';
-    const search = document.createElement('input');
-    search.type = 'search';
-    search.id = 'v2-mode-search';
-    search.placeholder = 'Buscar un modo…';
-    search.setAttribute('aria-label', 'Buscar modo de estudio');
-    searchWrap.appendChild(search);
-    top.append(searchWrap);
-    wrapper.appendChild(top);
-
-    const settings = document.createElement('details');
-    settings.className = 'mode-settings';
-    const summary = document.createElement('summary');
-    summary.innerHTML = '<span><strong>Configurar sesión</strong><small>Contenido, cantidad y dirección</small></span><span class="settings-chevron" aria-hidden="true">⌄</span>';
-    settings.appendChild(summary);
-
+    // Paso 1 · qué estudiar (siempre visible)
+    const step1 = document.createElement('section');
+    step1.className = 'mode-step';
+    const t1 = document.createElement('div'); t1.className = 'mode-step-title';
+    t1.innerHTML = '<span class="mode-step-num">1</span><span>¿Qué vas a estudiar?</span>';
+    step1.appendChild(t1);
     const controls = document.createElement('div');
-    controls.className = 'advanced-controls';
-    const makeSelect = (label, id, options, initial) => {
+    controls.className = 'mode-controls';
+    const makeSelect = (label, id, opts, initial) => {
       const wrap = document.createElement('label');
       const text = document.createElement('span'); text.textContent = label;
       const select = document.createElement('select'); select.id = id;
-      options.forEach(({value, text: optionText}) => {
+      opts.forEach(({ value, text: optionText }) => {
         const option = document.createElement('option'); option.value = value; option.textContent = optionText; select.appendChild(option);
       });
       select.value = initial;
       wrap.append(text, select); return wrap;
     };
-    const initialBlock = preserveCurrent ? 'current' : 'block';
-    const excludeEasy = db.settings.excludeEasy !== false;
     const scopeOptions = [
-        ...(preserveCurrent ? [{value:'current',text:`Mismo contenido de la sesión (${state.sessionContentItems.length} tarjetas)`}] : []),
-        {value:'block',text:'Bloque seleccionado'},
-        {value:'main',text:excludeEasy ? 'Vocabulario principal (sin regaladas)' : 'Vocabulario principal'},
-        {value:'all',text:excludeEasy ? 'Todo salvo regaladas, incluidos especiales' : 'Todo, incluidos especiales'},
-        {value:'easy',text:'Dificultad regalada'},
-        {value:'medium',text:'Dificultad intermedia'}, {value:'hard',text:'Dificultad difícil'},
-        {value:'confusion',text:'Expresiones similares'}, {value:'unknown',text:'Tarjetas aún no dominadas'},
-        {value:'mistakes',text:excludeEasy ? 'Errores guardados (sin regaladas)' : 'Solo errores guardados'}, {value:'review',text:'Solo Revisar'}
-      ];
+      ...(preserveCurrent ? [{ value: 'current', text: `Lo mismo que acabas de estudiar (${state.sessionContentItems.length} tarjetas)` }] : []),
+      { value: 'block', text: 'El bloque que elegí en Vocabulario' },
+      { value: 'main', text: excludeEasy ? 'Todo el vocabulario principal (sin regaladas)' : 'Todo el vocabulario principal' },
+      { value: 'all', text: excludeEasy ? 'Todo, con bloques especiales (sin regaladas)' : 'Todo, con bloques especiales' },
+      { value: 'easy', text: 'Solo dificultad regalada' },
+      { value: 'medium', text: 'Solo dificultad intermedia' },
+      { value: 'hard', text: 'Solo dificultad difícil' },
+      { value: 'confusion', text: 'Solo expresiones que se confunden' },
+      { value: 'unknown', text: 'Solo las que aún no domino' },
+      { value: 'mistakes', text: excludeEasy ? 'Solo mis errores (sin regaladas)' : 'Solo mis errores' },
+      { value: 'review', text: 'Solo las guardadas en Revisar' }
+    ];
     controls.append(
-      makeSelect('Contenido', 'v2-scope', scopeOptions, initialBlock),
-      makeSelect('Cantidad', 'v2-size', [
-        {value:'10',text:'10 tarjetas'}, {value:'20',text:'20 tarjetas'}, {value:'30',text:'30 tarjetas'},
-        {value:'60',text:'60 tarjetas'}, {value:'all',text:'Todas las disponibles'}
+      makeSelect('Contenido', 'v2-scope', scopeOptions, preserveCurrent ? 'current' : 'block'),
+      makeSelect('Cuántas tarjetas', 'v2-size', [
+        { value: '10', text: '10' }, { value: '20', text: '20' }, { value: '30', text: '30' },
+        { value: '60', text: '60' }, { value: 'all', text: 'Todas las disponibles' }
       ], preserveCurrent ? 'all' : '30'),
       makeSelect('Dirección', 'v2-direction', [
-        {value:'EN-ES',text:'Inglés → español'}, {value:'ES-EN',text:'Español → inglés'}, {value:'MIX',text:'Mezcla aleatoria'}
+        { value: 'EN-ES', text: 'Inglés → español' }, { value: 'ES-EN', text: 'Español → inglés' }, { value: 'MIX', text: 'Mezcla aleatoria' }
       ], getMode())
     );
-    settings.appendChild(controls);
-    wrapper.appendChild(settings);
+    step1.appendChild(controls);
+    wrapper.appendChild(step1);
 
-    const categories = [
-      {id:'recommended', label:'Recomendados'},
-      ...ADVANCED_MODE_GROUPS.map(g => ({id:g.id, label:g.name})),
-      {id:'all', label:'Todos'}
-    ];
-    let activeCategory = 'recommended';
-    const filterBar = document.createElement('div');
-    filterBar.className = 'mode-filter-bar';
-    filterBar.setAttribute('role', 'group');
-    filterBar.setAttribute('aria-label', 'Filtrar modos por objetivo');
-    const list = document.createElement('div');
-    list.className = 'mode-list';
-    const pager = document.createElement('div');
-    pager.className = 'vocab-pagination mode-pagination';
-    const prevPage = document.createElement('button'); prevPage.type = 'button'; prevPage.className = 'btn btn-secondary btn-sm'; prevPage.textContent = '← Anterior';
-    const pageStatus = document.createElement('span');
-    const nextPage = document.createElement('button'); nextPage.type = 'button'; nextPage.className = 'btn btn-secondary btn-sm'; nextPage.textContent = 'Siguiente →';
-    pager.append(prevPage, pageStatus, nextPage);
-    let modePage = 0;
+    // Paso 2 · cómo estudiar
+    const t2 = document.createElement('div'); t2.className = 'mode-step-title mode-step-title-2';
+    t2.innerHTML = '<span class="mode-step-num">2</span><span>¿Cómo quieres estudiar? <small>Toca un modo para empezar.</small></span>';
+    const searchWrap = document.createElement('label');
+    searchWrap.className = 'mode-search-wrap';
+    searchWrap.innerHTML = '<span aria-hidden="true">⌕</span>';
+    const search = document.createElement('input');
+    search.type = 'search'; search.id = 'v2-mode-search'; search.placeholder = 'Buscar un modo…';
+    search.setAttribute('aria-label', 'Buscar modo de estudio');
+    searchWrap.appendChild(search);
+    const head2 = document.createElement('div'); head2.className = 'mode-step-head2';
+    head2.append(t2, searchWrap);
+    wrapper.appendChild(head2);
+
+    const RECOMMENDED = new Set(['adaptive', 'active-recall', 'mistakes', 'blind']);
+    const groupsBox = document.createElement('div');
+    groupsBox.className = 'mode-groups';
+    const sections = [];
+    ADVANCED_MODE_GROUPS.forEach(group => {
+      const modes = ADVANCED_MODES.filter(m => m.group === group.id);
+      if (!modes.length) return;
+      const sec = document.createElement('section'); sec.className = 'mode-group';
+      const gh = document.createElement('div'); gh.className = 'mode-group-head';
+      const h3 = document.createElement('h3'); h3.textContent = group.name;
+      const gp = document.createElement('p'); gp.textContent = group.description;
+      gh.append(h3, gp);
+      const grid = document.createElement('div'); grid.className = 'mode-card-grid';
+      const cards = modes.map(mode => {
+        const card = document.createElement('button');
+        card.type = 'button'; card.className = 'mode-card';
+        card.setAttribute('aria-label', `Empezar modo: ${mode.name}`);
+        const icon = document.createElement('span'); icon.className = 'mode-card-icon'; icon.textContent = mode.icon; icon.setAttribute('aria-hidden', 'true');
+        const body = document.createElement('span'); body.className = 'mode-card-body';
+        const h4 = document.createElement('h4'); h4.textContent = mode.name;
+        if (RECOMMENDED.has(mode.id)) { const star = document.createElement('em'); star.className = 'mode-badge'; star.textContent = '★ Recomendado'; h4.appendChild(star); }
+        const p = document.createElement('p'); p.textContent = mode.description;
+        const tags = document.createElement('span'); tags.className = 'mode-card-tags';
+        mode.tags.forEach(t => { const tg = document.createElement('span'); tg.className = 'mode-row-tag'; tg.textContent = t; tags.appendChild(tg); });
+        body.append(h4, p, tags);
+        card.append(icon, body);
+        card.addEventListener('click', () => startAdvancedMode(mode.id, {
+          scope: $('#v2-scope').value, size: $('#v2-size').value, direction: $('#v2-direction').value
+        }));
+        card.dataset.search = `${mode.name} ${mode.description} ${mode.tags.join(' ')}`.toLocaleLowerCase('es');
+        grid.appendChild(card);
+        return card;
+      });
+      sec.append(gh, grid);
+      groupsBox.appendChild(sec);
+      sections.push({ sec, cards });
+    });
     const empty = document.createElement('div');
     empty.className = 'mode-empty hidden';
     empty.textContent = 'No encontré modos con ese nombre. Prueba otra búsqueda.';
-
-    function visibleModes() {
-      const query = search.value.trim().toLocaleLowerCase('es');
-      const recommended = new Set(['blind','active-recall','mistakes','adaptive']);
-      return ADVANCED_MODES.filter(mode => {
-        const matchesCategory = query ? true : (activeCategory === 'all' ||
-          (activeCategory === 'recommended' ? recommended.has(mode.id) : mode.group === activeCategory));
-        const haystack = `${mode.name} ${mode.description} ${mode.tags.join(' ')} ${mode.group}`.toLocaleLowerCase('es');
-        return matchesCategory && (!query || haystack.includes(query));
-      });
-    }
-
-    function renderModeList() {
-      const isSmallScreen = window.matchMedia('(max-width: 620px)').matches;
-      const availableListHeight = list.clientHeight;
-      const currentRow = list.querySelector('.mode-row');
-      const currentRowHeight = currentRow ? currentRow.getBoundingClientRect().height : 0;
-      const baseRowHeight = isSmallScreen ? (window.innerHeight <= 620 ? 42 : 48) : 62;
-      const rowHeight = Math.max(currentRowHeight, baseRowHeight);
-      const listGap = parseFloat(getComputedStyle(list).rowGap) || 6;
-      let perPage = availableListHeight > 0
-        ? Math.floor((availableListHeight + listGap) / (rowHeight + listGap)) : 0;
-      if (perPage < 1) perPage = window.innerHeight <= 400 ? 1 : (window.innerHeight <= 740 ? 2 : 3);
-      perPage = Math.max(1, Math.min(6, perPage));
-      list.replaceChildren();
-      const allModes = visibleModes();
-      const pageCount = Math.max(1, Math.ceil(allModes.length / perPage));
-      modePage = Math.min(modePage, pageCount - 1);
-      const modes = allModes.slice(modePage * perPage, modePage * perPage + perPage);
-      empty.classList.toggle('hidden', allModes.length !== 0);
-      modes.forEach(mode => {
-        const row = document.createElement('article');
-        row.className = 'mode-row';
-        const icon = document.createElement('span'); icon.className = 'mode-row-icon'; icon.textContent = mode.icon; icon.setAttribute('aria-hidden','true');
-        const body = document.createElement('div'); body.className = 'mode-row-body';
-        const title = document.createElement('h4'); title.textContent = mode.name;
-        const desc = document.createElement('p'); desc.textContent = mode.description;
-        const meta = document.createElement('span'); meta.className = 'mode-row-tag'; meta.textContent = mode.tags[0] || 'Práctica';
-        body.append(title, desc, meta);
-        const start = document.createElement('button'); start.type = 'button'; start.className = 'btn btn-primary btn-sm mode-row-start'; start.textContent = 'Empezar';
-        start.setAttribute('aria-label', `Empezar modo: ${mode.name}`);
-        start.addEventListener('click', () => startAdvancedMode(mode.id, {
-          scope: $('#v2-scope').value, size: $('#v2-size').value, direction: $('#v2-direction').value
-        }));
-        row.append(icon, body, start);
-        list.appendChild(row);
-      });
-      pageStatus.textContent = `${allModes.length ? modePage + 1 : 0} / ${allModes.length ? pageCount : 0}`;
-      prevPage.disabled = modePage <= 0;
-      nextPage.disabled = modePage >= pageCount - 1 || allModes.length === 0;
-      pager.hidden = allModes.length <= perPage;
-    }
-    prevPage.addEventListener('click', () => { modePage = Math.max(0, modePage - 1); renderModeList(); });
-    nextPage.addEventListener('click', () => { modePage += 1; renderModeList(); });
-    categories.forEach(category => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'mode-filter' + (category.id === activeCategory ? ' is-active' : '');
-      button.dataset.category = category.id;
-      button.textContent = category.label;
-      button.setAttribute('aria-pressed', category.id === activeCategory ? 'true' : 'false');
-      button.addEventListener('click', () => {
-        activeCategory = category.id;
-        modePage = 0;
-        search.value = '';
-        $$('.mode-filter', filterBar).forEach(node => {
-          const active = node === button;
-          node.classList.toggle('is-active', active);
-          node.setAttribute('aria-pressed', active ? 'true' : 'false');
-        });
-        renderModeList();
-      });
-      filterBar.appendChild(button);
-    });
+    groupsBox.appendChild(empty);
     search.addEventListener('input', () => {
-      modePage = 0;
-      if (search.value.trim()) activeCategory = 'all';
-      $$('.mode-filter', filterBar).forEach(node => {
-        const active = node.dataset.category === activeCategory;
-        node.classList.toggle('is-active', active);
-        node.setAttribute('aria-pressed', active ? 'true' : 'false');
+      const q = search.value.trim().toLocaleLowerCase('es');
+      let any = false;
+      sections.forEach(({ sec, cards }) => {
+        let shown = 0;
+        cards.forEach(c => { const ok = !q || c.dataset.search.includes(q); c.classList.toggle('hidden', !ok); if (ok) shown += 1; });
+        sec.classList.toggle('hidden', shown === 0);
+        if (shown) any = true;
       });
-      renderModeList();
+      empty.classList.toggle('hidden', any);
     });
-    wrapper.append(filterBar, list, pager, empty);
-
-    const note = document.createElement('p');
-    note.className = 'advanced-footnote';
-    note.textContent = 'El examen a ciegas oculta los resultados hasta el final. El progreso y los errores se guardan en este dispositivo.';
-    wrapper.appendChild(note);
-    renderModeList();
+    wrapper.appendChild(groupsBox);
     $('#mode-page-content').replaceChildren(wrapper);
     showView('modes');
-    requestAnimationFrame(renderModeList);
   }
 
   function syncBlockPickerLabel() {
@@ -8675,7 +8658,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
   /* ======================================================================
      INIT
      ====================================================================== */
-  /* ===== v2.9.2 · CARPETAS Y REPASO INMEDIATO ===== */
+  /* ===== v2.10.0 · CARPETAS Y REPASO INMEDIATO ===== */
   state.retype = { active: false };
   const RETYPE_TIMES = 2;
   function startRetype() {
@@ -8826,7 +8809,70 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
     return [back, ...sims.filter(c => folderIdOf(c.id) === f)];
   }
 
-  /* ===== v2.9.2 · GUARDADO AUTOMÁTICO DE LA SESIÓN ===== */
+  /* ===== v2.10.0 · EXAMEN A CIEGAS CON NAVEGACIÓN ===== */
+  state.blind = { active: false, answers: [], evaluating: false };
+  function setupBlindUI() {
+    const on = Boolean(state.blind && state.blind.active && !state.blind.evaluating);
+    $('#view-practice').classList.toggle('is-blind', on);
+    $('#blind-actions').classList.toggle('hidden', !on);
+    const strip = $('#blind-strip');
+    if (!on) { strip.classList.add('hidden'); return; }
+    el.btnSubmit.classList.add('hidden'); el.btnNext.classList.add('hidden');
+    $('#bl-prev').disabled = state.index === 0;
+    $('#bl-next').textContent = state.index === state.queue.length - 1 ? 'Terminar examen ✓' : 'Siguiente →';
+    if (state.queue.length <= 80) {
+      strip.classList.remove('hidden'); strip.replaceChildren();
+      state.queue.forEach((_, i) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'bl-dot' + (i === state.index ? ' is-current' : '') + (String(state.blind.answers[i] || '').trim() ? ' is-done' : '');
+        b.textContent = String(i + 1);
+        b.setAttribute('aria-label', `Ir a la pregunta ${i + 1}`);
+        b.addEventListener('click', () => blindGo(i));
+        strip.appendChild(b);
+      });
+    } else strip.classList.add('hidden');
+  }
+  function blindGo(i) {
+    state.blind.answers[state.index] = el.input.value;
+    state.index = Math.max(0, Math.min(state.queue.length - 1, i));
+    renderCurrent();
+  }
+  function blindStep(d) {
+    if (!state.blind || !state.blind.active) return;
+    if (d > 0 && state.index >= state.queue.length - 1) { blindFinish(); return; }
+    blindGo(state.index + d);
+  }
+  function blindFinish() {
+    const b = state.blind;
+    b.answers[state.index] = el.input.value;
+    const missing = state.queue.filter((_, i) => !String(b.answers[i] || '').trim()).length;
+    if (missing && !confirm(`Te faltan ${missing} sin responder y contarán como incorrectas. ¿Terminar el examen?`)) return;
+    b.evaluating = true;
+    clearCardTimers();
+    state.results = []; state.streak = 0;
+    for (let i = 0; i < state.queue.length; i++) {
+      state.index = i; state.answered = false; state.usedHint = false;
+      const ans = String(b.answers[i] || '');
+      el.input.value = ans; el.input.disabled = false; el.input.className = 'answer-input';
+      submitAnswer(!ans.trim());
+    }
+    b.evaluating = false; b.active = false;
+    state.index = state.queue.length;
+    finishSession();
+  }
+  $('#bl-prev').addEventListener('click', () => blindStep(-1));
+  $('#bl-next').addEventListener('click', () => blindStep(1));
+  el.input.addEventListener('input', () => {
+    if (state.blind && state.blind.active && !state.blind.evaluating) {
+      state.blind.answers[state.index] = el.input.value;
+      clearTimeout(state.blindSaveT); state.blindSaveT = setTimeout(() => saveSession(false), 400);
+      const dot = $$('#blind-strip .bl-dot')[state.index];
+      if (dot) dot.classList.toggle('is-done', Boolean(el.input.value.trim()));
+    }
+  });
+
+  /* ===== v2.10.0 · GUARDADO AUTOMÁTICO DE LA SESIÓN ===== */
   const SESSION_KEY = 'vocabPractice.session.v1';
   function saveSession(answered) {
     if (!state.queue.length || !views.practice.classList.contains('is-active')) return;
@@ -8837,6 +8883,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
         failuresRepeated: state.failuresRepeated, sm: state.sm,
         queue: state.queue.map(e => ({ u: e.item.uid, d: e.direction, c: e.claimed ? 1 : 0, t: e.usedText || '' })),
         results: state.results.map(r => ({ u: r.item.uid, d: r.direction, s: r.status, a: r.userAnswer || '', e: r.expectedAnswer || '', h: r.usedHint ? 1 : 0, o: r.otherBlock || '' })),
+        bl: state.blind && state.blind.active ? state.blind.answers : null,
         content: state.sessionContentItems.map(i => i.uid)
       }));
     } catch { /* sin espacio: la sesión simplemente no se guarda */ }
@@ -8871,6 +8918,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
     state.lastCategory = state.categoryMode;
     state.failuresRepeated = Boolean(sv.failuresRepeated);
     state.sm = sv.sm || { up: 0, down: 0, newMastered: 0 };
+    state.blind = { active: Boolean(sv.bl), answers: sv.bl || [], evaluating: false };
     state.sessionContentItems = (sv.content || []).map(u => QUESTION_BY_UID.get(u)).filter(Boolean);
     state.allowCurrentScope = false; state.answered = false; state.usedHint = false;
     showView('practice');
@@ -8908,7 +8956,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
     }
   }, 700);
 
-  /* ===== v2.9.2 · DOMINIO, SESIÓN INTELIGENTE, OPCIÓN MÚLTIPLE, XP ===== */
+  /* ===== v2.10.0 · DOMINIO, SESIÓN INTELIGENTE, OPCIÓN MÚLTIPLE, XP ===== */
   state.mc = { active: false, correct: '', chosen: null, forceWrong: false };
   state.sm = { up: 0, down: 0, newMastered: 0 };
   state.fcMarks = new Map();
