@@ -2718,10 +2718,6 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
 @media (max-width: 760px) { .mode-card-grid { grid-template-columns: 1fr; } .mode-controls { grid-template-columns: 1fr; } }
 #view-practice.is-blind .word-meta, #view-practice.is-blind #flag-repeat, #view-practice.is-blind #flag-history, #view-practice.is-blind #shortcuts { display: none !important; }
 .blind-actions { display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; }
-.blind-strip { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; }
-.bl-dot { min-width: 30px; height: 30px; padding: 0 6px; border-radius: 9px; border: 1px solid var(--border); background: var(--surface-2); color: var(--muted); font-size: .72rem; font-weight: 850; font-variant-numeric: tabular-nums; }
-.bl-dot.is-done { background: var(--primary-soft); color: var(--primary); border-color: color-mix(in srgb, var(--primary) 35%, var(--border)); }
-.bl-dot.is-current { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
 
 /* ===== v2.10.1 · MODOS COMO FILTRO ===== */
 .mode-filter-panel { display: grid; gap: 12px; max-width: 760px; margin: 0 auto; width: 100%; padding: 18px; border: 1px solid color-mix(in srgb, var(--primary) 15%, var(--border)); border-radius: 18px; background: linear-gradient(145deg, color-mix(in srgb, var(--surface-solid) 94%, var(--primary-soft)), var(--surface-solid) 62%); box-shadow: 0 10px 30px rgba(64,55,130,.07); }
@@ -3037,7 +3033,6 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
         <div class="answer-actions-outside" aria-label="Acciones de respuesta">
           <button id="btn-submit" class="btn btn-primary btn-lg" type="button">Comprobar</button>
           <button id="btn-next" class="btn btn-primary btn-lg hidden" type="button">Siguiente &rarr;</button>
-          <div id="blind-strip" class="blind-strip hidden" aria-label="Preguntas del examen"></div>
           <div id="blind-actions" class="blind-actions hidden">
             <button id="bl-prev" class="btn btn-secondary btn-lg" type="button" title="Anterior (←)" aria-label="Pregunta anterior">←</button>
             <button id="bl-next" class="btn btn-primary btn-lg" type="button" title="Siguiente (→)" aria-label="Pregunta siguiente">→</button>
@@ -7914,7 +7909,9 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
     if (weighting) items = prioritizeItems(items, weighting);
     else items = shuffle(items);
 
-    let sizeChoice = mode.config.sizeOverride || settings.size || '30';
+    // Examen a ciegas debe cubrir por defecto todo el contenido elegido.
+    // Los demás modos conservan su límite habitual de 30 si no se especifica otro.
+    let sizeChoice = mode.config.sizeOverride || settings.size || (modeId === 'blind' ? 'all' : '30');
     if (sizeChoice === 'all' || sizeChoice === 'Todo el conjunto') sizeChoice = items.length;
     const size = Math.max(1, Number(sizeChoice) || 30);
     if (items.length > size) items = items.slice(0, size);
@@ -7979,7 +7976,7 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
 
     // Filtro 3 y 4 · cantidad y dirección
     const size = document.createElement('select'); size.id = 'v2-size';
-    [['all', 'Todas las disponibles'], ['10', '10'], ['20', '20'], ['30', '30'], ['60', '60']].forEach(([v, t]) => { const o = document.createElement('option'); o.value = v; o.textContent = t; size.appendChild(o); });
+    [['all', 'Todas las disponibles'], ['10', '10'], ['20', '20'], ['30', '30'], ['60', '60'], ['100', '100'], ['150', '150']].forEach(([v, t]) => { const o = document.createElement('option'); o.value = v; o.textContent = t; size.appendChild(o); });
     size.value = 'all';
     const dir = document.createElement('select'); dir.id = 'v2-direction';
     [['EN-ES', 'Inglés → español'], ['ES-EN', 'Español → inglés'], ['MIX', 'Mezcla aleatoria']].forEach(([v, t]) => { const o = document.createElement('option'); o.value = v; o.textContent = t; dir.appendChild(o); });
@@ -8789,23 +8786,13 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
     const on = Boolean(state.blind && state.blind.active && !state.blind.evaluating);
     $('#view-practice').classList.toggle('is-blind', on);
     $('#blind-actions').classList.toggle('hidden', !on);
-    const strip = $('#blind-strip');
-    if (!on) { strip.classList.add('hidden'); return; }
+    if (!on) return;
     el.btnSubmit.classList.add('hidden'); el.btnNext.classList.add('hidden');
     $('#bl-prev').disabled = state.index === 0;
-    $('#bl-next').textContent = state.index === state.queue.length - 1 ? 'Terminar ✓' : '→';
-    if (false) {
-      strip.classList.remove('hidden'); strip.replaceChildren();
-      state.queue.forEach((_, i) => {
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'bl-dot' + (i === state.index ? ' is-current' : '') + (String(state.blind.answers[i] || '').trim() ? ' is-done' : '');
-        b.textContent = String(i + 1);
-        b.setAttribute('aria-label', `Ir a la pregunta ${i + 1}`);
-        b.addEventListener('click', () => blindGo(i));
-        strip.appendChild(b);
-      });
-    } else strip.classList.add('hidden');
+    const nextButton = $('#bl-next');
+    const isLastQuestion = state.index === state.queue.length - 1;
+    nextButton.textContent = isLastQuestion ? 'Terminar ✓' : '→';
+    nextButton.setAttribute('aria-label', isLastQuestion ? 'Terminar y corregir el examen' : 'Siguiente pregunta');
   }
   function blindGo(i) {
     state.blind.answers[state.index] = el.input.value;
@@ -8857,8 +8844,6 @@ body.is-retype .app { box-shadow: 0 24px 72px rgba(180,83,9,.14), 0 0 72px rgba(
     if (state.blind && state.blind.active && !state.blind.evaluating) {
       state.blind.answers[state.index] = el.input.value;
       clearTimeout(state.blindSaveT); state.blindSaveT = setTimeout(() => saveSession(false), 400);
-      const dot = $$('#blind-strip .bl-dot')[state.index];
-      if (dot) dot.classList.toggle('is-done', Boolean(el.input.value.trim()));
     }
   });
 
